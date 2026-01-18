@@ -12,7 +12,7 @@ Before running the INIT prompt, clone SpecFlow into your project:
 cd your-project
 
 # Clone the framework
-git clone https://github.com/youruser/specflow .specflow
+git clone https://github.com/jurebordon/specflow .specflow
 
 # Add to gitignore (framework is optional tooling, not a dependency)
 echo ".specflow/" >> .gitignore
@@ -38,7 +38,7 @@ If YES: Read these reference files to understand the templates:
 - .specflow/configuration/SETUP_QUESTIONS.md
 
 If NO: Ask the user to run:
-  git clone https://github.com/youruser/specflow .specflow
+  git clone https://github.com/jurebordon/specflow .specflow
   echo ".specflow/" >> .gitignore
 
 Then continue.
@@ -244,7 +244,7 @@ Conditional blocks use Handlebars syntax:
 ```bash
 # 1. Clone SpecFlow into your project
 cd my-project
-git clone https://github.com/youruser/specflow .specflow
+git clone https://github.com/jurebordon/specflow .specflow
 echo ".specflow/" >> .gitignore
 
 # 2. Start Claude Code

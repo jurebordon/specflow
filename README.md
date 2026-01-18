@@ -26,7 +26,7 @@ SpecFlow solves this with:
 cd your-project
 
 # Clone the framework
-git clone https://github.com/youruser/specflow .specflow
+git clone https://github.com/jurebordon/specflow .specflow
 
 # Add to gitignore (it's tooling, not a dependency)
 echo ".specflow/" >> .gitignore

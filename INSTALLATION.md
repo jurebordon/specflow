@@ -10,7 +10,7 @@ SpecFlow is installed as a gitignored clone within your project. This keeps temp
 cd your-project
 
 # Clone SpecFlow
-git clone https://github.com/youruser/specflow .specflow
+git clone https://github.com/jurebordon/specflow .specflow
 
 # Add to gitignore
 echo ".specflow/" >> .gitignore
@@ -109,7 +109,7 @@ When a team member clones your project:
 1. They clone your project (`.specflow/` is gitignored, so not included)
 2. They run the install command:
    ```bash
-   git clone https://github.com/youruser/specflow .specflow
+   git clone https://github.com/jurebordon/specflow .specflow
    ```
 3. They can now use the same session commands
 
@@ -123,7 +123,7 @@ If you prefer a single SpecFlow installation:
 
 ```bash
 # Clone once to a global location
-git clone https://github.com/youruser/specflow ~/.specflow
+git clone https://github.com/jurebordon/specflow ~/.specflow
 
 # In each project, symlink or reference it
 ln -s ~/.specflow .specflow
