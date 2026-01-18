@@ -1,0 +1,64 @@
+# Feature: {{FEATURE_NAME}}
+
+## Ticket
+- {{TICKET_SYSTEM}}: {{TICKET_ID}}
+{{#if MR_LINK}}
+- MR/PR: {{MR_LINK}}
+{{/if}}
+
+## Overview
+
+{{FEATURE_DESCRIPTION}}
+
+## Requirements
+
+{{#each REQUIREMENTS}}
+- {{this}}
+{{/each}}
+
+## Dependencies
+
+### Upstream (this feature depends on)
+{{#each UPSTREAM_DEPS}}
+- {{this}}
+{{/each}}
+{{#unless UPSTREAM_DEPS}}
+- TODO: Identify upstream dependencies
+{{/unless}}
+
+### Downstream (will consume this feature)
+{{#each DOWNSTREAM_DEPS}}
+- {{this}}
+{{/each}}
+{{#unless DOWNSTREAM_DEPS}}
+- TODO: Identify downstream consumers
+{{/unless}}
+
+## Success Criteria
+
+{{#each SUCCESS_CRITERIA}}
+- [ ] {{this}}
+{{/each}}
+{{#unless SUCCESS_CRITERIA}}
+- [ ] TODO: Define success criteria
+{{/unless}}
+
+## Open Questions
+
+{{#each OPEN_QUESTIONS}}
+- [ ] {{this}}
+{{/each}}
+{{#unless OPEN_QUESTIONS}}
+- None currently
+{{/unless}}
+
+## Decisions Made
+
+<!-- Append decisions here as they're made -->
+<!-- Format: - YYYY-MM-DD: [Decision] - [Rationale] -->
+
+---
+
+## Notes
+
+<!-- Any additional context, links, or references -->

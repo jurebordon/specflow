@@ -1,0 +1,147 @@
+# Development Workflow
+
+> How to work on this repository - for humans and AI assistants.
+
+## Documentation Layers
+
+| Layer | Documents | Change Frequency |
+|-------|-----------|------------------|
+| **Strategic** | VISION.md, ADR.md | Rarely (pivots, major decisions) |
+| **Tactical** | OVERVIEW.md, ROADMAP.md, WORKFLOW.md | Per milestone/feature |
+| **Operational** | SESSION_LOG.md, .ai/agents/* | Every session |
+| **Frozen** | docs/frozen/* | Never (historical baseline) |
+
+## Session Lifecycle
+
+### Before Starting Work
+
+- [ ] Read `ROADMAP.md` - pick ONE task from Now/Next
+- [ ] Read last 3 entries in `SESSION_LOG.md`
+- [ ] Check `ADR.md` for relevant decisions
+- [ ] Run `/plan-session` or read the plan prompt
+
+### During Work
+
+- [ ] Create feature branch: `{{GIT_BRANCH_CONVENTION}}`
+- [ ] Stay within scope of chosen task
+- [ ] Commit frequently with clear messages
+- [ ] Note any decisions made for later documentation
+
+### After Work
+
+- [ ] Run tests: `{{TEST_COMMAND}}`
+- [ ] Update `ROADMAP.md` (mark done, adjust Next)
+- [ ] Append entry to `SESSION_LOG.md`
+- [ ] If architecture changed: update `OVERVIEW.md` and/or `ADR.md`
+- [ ] {{GIT_MERGE_INSTRUCTION}}
+
+## Git Workflow
+
+{{#if GIT_WORKFLOW_SOLO}}
+### Solo Developer Flow
+
+```
+main ←── feature/branch
+         └── merge when tests pass
+```
+
+- Branch from main: `git checkout -b type/description`
+- Work and commit on branch
+- When done: `./scripts/merge-to-main.sh` or merge manually
+- Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`
+{{/if}}
+
+{{#if GIT_WORKFLOW_PR}}
+### PR Review Flow
+
+```
+main ←── PR ←── feature/branch
+         └── requires review
+```
+
+- Branch from main: `git checkout -b type/description`
+- Work and commit on branch
+- When done: create PR via `gh pr create` or platform UI
+- Do NOT merge locally - wait for review
+- Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`
+{{/if}}
+
+{{#if GIT_WORKFLOW_CICD}}
+### CI/CD Gated Flow
+
+```
+main ←── CI/CD ←── MR ←── feature/branch
+                   └── automated merge on approval
+```
+
+- Branch from main: `git checkout -b type/description`
+- Work and commit on branch
+- When done: create MR via `{{MR_COMMAND}}`
+- Do NOT merge locally - CI/CD handles merge
+- Branch naming: {{GIT_BRANCH_CONVENTION}}
+{{/if}}
+
+## Documentation Update Rules
+
+### Always Update (every session)
+
+- `SESSION_LOG.md` - Prepend new entry with session summary
+
+### Update When Changed
+
+| Document | Update When |
+|----------|-------------|
+| `ROADMAP.md` | Tasks complete, priorities change |
+| `OVERVIEW.md` | System architecture changes |
+| `ADR.md` | Significant technical decision made (append only) |
+| `VISION.md` | Product direction pivots |
+| `WORKFLOW.md` | Process changes |
+
+### Never Update
+
+- `docs/frozen/PRD_V0.md` - Historical baseline
+- `docs/frozen/TECH_SPEC_V0.md` - Historical baseline
+
+## Metrics Policy
+
+**No manual metrics.** Do not track:
+- Test counts
+- Coverage percentages
+- Lines of code
+- Velocity numbers
+
+If metrics are needed, they must be:
+- Generated automatically by CI/scripts
+- Stored in auto-generated artifacts (not hand-edited docs)
+
+## Session Commands
+
+| Command | When to Use |
+|---------|-------------|
+| `/plan-session` | Before starting work |
+| `/start-session` | Beginning implementation |
+| `/end-session` | Wrapping up, merging |
+| `/pivot-session` | Reassessing direction |
+
+Commands are in `.claude/commands/`.
+
+## Quick Reference
+
+```bash
+# Start work
+git checkout main && git pull
+git checkout -b feat/my-feature
+# ... code ...
+
+# End work
+{{TEST_COMMAND}}
+git add . && git commit -m "feat: description"
+{{GIT_MERGE_INSTRUCTION}}
+```
+
+## Getting Help
+
+- Architecture questions → Check `ADR.md`, then ask
+- Current priorities → Check `ROADMAP.md`
+- Recent context → Check `SESSION_LOG.md`
+- System understanding → Check `OVERVIEW.md`

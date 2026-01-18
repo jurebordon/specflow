@@ -1,0 +1,65 @@
+# Roadmap
+
+**Last Updated**: {{CURRENT_DATE}}
+**Current Phase**: {{CURRENT_PHASE}}
+
+## Now (Current Work)
+
+<!-- ONE task in progress at a time -->
+- [ ] {{CURRENT_TASK}}
+
+## Next (Queued)
+
+<!-- Priority ordered - top item is next -->
+{{#each NEXT_TASKS}}
+{{@index}}. {{this}}
+{{/each}}
+
+{{#unless NEXT_TASKS}}
+1. TODO: Define next priority
+2. TODO: Define following priority
+{{/unless}}
+
+## Later (Backlog)
+
+<!-- Ideas and future work, not prioritized -->
+{{#each BACKLOG}}
+- {{this}}
+{{/each}}
+
+{{#unless BACKLOG}}
+- TODO: Add backlog items as they emerge
+{{/unless}}
+
+## Done (Recent)
+
+<!-- Recently completed, for context -->
+{{#each DONE}}
+- [x] {{this.task}} ({{this.date}})
+{{/each}}
+
+{{#unless DONE}}
+- None yet (fresh project)
+{{/unless}}
+
+## Blockers
+
+<!-- Anything preventing progress -->
+{{#each BLOCKERS}}
+- **{{this.id}}**: {{this.description}}
+  - Impact: {{this.impact}}
+  - Potential resolution: {{this.resolution}}
+{{/each}}
+
+{{#unless BLOCKERS}}
+- None
+{{/unless}}
+
+---
+
+## Notes
+
+- Tasks should be small enough to complete in 1-2 sessions
+- Move items between sections as priorities change
+- Add blockers immediately when encountered
+- Reference tasks by ID in SESSION_LOG entries

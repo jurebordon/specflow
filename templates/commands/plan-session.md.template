@@ -1,0 +1,50 @@
+# Plan Session
+
+{{#if FEATURE_NAME}}
+## Feature Mode: {{FEATURE_NAME}}
+
+Read feature-specific context:
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md - feature requirements (north star)
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md - current tasks
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md (last 2-3 entries) - recent work
+
+Also read project context:
+- CLAUDE.md - project overview
+- {{DOCS_PATH}}/OVERVIEW.md - system understanding (if needed)
+
+Create a session plan for this feature:
+
+1. **Feature**: {{FEATURE_NAME}}
+2. **Session Goal**: ONE task from feature ROADMAP (pick from Now, or top of Next)
+3. **Implementation Steps**: Concrete actions to complete the task
+4. **Files Likely to Change**: Based on task scope
+5. **Success Criteria**: How we'll know it's done
+6. **Questions/Blockers**: Anything unclear before starting
+
+{{else}}
+## Project Mode
+
+Read CLAUDE.md to get project context.
+
+Then check the current state:
+- {{DOCS_PATH}}/ROADMAP.md - for current and upcoming tasks
+- {{DOCS_PATH}}/SESSION_LOG.md (last 3 entries) - for recent context
+- {{DOCS_PATH}}/OVERVIEW.md - for system understanding
+- {{DOCS_PATH}}/ADR.md - for relevant decisions
+
+**Note**: If you're working on a specific feature, use `/plan-session --feature <name>` instead.
+
+Create a session plan including:
+
+1. **Session Goal**: ONE task from ROADMAP (pick from Now, or top of Next)
+2. **Implementation Steps**: Concrete actions to complete the task
+3. **Files Likely to Change**: Based on task scope
+4. **Success Criteria**: How we'll know it's done
+5. **Questions/Blockers**: Anything unclear before starting
+{{/if}}
+
+{{#if TICKETING}}
+If the task references a ticket ({{TICKET_FORMAT}}), include ticket context.
+{{/if}}
+
+Do NOT start implementing. Present the plan and wait for approval.

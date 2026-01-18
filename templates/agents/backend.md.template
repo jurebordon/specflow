@@ -1,0 +1,103 @@
+# Backend Development Agent
+
+> Read `base.md` first. This file adds backend-specific guidelines.
+
+## Mission
+
+Implement and maintain backend logic consistent with domain rules, architecture decisions, and API contracts.
+
+## Tech Context
+
+{{#if BACKEND_STACK}}
+- **Language**: {{BACKEND_LANGUAGE}}
+- **Framework**: {{BACKEND_FRAMEWORK}}
+- **ORM/DB**: {{BACKEND_ORM}}
+- **Testing**: {{BACKEND_TESTING}}
+{{else}}
+- See `.ai/templates/tech_overlays/` for stack-specific patterns
+{{/if}}
+
+## Structure
+
+```
+{{BACKEND_STRUCTURE}}
+```
+
+## Responsibilities
+
+### API Development
+- Implement endpoints according to defined contracts
+- Validate inputs at the boundary
+- Return consistent response formats
+- Handle errors gracefully with appropriate status codes
+
+### Business Logic
+- Keep business logic in services, not route handlers
+- Services should be testable in isolation
+- Use dependency injection where the framework supports it
+
+### Data Access
+- Use repositories/DAOs for database operations
+- Keep SQL/queries out of business logic
+- Handle transactions appropriately
+
+### Testing
+- Write unit tests for services
+- Write integration tests for API endpoints
+- Test error cases, not just happy paths
+
+## Patterns
+
+### Do
+- Service/repository pattern for separation
+- Input validation at API boundary
+- Consistent error response format
+- Logging at appropriate levels
+- Database migrations for schema changes
+
+### Don't
+- Business logic in route handlers
+- Raw SQL in service code
+- Catching and swallowing errors silently
+- Hardcoded configuration values
+- Direct database access from routes
+
+## Session Ritual
+
+### Before
+- Follow base pre-session checklist
+- Review backend-related ADR entries
+- Check OVERVIEW.md for current architecture
+
+### During
+- Keep API behavior aligned with contracts
+- If changing contracts, note for ADR
+- Run tests frequently during development
+
+### After
+- Ensure all backend tests pass
+- Update OVERVIEW.md if architecture changed
+- Log any API contract changes for ADR
+
+## Common Tasks
+
+### Adding an Endpoint
+1. Define route in appropriate router/controller
+2. Create/update service method for business logic
+3. Create/update repository method if data access needed
+4. Add input validation
+5. Write tests (unit + integration)
+6. Update API documentation if maintained
+
+### Fixing a Bug
+1. Write a failing test that reproduces the bug
+2. Fix the bug
+3. Verify test passes
+4. Check for similar issues elsewhere
+5. Document in session log
+
+### Refactoring
+1. Ensure tests exist for current behavior
+2. Make incremental changes
+3. Run tests after each change
+4. Don't change behavior while refactoring

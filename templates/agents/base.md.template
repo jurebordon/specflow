@@ -1,0 +1,103 @@
+# AI Agent Base Instructions
+
+> Core behavior for all AI agents working on this project.
+> Role-specific agents extend this with additional guidelines.
+
+## Core Principles
+
+1. **Respect documentation hierarchy**
+   - Strategic docs (VISION, ADR) define boundaries
+   - Tactical docs (OVERVIEW, ROADMAP) define current state
+   - Operational docs (SESSION_LOG) track progress
+
+2. **Code is truth**
+   - When docs and code disagree, code is assumed correct
+   - Update docs to match reality, not vice versa
+
+3. **Ask, don't assume**
+   - When requirements are unclear, ask for clarification
+   - Never invent facts, metrics, or requirements
+   - Use TODO placeholders for genuinely unknown items
+
+4. **No manual metrics**
+   - Never maintain test counts, coverage, or LOC in docs
+   - Metrics must come from automation or not exist
+
+## Pre-Session Checklist
+
+Before starting any work:
+
+- [ ] Read `ROADMAP.md` and identify ONE task
+- [ ] Read last 3 entries in `SESSION_LOG.md`
+- [ ] Scan `ADR.md` for decisions affecting your work
+- [ ] Read role-specific agent guide if applicable
+
+If task or requirements are unclear:
+- Ask precise clarification questions before modifying code
+
+## During Session
+
+- Work only within the chosen task scope
+- Keep changes small and consistent with existing patterns
+- Commit frequently with clear messages
+- If architecture or contracts must change:
+  - Note it explicitly for ADR entry
+  - Don't make sweeping changes without discussion
+
+## Post-Session Checklist
+
+After completing work:
+
+- [ ] Run tests and verify they pass
+- [ ] Prepend session entry to `SESSION_LOG.md`
+- [ ] Update `ROADMAP.md`:
+  - Mark completed tasks as done
+  - Add new tasks only if clearly necessary
+  - Update blockers if any emerged
+- [ ] If significant decision was made:
+  - [ ] Draft or append ADR entry
+  - [ ] Update `OVERVIEW.md` if architecture changed
+
+## Handling Documentation Drift
+
+When you detect inconsistency:
+
+1. **Flag it** - Don't silently ignore
+2. **Identify truth** - Code is usually correct
+3. **Propose fix** - Suggest specific doc updates
+4. **Get confirmation** - For significant changes, ask user
+
+Examples of drift:
+- OVERVIEW.md describes components that don't exist
+- ROADMAP.md shows tasks that are already done
+- ADR references deprecated approaches
+
+## Scope Discipline
+
+**Do:**
+- Complete the ONE task you selected
+- Make minimal necessary changes
+- Leave code better than you found it (within scope)
+
+**Don't:**
+- Fix unrelated issues you notice (log them instead)
+- Add features not in the task
+- Refactor beyond what's needed
+- Add "nice to have" improvements
+
+If you notice something that should be fixed:
+- Add it to ROADMAP.md backlog
+- Note it in session log
+- Don't fix it now unless it blocks your task
+
+## Communication
+
+When asking questions:
+- Be specific about what you need to know
+- Provide context for why you're asking
+- Offer options when possible
+
+When reporting:
+- Be concise but complete
+- Highlight decisions that need confirmation
+- Flag blockers immediately

@@ -1,0 +1,100 @@
+# System Overview
+
+> Living document describing what the system is *now*.
+
+## 1. What This Product Does
+
+{{PRODUCT_DESCRIPTION}}
+
+## 2. Core User Journeys
+
+{{#each USER_JOURNEYS}}
+- **{{this.id}}**: {{this.name}} - {{this.description}}
+{{/each}}
+
+{{#unless USER_JOURNEYS}}
+<!-- Define the main paths users take through the system -->
+- **UJ1**: TODO - Define first user journey
+- **UJ2**: TODO - Define second user journey
+{{/unless}}
+
+## 3. Architecture at 10,000 ft
+
+### Backend
+
+- **Stack**: {{BACKEND_STACK}}
+- **Structure**:
+  ```
+  {{BACKEND_STRUCTURE}}
+  ```
+- **Main modules**: {{BACKEND_MODULES}}
+
+### Frontend
+
+{{#if FRONTEND_STACK}}
+- **Stack**: {{FRONTEND_STACK}}
+- **Structure**:
+  ```
+  {{FRONTEND_STRUCTURE}}
+  ```
+{{else}}
+- Not applicable (API-only / CLI / etc.)
+{{/if}}
+
+### Data
+
+- **Primary database**: {{DATABASE}}
+- **Key entities**: {{KEY_ENTITIES}}
+
+### Integrations
+
+{{#if INTEGRATIONS}}
+{{#each INTEGRATIONS}}
+- {{this.name}}: {{this.purpose}}
+{{/each}}
+{{else}}
+- None yet
+{{/if}}
+
+## 4. External Contracts
+
+### API
+
+{{#if API_SPEC_LOCATION}}
+- OpenAPI spec: `{{API_SPEC_LOCATION}}`
+{{else}}
+- TODO: Link to API specification
+{{/if}}
+
+### Events
+
+{{#if EVENT_SCHEMA_LOCATION}}
+- Event schemas: `{{EVENT_SCHEMA_LOCATION}}`
+{{else}}
+- Not applicable / TODO
+{{/if}}
+
+### Data
+
+{{#if DB_MIGRATIONS_LOCATION}}
+- Migrations: `{{DB_MIGRATIONS_LOCATION}}`
+{{else}}
+- TODO: Link to database schema / migrations
+{{/if}}
+
+## 5. Invariants
+
+> Rules that must always hold. Breaking these requires an ADR entry.
+
+{{#each INVARIANTS}}
+- {{this}}
+{{/each}}
+
+{{#unless INVARIANTS}}
+<!-- Examples:
+- Every entity must have an owner
+- IDs are immutable once created
+- All API endpoints require authentication
+-->
+- TODO: Define system invariants
+{{/unless}}

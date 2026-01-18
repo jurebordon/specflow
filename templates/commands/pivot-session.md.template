@@ -1,0 +1,126 @@
+# Pivot Session
+
+This is a pivot session to reassess project direction and realign documentation.
+
+## 1. Review Current State
+
+Read and assess these documents:
+
+**{{DOCS_PATH}}/ROADMAP.md**
+- Are tasks in "Now" actually current?
+- Is "Next" prioritized correctly?
+- Any stale items in "Later"?
+- Are blockers still relevant?
+
+**{{DOCS_PATH}}/SESSION_LOG.md** (last 5-10 entries)
+- Any patterns in recent work?
+- Recurring blockers?
+- Scope creep?
+
+**{{DOCS_PATH}}/VISION.md**
+- Is the stated direction still valid?
+- Have priorities shifted?
+
+**{{DOCS_PATH}}/OVERVIEW.md**
+- Does this match the actual system?
+- Any drift from reality?
+
+**{{DOCS_PATH}}/ADR.md**
+- Any decisions being ignored?
+- Any decisions that should be revisited?
+
+## 2. Identify Drift
+
+Report on:
+- What has changed since docs were last updated?
+- Where do docs not match reality?
+- What decisions have been implicitly made but not documented?
+
+## 3. Propose Updates
+
+For each issue identified, propose:
+- Which document needs updating
+- What specifically should change
+- Whether an ADR entry is needed
+
+**Wait for approval before making changes.**
+
+## 4. Update Strategic Docs (if approved)
+
+### VISION.md
+If product direction changed:
+- Update relevant sections
+- Add entry to Pivot History:
+```markdown
+- [DATE] [Brief description of pivot]
+  - [Why the change was made]
+```
+
+### ADR.md
+If technical direction changed:
+- Append new entry (never modify existing)
+- Include context, decision, and consequences
+
+## 5. Update Tactical Docs
+
+### ROADMAP.md
+- Remove completed or cancelled items from Now/Next
+- Reprioritize based on current reality
+- Update or remove stale blockers
+- Add any newly identified work
+
+### OVERVIEW.md
+- Update architecture if it changed
+- Update integrations if they changed
+- Ensure invariants are still accurate
+
+### WORKFLOW.md
+- Update if process changed
+- Update if git workflow changed
+
+## 6. Update Operational Docs (if needed)
+
+### .claude/commands/
+Regenerate if:
+- Tech stack changed
+- Git workflow changed
+- Integrations changed
+
+### .ai/agents/
+Update if:
+- Patterns changed
+- New conventions established
+- Roles changed
+
+## 7. Document the Pivot
+
+Add to {{DOCS_PATH}}/SESSION_LOG.md:
+```markdown
+## Session: [DATE] (Pivot)
+
+**Type**: Pivot session
+**Trigger**: [Why this pivot was needed]
+
+### Changes Made
+- [List of documents updated]
+- [Key changes in each]
+
+### Decisions Made
+- [Any decisions that were made]
+
+### Impact
+- [How this affects upcoming work]
+
+### Next
+- [Recommended next steps]
+
+---
+```
+
+## 8. Summary
+
+Provide:
+- What was reviewed
+- What was updated
+- Key decisions made
+- Recommended next action

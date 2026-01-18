@@ -1,0 +1,59 @@
+# Roadmap: {{FEATURE_NAME}}
+
+**Ticket**: {{TICKET_ID}}
+{{#if MR_LINK}}
+**MR/PR**: {{MR_LINK}}
+{{/if}}
+**Branch**: {{BRANCH_NAME}}
+**Last Updated**: {{DATE}}
+
+## Now
+
+<!-- Current task - should be ONE item -->
+- [ ] {{CURRENT_TASK}}
+
+## Next
+
+<!-- Priority ordered - top item is next after current -->
+{{#each NEXT_TASKS}}
+{{@index}}. {{this}}
+{{/each}}
+{{#unless NEXT_TASKS}}
+1. TODO: Define next tasks
+{{/unless}}
+
+## Later
+
+<!-- Future enhancements, nice-to-haves -->
+{{#each LATER_TASKS}}
+- {{this}}
+{{/each}}
+{{#unless LATER_TASKS}}
+- TODO: Add backlog items as they emerge
+{{/unless}}
+
+## Done
+
+<!-- Completed tasks with dates -->
+- [x] Feature documentation created ({{DATE}})
+
+## Blockers
+
+<!-- Anything preventing progress -->
+{{#each BLOCKERS}}
+- **{{this.id}}**: {{this.description}}
+{{/each}}
+{{#unless BLOCKERS}}
+- None
+{{/unless}}
+
+---
+
+## Feature Completion Checklist
+
+When this feature is done:
+- [ ] All tasks in "Done"
+- [ ] Success criteria met (see SPEC.md)
+- [ ] Final SESSION_LOG entry added
+- [ ] Project ADR.md updated (if decisions made)
+- [ ] Project OVERVIEW.md updated (if architecture changed)

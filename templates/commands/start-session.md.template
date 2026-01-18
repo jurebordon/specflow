@@ -1,0 +1,60 @@
+# Start Session
+
+The session plan has been approved. Begin implementation.
+
+## 1. Verify Environment
+
+Run baseline checks:
+```bash
+{{TEST_COMMAND}}
+```
+
+Check for uncommitted changes:
+```bash
+git status
+```
+
+If tests fail or uncommitted changes exist, resolve before proceeding.
+
+## 2. Create Feature Branch
+
+```bash
+git checkout {{DEFAULT_BRANCH}} && git pull origin {{DEFAULT_BRANCH}}
+git checkout -b {{BRANCH_CONVENTION}}/[description]
+```
+
+Branch naming: `{{BRANCH_CONVENTION}}/short-description`
+Examples: `feat/user-auth`, `fix/login-bug`, `refactor/api-cleanup`
+
+{{#if TICKETING}}
+Include ticket reference: `{{BRANCH_CONVENTION}}/{{TICKET_FORMAT}}-description`
+{{/if}}
+
+## 3. Determine Role
+
+Based on the task, read the appropriate agent guide:
+- Backend work → `.ai/agents/backend.md`
+{{#if HAS_FRONTEND}}
+- Frontend work → `.ai/agents/frontend.md`
+{{/if}}
+- Testing focus → `.ai/agents/qa.md`
+- Architecture decisions → `.ai/agents/architecture.md`
+
+## 4. Begin Implementation
+
+- Mark the task as in_progress in your tracking
+- Follow the session plan step by step
+- Commit frequently with clear messages
+- Note any decisions or blockers as you encounter them
+
+**Commit convention**: `{{COMMIT_CONVENTION}}`
+{{#if TICKETING}}
+Include ticket reference in commits: `{{TICKET_FORMAT}}`
+{{/if}}
+
+## Guidelines
+
+- Stay within scope - one task, one session
+- Commit after each logical chunk of work
+- If blocked, document it and consider ending session early
+- Don't create backup files - git is your safety net

@@ -1,0 +1,112 @@
+# Frontend Development Agent
+
+> Read `base.md` first. This file adds frontend-specific guidelines.
+
+## Mission
+
+Implement and maintain user interfaces that are accessible, performant, and consistent with design patterns.
+
+## Tech Context
+
+{{#if FRONTEND_STACK}}
+- **Framework**: {{FRONTEND_FRAMEWORK}}
+- **Language**: {{FRONTEND_LANGUAGE}}
+- **Styling**: {{FRONTEND_STYLING}}
+- **State Management**: {{FRONTEND_STATE}}
+- **Testing**: {{FRONTEND_TESTING}}
+{{else}}
+- See `.ai/templates/tech_overlays/` for stack-specific patterns
+{{/if}}
+
+## Structure
+
+```
+{{FRONTEND_STRUCTURE}}
+```
+
+## Responsibilities
+
+### Component Development
+- Build reusable, composable components
+- Keep components focused (single responsibility)
+- Handle loading and error states
+- Ensure accessibility (ARIA, keyboard navigation)
+
+### State Management
+- Use appropriate state scope (local vs global)
+- Keep state normalized where practical
+- Handle async operations consistently
+
+### API Integration
+- Use consistent patterns for API calls
+- Handle loading, success, and error states
+- Implement appropriate caching if needed
+
+### Testing
+- Write unit tests for utility functions
+- Write component tests for UI behavior
+- Test user interactions, not implementation details
+
+## Patterns
+
+### Do
+- Component composition over inheritance
+- Consistent naming conventions
+- Accessible markup (semantic HTML, ARIA)
+- Responsive design considerations
+- Loading and error states for async operations
+
+### Don't
+- Business logic in components (extract to hooks/utils)
+- Inline styles for reusable patterns
+- Ignoring accessibility
+- Direct API calls in render logic
+- Prop drilling through many layers (use context/state management)
+
+## Session Ritual
+
+### Before
+- Follow base pre-session checklist
+- Review UI/UX related decisions in ADR
+- Check OVERVIEW.md for component architecture
+
+### During
+- Test in multiple viewports if relevant
+- Check accessibility with keyboard navigation
+- Verify loading and error states work
+
+### After
+- Ensure all frontend tests pass
+- Update OVERVIEW.md if component structure changed
+- Note any design pattern decisions for ADR
+
+## Common Tasks
+
+### Adding a Component
+1. Create component file in appropriate directory
+2. Implement with props interface
+3. Handle loading/error states if async
+4. Add accessibility attributes
+5. Write tests
+6. Export from index if using barrel exports
+
+### Adding a Page/Route
+1. Create page component
+2. Add route configuration
+3. Implement data fetching if needed
+4. Handle loading and error states
+5. Add tests
+6. Update navigation if needed
+
+### Fixing a UI Bug
+1. Identify the component with the issue
+2. Write a test that fails (if possible)
+3. Fix the issue
+4. Verify across relevant viewports/states
+5. Document in session log
+
+### Styling Changes
+1. Check if design tokens/variables exist for the values
+2. Prefer existing patterns over new ones
+3. Ensure responsive behavior
+4. Test in different themes if applicable (dark mode, etc.)

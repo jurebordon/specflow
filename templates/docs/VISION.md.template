@@ -1,0 +1,49 @@
+# Project Vision
+
+## 1. Problem Statement
+
+{{PROBLEM_STATEMENT}}
+
+## 2. Solution Hypothesis
+
+{{SOLUTION_HYPOTHESIS}}
+
+## 3. Target Users
+
+{{TARGET_USERS}}
+
+## 4. Success Metrics
+
+{{#if SUCCESS_METRICS}}
+{{#each SUCCESS_METRICS}}
+- {{this}}
+{{/each}}
+{{else}}
+<!-- Define qualitative or quantitative indicators of success. No invented numbers. -->
+- TODO: Define success metrics
+{{/if}}
+
+## 5. Non-Goals
+
+{{#if NON_GOALS}}
+{{#each NON_GOALS}}
+- {{this}}
+{{/each}}
+{{else}}
+<!-- Clarify what is explicitly out of scope. -->
+- TODO: Define non-goals
+{{/if}}
+
+## 6. Tech Stack
+
+- **Backend**: {{BACKEND_STACK}}
+- **Frontend**: {{FRONTEND_STACK}}
+- **Database**: {{DATABASE}}
+- **Infrastructure**: {{INFRASTRUCTURE}}
+
+## 7. Pivot History
+
+- {{CURRENT_DATE}} - Initial concept defined
+  - {{INITIAL_DIRECTION}}
+
+<!-- Append new entries when direction changes significantly -->

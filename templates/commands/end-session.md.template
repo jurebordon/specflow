@@ -1,0 +1,183 @@
+# End Session
+
+Implementation is complete. Wrap up the session.
+
+## 1. Run Tests
+
+Verify all tests pass:
+```bash
+{{TEST_COMMAND}}
+```
+
+If tests fail, fix them before proceeding.
+
+## 2. Update Documentation
+
+{{#if FEATURE_NAME}}
+### Feature Mode: {{FEATURE_NAME}}
+
+**{{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md**
+- Mark completed task as done (move to Done section with date)
+- Adjust Now/Next if priorities changed
+- Add any new blockers discovered
+
+**{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md**
+Prepend a new entry (see format below)
+
+**If feature is complete:**
+- Check all success criteria in SPEC.md
+- Update project {{DOCS_PATH}}/ADR.md if significant decisions were made
+- Update project {{DOCS_PATH}}/OVERVIEW.md if architecture changed
+- Consider moving feature to `{{DOCS_PATH}}/features/_completed/`
+
+{{else}}
+### Project Mode
+
+**{{DOCS_PATH}}/ROADMAP.md**
+- Mark completed task as done (move to Done section with date)
+- Adjust Now/Next if priorities changed
+- Add any new blockers discovered
+
+**{{DOCS_PATH}}/SESSION_LOG.md**
+Prepend a new entry:
+{{/if}}
+
+### Session Log Entry Format
+```markdown
+## Session: [TODAY'S DATE]
+
+**Role**: [backend/frontend/qa/architecture]
+**Task**: [Task from ROADMAP]
+**Branch**: {{BRANCH_CONVENTION}}/[branch-name]
+
+### Summary
+- [What was accomplished]
+
+### Files Changed
+- [List of files modified]
+
+### Decisions
+- [Any design decisions made]
+
+### Blockers
+- [Issues encountered, or "None"]
+
+### Next
+- [Suggested focus for next session]
+
+---
+```
+
+### Update If Changed:
+- `{{DOCS_PATH}}/OVERVIEW.md` - if architecture or system description changed
+- `{{DOCS_PATH}}/ADR.md` - if significant technical decision was made (append new entry)
+
+## 3. Final Commit
+
+Ensure all changes are committed:
+```bash
+git status
+git add .
+git commit -m "{{COMMIT_CONVENTION}}: [description]"
+```
+
+{{#if TICKETING}}
+Include ticket reference: `{{COMMIT_CONVENTION}}: [description] ({{TICKET_FORMAT}})`
+{{/if}}
+
+## 4. {{GIT_WORKFLOW_NAME}}
+
+{{#if GIT_WORKFLOW_SOLO}}
+### Merge to Main
+
+Option A - Use merge script (if available):
+```bash
+./scripts/merge-to-main.sh
+```
+
+Option B - Manual merge:
+```bash
+git checkout {{DEFAULT_BRANCH}}
+git pull origin {{DEFAULT_BRANCH}}
+git merge [branch-name]
+git push origin {{DEFAULT_BRANCH}}
+git branch -d [branch-name]
+```
+{{/if}}
+
+{{#if GIT_WORKFLOW_PR_GITHUB}}
+### Create Pull Request
+
+Push branch:
+```bash
+git push -u origin [branch-name]
+```
+
+Create PR:
+```bash
+gh pr create --title "{{COMMIT_CONVENTION}}: [description]" --body "## Summary
+- [what was done]
+
+## Test Plan
+- [how to verify]
+
+{{#if TICKETING}}
+## Related
+- Ticket: {{TICKET_FORMAT}}
+{{/if}}
+"
+```
+
+**Do NOT merge** - wait for review.
+{{/if}}
+
+{{#if GIT_WORKFLOW_PR_GITLAB}}
+### Create Merge Request
+
+Push branch:
+```bash
+git push -u origin [branch-name]
+```
+
+Create MR:
+```bash
+glab mr create --title "{{COMMIT_CONVENTION}}: [description]" --description "## Summary
+- [what was done]
+
+## Test Plan
+- [how to verify]
+"
+```
+
+**Do NOT merge** - wait for review and CI.
+{{/if}}
+
+{{#if GIT_WORKFLOW_CICD}}
+### Create Merge Request
+
+Push branch:
+```bash
+git push -u origin [branch-name]
+```
+
+Create MR:
+```bash
+{{MR_COMMAND}} --title "{{COMMIT_CONVENTION}}: [description]" --remove-source-branch
+```
+
+The CI/CD pipeline will handle merge after approval.
+
+Check status:
+```bash
+{{MR_STATUS_COMMAND}}
+```
+
+**Do NOT attempt local merge.**
+{{/if}}
+
+## 5. Session Summary
+
+Provide a brief summary:
+- What was accomplished this session
+- Any issues encountered and how they were resolved
+- Suggestions for next session (if applicable)

@@ -1,0 +1,38 @@
+# Session Log
+
+> Append-only journal of development sessions. Newest entries first.
+> Each session gets one entry - prepend new entries at the top.
+
+---
+
+<!--
+{{#if USES_WORKTREES}}
+## [{{FEATURE_NAME}}] YYYY-MM-DD
+{{else}}
+## Session: YYYY-MM-DD
+{{/if}}
+
+**Role**: backend / frontend / qa / architecture
+**Task**: [Task from ROADMAP.md]
+**Branch**: type/branch-name
+{{#if FEATURE_NAME}}**Feature**: {{FEATURE_NAME}}{{/if}}
+
+### Summary
+- What was accomplished
+
+### Files Changed
+- path/to/file
+
+### Decisions
+- Any design decisions (consider ADR if significant)
+
+### Blockers
+- Issues encountered (or "None")
+
+### Next
+- Suggested focus for next session
+
+---
+-->
+
+<!-- Prepend new session entries above this line -->

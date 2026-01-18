@@ -1,0 +1,81 @@
+# New Worktree
+
+You are setting up a git worktree for parallel feature development.
+
+## Step 1: Confirm Feature
+
+Ask: "What feature should this worktree be for?"
+
+If not already clear from context:
+- Feature name (kebab-case, e.g., `user-auth`, `api-v2`)
+- Brief description of the feature
+- Is there an existing branch, or should we create one?
+
+## Step 2: Verify Prerequisites
+
+Check current state:
+```bash
+# Ensure we're in the main worktree
+git worktree list
+
+# Ensure main is up to date
+git checkout {{DEFAULT_BRANCH}}
+git pull origin {{DEFAULT_BRANCH}}
+```
+
+## Step 3: Create Worktree
+
+```bash
+# Create worktree with new branch
+git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+
+# Or from existing branch
+git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+```
+
+Worktree location: `../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
+
+## Step 4: Initialize Feature Docs
+
+Navigate to worktree and set up feature documentation:
+
+```bash
+cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+```
+
+Then run `/new-feature` to create:
+- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md`
+- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md`
+- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md`
+
+## Step 5: Summarize
+
+Provide summary to user:
+
+```
+Worktree created for: {{FEATURE_NAME}}
+
+Location: ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+Branch: {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+
+To work on this feature:
+  cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+
+Then use:
+  /plan-session --feature {{FEATURE_NAME}}
+  /start-session --feature {{FEATURE_NAME}}
+
+To switch back to main:
+  cd ../{{PROJECT_NAME}}
+
+Other worktrees:
+  git worktree list
+```
+
+## Notes
+
+- Worktree directory is sibling to main repo (not inside it)
+- Each worktree has its own working directory but shares git history
+- Feature docs travel with the branch
+- Use `[feature-name] YYYY-MM-DD` format in SESSION_LOG to avoid merge conflicts
+- Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}`

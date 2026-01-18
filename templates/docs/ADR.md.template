@@ -1,0 +1,60 @@
+# Architecture Decision Record
+
+> Append-only log of significant architecture and design decisions.
+> Never modify existing entries - only append new ones.
+
+## ADR-0001: Initial Architecture and Tech Stack
+
+- **Date**: {{CURRENT_DATE}}
+- **Status**: Accepted
+
+### Context
+
+Project initialized from PRD and Tech Spec. Need to establish baseline architecture.
+
+### Decision
+
+- **Backend**: {{BACKEND_STACK}}
+- **Frontend**: {{FRONTEND_STACK}}
+- **Database**: {{DATABASE}}
+- **Infrastructure**: {{INFRASTRUCTURE}}
+
+### Consequences
+
+- Establishes baseline stack for all future work
+- Team should have familiarity with chosen technologies
+- Future ADRs will build on this foundation
+
+### Related
+
+- `docs/frozen/PRD_V0.md`
+- `docs/frozen/TECH_SPEC_V0.md`
+
+---
+
+<!--
+## ADR-XXXX: [Decision Title]
+
+- **Date**: YYYY-MM-DD
+- **Status**: Proposed / Accepted / Deprecated / Superseded by ADR-XXXX
+
+### Context
+
+[Why this decision is needed]
+
+### Decision
+
+[What was decided]
+
+### Consequences
+
+[What this means for the project]
+
+### Related
+
+[Links to related docs, code, or ADRs]
+
+---
+-->
+
+<!-- New ADRs must be appended below this line. Do not modify existing entries. -->

@@ -1,0 +1,118 @@
+# {{PROJECT_NAME}}
+
+> This file provides context for AI assistants working on this project.
+
+## Project Overview
+
+{{PROJECT_DESCRIPTION}}
+
+## Quick Context
+
+- **Type**: {{PROJECT_TYPE}} (greenfield / constrained / adoption)
+- **Stack**: {{TECH_STACK}}
+- **Git Workflow**: {{GIT_WORKFLOW}} (solo / pr-review / ci-cd-gated)
+
+## Documentation
+
+Read these before making changes:
+
+| Priority | Document | Purpose |
+|----------|----------|---------|
+| 1 | [ROADMAP.md]({{DOCS_PATH}}/ROADMAP.md) | Current tasks and priorities |
+| 2 | [SESSION_LOG.md]({{DOCS_PATH}}/SESSION_LOG.md) | Recent session history |
+| 3 | [OVERVIEW.md]({{DOCS_PATH}}/OVERVIEW.md) | System architecture |
+| 4 | [ADR.md]({{DOCS_PATH}}/ADR.md) | Architecture decisions |
+| 5 | [VISION.md]({{DOCS_PATH}}/VISION.md) | Product direction |
+
+{{#if DOCS_EXTERNAL}}
+> Note: Documentation is stored externally at `{{DOCS_EXTERNAL_PATH}}`
+{{/if}}
+
+## Session Commands
+
+Use these commands to structure your work:
+
+- `/plan-session` - Prepare for implementation
+- `/start-session` - Begin coding
+- `/end-session` - Wrap up and merge
+- `/pivot-session` - Reassess direction
+
+Commands are in `.claude/commands/`.
+
+## Key Patterns
+
+{{#if BACKEND_STACK}}
+### Backend ({{BACKEND_STACK}})
+- See `.ai/agents/backend.md` for patterns
+- Structure: {{BACKEND_STRUCTURE}}
+{{/if}}
+
+{{#if FRONTEND_STACK}}
+### Frontend ({{FRONTEND_STACK}})
+- See `.ai/agents/frontend.md` for patterns
+- Structure: {{FRONTEND_STRUCTURE}}
+{{/if}}
+
+## Invariants
+
+These rules must always hold:
+
+{{#each INVARIANTS}}
+- {{this}}
+{{/each}}
+
+## Git Workflow
+
+{{#if GIT_WORKFLOW_SOLO}}
+- Work on feature branches
+- Merge directly to main when tests pass
+- Use `./scripts/merge-to-main.sh` for clean merges
+{{/if}}
+
+{{#if GIT_WORKFLOW_PR}}
+- Work on feature branches
+- Create PR for review (don't merge directly)
+- Use `/end-session` to create PR
+{{/if}}
+
+{{#if GIT_WORKFLOW_CICD}}
+- Work on feature branches
+- Create MR and let CI/CD handle merge
+- Do not merge locally
+{{/if}}
+
+{{#if USES_WORKTREES}}
+## Parallel Development
+
+This project uses git worktrees for parallel feature development.
+
+**Suggest worktrees when:**
+- ROADMAP.md has 2+ independent "Now" items
+- Current work is blocked and another feature could progress
+- User wants to "park" current work temporarily
+
+**Session log format:** Use `## [feature-name] YYYY-MM-DD` to avoid merge conflicts.
+
+See [WORKTREES.md]({{DOCS_PATH}}/../configuration/WORKTREES.md) for workflow details.
+{{/if}}
+
+## Working Agreements
+
+1. **One task per session** - Don't mix unrelated changes
+2. **Update docs** - SESSION_LOG.md after every session, ROADMAP.md when tasks change
+3. **Ask when unclear** - Don't invent requirements
+4. **No manual metrics** - Automated or nothing
+{{#if USES_WORKTREES}}
+5. **Suggest parallel work** - When detecting independent tasks, offer worktree setup
+{{/if}}
+
+## Getting Started
+
+1. Run `/plan-session` to see current priorities
+2. Pick ONE task from ROADMAP.md
+3. Run `/start-session` to begin
+4. When done, run `/end-session`
+
+---
+
+*This project uses [SpecFlow](https://github.com/{{SPECFLOW_REPO}}) for AI-assisted development.*

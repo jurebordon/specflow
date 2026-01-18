@@ -1,0 +1,165 @@
+# New Feature Setup
+
+You are setting up documentation for a new feature in this project.
+
+## Step 1: Gather Context
+
+{{#if ALLOW_SCAN}}
+First, ask: "May I scan relevant parts of the codebase to understand the context for this feature?"
+
+If yes, scan:
+{{#if IS_DBT}}
+- `models/` directory structure
+- Relevant `schema.yml` files
+- Existing models that may be upstream/downstream
+{{else}}
+- Project structure
+- Relevant existing code
+- Related components/modules
+{{/if}}
+{{/if}}
+
+## Step 2: Understand the Feature
+
+Ask the user:
+
+1. **What is this feature?**
+   - Brief description of what we're building
+   - Why is it needed?
+
+2. **What are the requirements?**
+   - Key functionality
+   - Inputs and outputs
+   - Dependencies on existing code
+
+3. **What are the success criteria?**
+   - How will we know it's done?
+   - What tests or validations?
+
+4. **Is there a ticket or MR?**
+   - Ticket reference (e.g., DATA-123, JIRA-456)
+   - Existing MR/PR link
+   - Branch name to use
+
+If the user provides a spec document or ticket, use that information instead of asking.
+
+## Step 3: Create Feature Documentation
+
+Create the following files:
+
+### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md
+
+```markdown
+# Feature: {{FEATURE_NAME}}
+
+## Ticket
+- {{TICKET_SYSTEM}}: {{TICKET_ID}}
+- MR/PR: {{MR_LINK}}
+
+## Overview
+[Description of what this feature does and why]
+
+## Requirements
+[Key requirements gathered from user]
+
+## Dependencies
+### Upstream
+- [What this feature depends on]
+
+### Downstream
+- [What will consume this feature]
+
+## Success Criteria
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+- [ ] [Criterion 3]
+
+## Open Questions
+- [ ] [Any unresolved questions]
+
+## Decisions Made
+- [Date]: [Decision and rationale]
+```
+
+### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md
+
+```markdown
+# Roadmap: {{FEATURE_NAME}}
+
+**Ticket**: {{TICKET_ID}}
+**MR/PR**: {{MR_LINK}}
+**Branch**: {{BRANCH_NAME}}
+
+## Now
+- [ ] [First task to implement]
+
+## Next
+1. [Second priority task]
+2. [Third priority task]
+
+## Later
+- [Nice to have / future enhancement]
+
+## Done
+- [x] Feature documentation created ({{DATE}})
+
+## Blockers
+- None
+```
+
+### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md
+
+```markdown
+# Session Log: {{FEATURE_NAME}}
+
+> Append new sessions above this line, newest first.
+
+## Session: {{DATE}}
+
+**Task**: Feature setup
+**Branch**: {{BRANCH_NAME}}
+
+### Summary
+- Created feature specification
+- Created roadmap with initial tasks
+- Set up session logging
+
+### Files Changed
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md (new)
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md (new)
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md (new)
+
+### Next
+- Begin implementation of first task
+
+---
+```
+
+## Step 4: Summarize and Offer Next Steps
+
+After creating the files, provide a summary:
+
+```
+Feature documentation created for: {{FEATURE_NAME}}
+
+Files created:
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md (feature requirements)
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md (task tracking)
+- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md (session history)
+
+Linked to:
+- Ticket: {{TICKET_ID}}
+- Branch: {{BRANCH_NAME}}
+
+Next steps:
+1. Review SPEC.md and confirm requirements
+2. Run /plan-session --feature {{FEATURE_NAME}} to plan first task
+3. Run /start-session --feature {{FEATURE_NAME}} to begin work
+```
+
+## Notes
+
+- Feature name should be kebab-case (e.g., `customer-dimension`, `order-metrics`)
+- If no ticket provided, use branch name as primary identifier
+- Feature docs are self-contained - all context for this feature is in its folder
+- Project-level docs (ADR.md, OVERVIEW.md) are updated only when feature completes
