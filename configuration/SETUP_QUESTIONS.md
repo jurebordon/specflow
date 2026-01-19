@@ -214,6 +214,71 @@ The setup process uses these questions to generate appropriate documentation and
 
 ---
 
+## 7.5. Documentation Organization
+
+**Question**: How should documentation be organized?
+
+| Option | Description | Use Case |
+|--------|-------------|----------|
+| **Central (default)** | Single docs/ folder with all documentation | Simple projects, unified view |
+| **Per-Feature** | Each feature has docs/features/[name]/ with ROADMAP, SESSION_LOG | Large projects, feature isolation |
+
+### Key Differences
+
+**Central Documentation**:
+```
+docs/
+├── ROADMAP.md          # All features
+├── SESSION_LOG.md      # All sessions
+├── VISION.md
+├── OVERVIEW.md
+└── ADR.md
+```
+
+**Per-Feature Documentation**:
+```
+docs/
+├── VISION.md           # Project-wide
+├── OVERVIEW.md         # Project-wide
+├── ADR.md              # Project-wide
+└── features/
+    ├── user-auth/
+    │   ├── SPEC.md
+    │   ├── ROADMAP.md
+    │   └── SESSION_LOG.md
+    └── api-v2/
+        ├── SPEC.md
+        ├── ROADMAP.md
+        └── SESSION_LOG.md
+```
+
+### Important: Independent of Git Workflow
+
+Documentation organization is **separate** from worktree usage:
+
+| Docs Organization | Git Workflow | Behavior |
+|-------------------|--------------|----------|
+| Central | No worktrees | Single ROADMAP, no tags needed |
+| Central | With worktrees | Single ROADMAP, tasks tagged `[worktree: name]` |
+| Per-Feature | No worktrees | Feature ROADMAPs, switch with branches |
+| Per-Feature | With worktrees | Feature ROADMAPs, travel with worktree branches |
+
+**Central + Worktrees** requires task tagging:
+```markdown
+## Now
+- [ ] Fix authentication bug [worktree: auth-fix]
+- [ ] Add API v2 endpoints [worktree: api-v2]
+```
+
+**Per-Feature** doesn't need tags (docs are scoped to feature already).
+
+### Follow-up Questions
+
+**For Per-Feature**:
+- Should strategic docs (VISION, ADR) stay central? (recommended: yes)
+
+---
+
 ## 8. Agent Roles
 
 **Question**: Which AI agent roles are relevant?

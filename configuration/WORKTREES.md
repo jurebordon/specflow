@@ -85,15 +85,60 @@ The feature docs live in the worktree and travel with the branch.
 
 ---
 
+## Documentation Organization
+
+Worktrees work with **both** documentation organization styles:
+
+### Central Documentation + Worktrees
+
+Single `docs/` folder shared across all worktrees:
+- **ROADMAP.md**: One file with all tasks, tagged by worktree
+- **SESSION_LOG.md**: One file with all sessions, prefixed by worktree name
+
+**Task format in ROADMAP.md**:
+```markdown
+## Now
+- [ ] Fix authentication bug [worktree: auth-fix]
+- [ ] Add API v2 endpoints [worktree: api-v2]
+```
+
+**Session format in SESSION_LOG.md**:
+```markdown
+## [auth-fix] 2024-01-15
+
+**Task**: Fix authentication bug
+**Branch**: fix/auth-bug
+**Worktree**: auth-fix
+
+### Summary
+- Fixed token expiration logic
+- Added test coverage
+```
+
+AI agents automatically filter tasks by detecting current worktree.
+
+### Per-Feature Documentation + Worktrees
+
+Feature docs travel with branches:
+- **docs/features/[name]/ROADMAP.md**: Feature-specific tasks
+- **docs/features/[name]/SESSION_LOG.md**: Feature-specific sessions
+
+**No tagging needed** - docs are already scoped to the feature.
+
+---
+
 ## Session Log Format
 
-To avoid merge conflicts, session entries should include a feature identifier:
+### For Central Documentation
+
+To avoid merge conflicts, prefix entries with worktree name:
 
 ```markdown
-## [feature-name] 2024-01-15
+## [worktree-name] 2024-01-15
 
 **Task**: Implement user authentication
 **Branch**: feat/user-auth
+**Worktree**: auth-fix
 
 ### Summary
 - Added login endpoint
@@ -105,10 +150,26 @@ To avoid merge conflicts, session entries should include a feature identifier:
 ---
 ```
 
+### For Per-Feature Documentation
+
+Use regular date format (docs are feature-scoped):
+
+```markdown
+## Session: 2024-01-15
+
+**Task**: Implement user authentication
+**Branch**: feat/user-auth
+
+### Summary
+- Added login endpoint
+
+---
+```
+
 This format ensures:
-- Entries from different features don't conflict on merge
+- Entries from different worktrees don't conflict on merge
 - Git can auto-merge when both add at top of file
-- Easy to filter/search by feature
+- Easy to filter/search by worktree or feature
 
 ---
 

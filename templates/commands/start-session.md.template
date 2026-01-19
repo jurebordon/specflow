@@ -2,6 +2,20 @@
 
 The session plan has been approved. Begin implementation.
 
+## 0. Detect Context
+
+{{#if USES_WORKTREES}}
+Determine current worktree:
+```bash
+git worktree list | grep $(pwd)
+CURRENT_BRANCH=$(git branch --show-current)
+```
+
+{{#if DOCS_ORGANIZATION_CENTRAL}}
+**Important**: This project uses central documentation with worktrees. Tasks in ROADMAP.md should be tagged with `[worktree: name]`. Only work on tasks matching your current worktree.
+{{/if}}
+{{/if}}
+
 ## 1. Verify Environment
 
 Run baseline checks:

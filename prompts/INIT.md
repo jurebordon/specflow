@@ -111,6 +111,17 @@ Ask: "How much documentation structure do you want?"
 - **Standard**: Above + VISION, OVERVIEW, ADR
 - **Full**: Above + agent guides for relevant roles
 
+## Step 6.5: Documentation Organization
+
+Ask: "How should documentation be organized?"
+- **Central (default)**: Single docs/ folder with all documentation
+- **Per-Feature**: Each feature has docs/features/[name]/ with its own ROADMAP, SESSION_LOG
+
+Context for AI:
+- This is independent of worktree workflow
+- Per-feature docs travel with branches (no tagging needed)
+- Central docs + worktrees requires `[worktree: name]` tags on tasks
+
 ## Step 7: Generate Configuration
 
 Create `.specflow-config.md` (this file IS tracked, unlike .specflow/):
@@ -143,6 +154,7 @@ Create `.specflow-config.md` (this file IS tracked, unlike .specflow/):
 - **Path**: [docs/ or custom]
 - **Depth**: [minimal/standard/full]
 - **Location**: [in-git/separate/gitignored/external]
+- **Organization**: [central/per-feature]
 ```
 
 ## Step 8: Generate Project Files

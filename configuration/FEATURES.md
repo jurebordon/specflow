@@ -2,6 +2,21 @@
 
 For large projects where multiple features are developed in parallel, project-level documentation doesn't scale. Feature-scoped documentation provides isolated tracking per feature.
 
+## Important: Features ≠ Worktrees
+
+**Feature documentation** and **git worktrees** are separate concerns:
+
+- **Feature docs** = How documentation is organized (central vs per-feature)
+- **Worktrees** = Git workflow for parallel development
+
+You can use:
+- Central docs without worktrees (single workspace, unified docs)
+- Central docs with worktrees (parallel workspaces, tagged tasks)
+- Per-feature docs without worktrees (switch branches, feature-scoped docs)
+- Per-feature docs with worktrees (parallel workspaces, feature-scoped docs)
+
+See [WORKTREES.md](WORKTREES.md) for the git workflow aspect.
+
 ## When to Use Feature Docs
 
 | Situation | Use Feature Docs? |

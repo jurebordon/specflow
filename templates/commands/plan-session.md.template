@@ -24,6 +24,24 @@ Create a session plan for this feature:
 {{else}}
 ## Project Mode
 
+{{#if USES_WORKTREES}}
+## Step 0: Detect Current Context
+
+Determine your current worktree and branch:
+```bash
+git worktree list | grep $(pwd)
+CURRENT_BRANCH=$(git branch --show-current)
+```
+
+{{#if DOCS_ORGANIZATION_CENTRAL}}
+**Important**: This project uses central documentation with worktrees.
+- Tasks in ROADMAP.md are tagged with `[worktree: name]`
+- Only select tasks matching your current worktree: `[worktree: $(basename $(pwd))]`
+- Session log entries should be prefixed with: `## [worktree-name] YYYY-MM-DD`
+{{/if}}
+
+{{/if}}
+
 Read CLAUDE.md to get project context.
 
 Then check the current state:
@@ -36,7 +54,7 @@ Then check the current state:
 
 Create a session plan including:
 
-1. **Session Goal**: ONE task from ROADMAP (pick from Now, or top of Next)
+1. **Session Goal**: ONE task from ROADMAP{{#if USES_WORKTREES}}{{#if DOCS_ORGANIZATION_CENTRAL}} (matching your worktree tag){{/if}}{{/if}} (pick from Now, or top of Next)
 2. **Implementation Steps**: Concrete actions to complete the task
 3. **Files Likely to Change**: Based on task scope
 4. **Success Criteria**: How we'll know it's done

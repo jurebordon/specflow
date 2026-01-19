@@ -63,3 +63,10 @@
 - Move items between sections as priorities change
 - Add blockers immediately when encountered
 - Reference tasks by ID in SESSION_LOG entries
+{{#if USES_WORKTREES}}
+{{#if DOCS_ORGANIZATION_CENTRAL}}
+- **Worktree tagging**: Tag each task with `[worktree: name]` to indicate which worktree should work on it
+- Example: `- [ ] Fix auth bug [worktree: auth-fix]`
+- AI agents will filter tasks by current worktree when planning sessions
+{{/if}}
+{{/if}}

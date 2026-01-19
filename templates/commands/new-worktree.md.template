@@ -35,18 +35,37 @@ git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} {{BRANCH_CONVENTION}}/{{FE
 
 Worktree location: `../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
 
-## Step 4: Initialize Feature Docs
+## Step 4: Initialize Documentation
 
-Navigate to worktree and set up feature documentation:
+Navigate to worktree:
 
 ```bash
 cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
 ```
 
-Then run `/new-feature` to create:
+{{#if DOCS_ORGANIZATION_PER_FEATURE}}
+Run `/new-feature` to create feature-specific docs:
 - `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md`
 - `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md`
 - `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md`
+{{/if}}
+
+{{#if DOCS_ORGANIZATION_CENTRAL}}
+**Tag tasks in central ROADMAP**: Go back to main worktree and update `{{DOCS_PATH}}/ROADMAP.md`:
+
+```bash
+cd ../{{PROJECT_NAME}}
+```
+
+Add `[worktree: {{FEATURE_NAME}}]` tags to relevant tasks:
+```markdown
+## Now
+- [ ] Implement feature X [worktree: {{FEATURE_NAME}}]
+- [ ] Add tests for feature X [worktree: {{FEATURE_NAME}}]
+```
+
+This allows AI agents to filter tasks by worktree when planning sessions.
+{{/if}}
 
 ## Step 5: Summarize
 
@@ -76,6 +95,13 @@ Other worktrees:
 
 - Worktree directory is sibling to main repo (not inside it)
 - Each worktree has its own working directory but shares git history
+{{#if DOCS_ORGANIZATION_PER_FEATURE}}
 - Feature docs travel with the branch
-- Use `[feature-name] YYYY-MM-DD` format in SESSION_LOG to avoid merge conflicts
+- Use `[feature-name] YYYY-MM-DD` format in feature SESSION_LOG
+{{/if}}
+{{#if DOCS_ORGANIZATION_CENTRAL}}
+- Tasks in ROADMAP.md must be tagged with `[worktree: name]`
+- Session log entries prefixed with `[worktree-name] YYYY-MM-DD`
+- AI agents filter by current worktree automatically
+{{/if}}
 - Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
