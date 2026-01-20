@@ -1,6 +1,4 @@
 .DS_Store
 
 # SpecFlow operational docs (not to be confused with framework templates)
-docs/
-.specflow-config.md
-CLAUDE.md
+docs_specflow/

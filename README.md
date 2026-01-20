@@ -14,9 +14,10 @@ AI coding assistants are powerful but undirected. Without structure, you get:
 
 SpecFlow solves this with:
 - **Three-layer documentation** (strategic → tactical → operational)
+- **Feature-tagged tasks** (every task belongs to a feature)
 - **Session-based workflow** (plan → implement → wrap up)
-- **Adaptive setup** that fits your project reality
-- **Generated commands** tailored to your tech stack and git workflow
+- **Tech-adaptive commands** (auto-detects your stack, generates appropriate commands)
+- **Automatic feature detection** (from branch names, zero configuration)
 
 ## Quick Start
 
@@ -76,35 +77,35 @@ After initialization, your project will have:
 
 ```
 your-project/
-├── .specflow/                # Framework (gitignored)
+├── .specflow/                 # Framework (gitignored)
 │   ├── templates/
 │   ├── prompts/
 │   └── configuration/
-├── .specflow-config.md       # Project settings (tracked)
-├── CLAUDE.md                 # Root context for AI assistants
-├── docs/
-│   ├── VISION.md             # Product north star (strategic)
-│   ├── ADR.md                # Architecture decisions (strategic)
-│   ├── OVERVIEW.md           # Current system state (tactical)
-│   ├── ROADMAP.md            # Now/Next/Later tasks (tactical)
-│   ├── WORKFLOW.md           # How to work on this repo (tactical)
-│   └── SESSION_LOG.md        # Session journal (operational)
-├── .claude/
-│   └── commands/             # Generated session commands
-│       ├── plan-session.md
-│       ├── start-session.md
-│       ├── end-session.md
-│       ├── pivot-session.md
-│       ├── new-feature.md    # If using features
-│       └── new-worktree.md   # If using worktrees
-└── .ai/
-    └── agents/               # Role-specific guides (Full depth)
-        ├── backend.md
-        ├── frontend.md
-        └── ...
+├── CLAUDE.md                  # Root context for AI assistants
+├── docs_specflow/             # SpecFlow documentation (tracked or gitignored, your choice)
+│   ├── .specflow-config.md    # Project settings
+│   ├── ROADMAP.md             # All tasks, tagged [feature: name]
+│   ├── SESSION_LOG.md         # All sessions, tagged [feature-name]
+│   ├── VISION.md              # Product north star (strategic)
+│   ├── ADR.md                 # Architecture decisions (strategic)
+│   ├── OVERVIEW.md            # Current system state (tactical)
+│   ├── WORKFLOW.md            # Tech-specific commands (tactical)
+│   └── feature_docs/          # Per-feature specs
+│       ├── user-auth/
+│       │   └── SPEC.md        # Feature requirements (frozen)
+│       └── api-v2/
+│           └── SPEC.md
+└── .claude/
+    └── commands/              # Generated session commands
+        ├── explore-project.md # For adoption mode
+        ├── plan-session.md
+        ├── start-session.md
+        ├── end-session.md
+        ├── new-feature.md
+        └── new-worktree.md    # Advanced option
 ```
 
-The exact structure adapts based on your answers during setup.
+All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
 ## Documentation
 
