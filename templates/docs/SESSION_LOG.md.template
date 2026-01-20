@@ -6,21 +6,12 @@
 ---
 
 <!--
-{{#if USES_WORKTREES}}
-{{#if DOCS_ORGANIZATION_CENTRAL}}
-## [worktree-name] YYYY-MM-DD
-{{else}}
-## [{{FEATURE_NAME}}] YYYY-MM-DD
-{{/if}}
-{{else}}
-## Session: YYYY-MM-DD
-{{/if}}
+## [feature-name] YYYY-MM-DD
 
 **Role**: backend / frontend / qa / architecture
-**Task**: [Task from ROADMAP.md]
+**Task**: [Task from ROADMAP.md with feature tag]
 **Branch**: type/branch-name
-{{#if USES_WORKTREES}}**Worktree**: worktree-name{{/if}}
-{{#if FEATURE_NAME}}**Feature**: {{FEATURE_NAME}}{{/if}}
+**Feature**: feature-name
 
 ### Summary
 - What was accomplished

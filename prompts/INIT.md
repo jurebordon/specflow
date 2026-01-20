@@ -96,35 +96,39 @@ For each "yes", ask:
 - Ticketing: What format? (e.g., PROJ-123, #123)
 - CI/CD: What platform? What runs on PR?
 
-## Step 5: Documentation Location
+## Step 5: Tech Stack Detection
 
-Ask: "Where should SpecFlow documentation live?"
-- **In Git (default)**: `docs/` folder, committed to repo
-- **Separate Folder**: Custom folder name, committed
-- **Gitignored**: In repo but added to .gitignore
-- **External**: Outside repo entirely
+Ask: "May I scan your project to detect the tech stack? This helps generate appropriate test/build/lint commands."
 
-## Step 6: Documentation Depth
+**If YES**:
+- Scan for common files:
+  - `package.json` → Node.js
+  - `requirements.txt` or `pyproject.toml` → Python
+  - `dbt_project.yml` → DBT
+  - `Gemfile` → Ruby
+  - `go.mod` → Go
+  - `Cargo.toml` → Rust
+  - `pom.xml` or `build.gradle` → Java
+- Identify: language(s), framework(s), test runner, build tool
+- Show findings: "Found: Python + DBT + pytest"
+- Ask: "Is this correct? Any additional tools to note?"
 
-Ask: "How much documentation structure do you want?"
-- **Minimal**: CLAUDE.md, ROADMAP, SESSION_LOG, WORKFLOW
-- **Standard**: Above + VISION, OVERVIEW, ADR
-- **Full**: Above + agent guides for relevant roles
+**If NO**:
+- Ask: "Please describe your tech stack (language, framework, test tool, build tool)"
 
-## Step 6.5: Documentation Organization
+Store in config for generating tech-adaptive commands.
 
-Ask: "How should documentation be organized?"
-- **Central (default)**: Single docs/ folder with all documentation
-- **Per-Feature**: Each feature has docs/features/[name]/ with its own ROADMAP, SESSION_LOG
+## Step 6: Documentation Tracking
 
-Context for AI:
-- This is independent of worktree workflow
-- Per-feature docs travel with branches (no tagging needed)
-- Central docs + worktrees requires `[worktree: name]` tags on tasks
+Ask: "Should docs_specflow/ be tracked in git or gitignored?"
+- **Gitignored (recommended)**: Start personal, unignore later if team adopts
+- **Tracked**: Team shares SpecFlow documentation from day one
+
+**Note**: All SpecFlow documentation will live in `docs_specflow/` folder.
 
 ## Step 7: Generate Configuration
 
-Create `.specflow-config.md` (this file IS tracked, unlike .specflow/):
+Create `docs_specflow/.specflow-config.md` (inherits tracking from docs_specflow/):
 
 ```markdown
 # SpecFlow Project Configuration
@@ -135,74 +139,103 @@ Create `.specflow-config.md` (this file IS tracked, unlike .specflow/):
 - **Description**: [one-liner]
 
 ## Tech Stack
-- **Backend**: [language/framework]
-- **Frontend**: [framework or "none"]
-- **Database**: [database]
+- **Languages**: [python, typescript, etc.]
+- **Frameworks**: [dbt, fastapi, react, etc.]
+- **Test Command**: [pytest / npm test / dbt test / etc.]
+- **Build Command**: [python -m build / npm run build / dbt build / etc.]
+- **Lint Command**: [ruff check . / eslint . / sqlfluff lint / etc.]
+
+{{#if MIXED_STACK}}
+## Tech Commands (Mixed Stack)
+- **Test Commands**:
+  - Python: pytest
+  - DBT: dbt test
+- **Build Commands**:
+  - Python: python -m build
+  - DBT: dbt build
+- **Lint Commands**:
+  - Python: ruff check .
+  - SQL: sqlfluff lint
+{{/if}}
 
 ## Git Workflow
 - **Type**: [solo/pr-review/ci-cd-gated]
 - **Platform**: [GitHub/GitLab/Bitbucket]
 - **Default Branch**: [main/master]
 - **Branch Convention**: [e.g., feat/description]
-- **Uses Worktrees**: [yes/no]
 
 ## Integrations
 - **Ticketing**: [system] (format: [TICKET-123])
 - **CI/CD**: [platform]
 
 ## Documentation
-- **Path**: [docs/ or custom]
-- **Depth**: [minimal/standard/full]
-- **Location**: [in-git/separate/gitignored/external]
-- **Organization**: [central/per-feature]
+- **Path**: docs_specflow/
+- **Tracking**: [gitignored/tracked]
 ```
 
-## Step 8: Generate Project Files
+## Step 8: Check for Existing CLAUDE.md
+
+Check if `CLAUDE.md` exists anywhere in the project root.
+
+**If EXISTS**:
+- Ask: "I found an existing CLAUDE.md. May I add SpecFlow context to it?"
+  - **Yes**: Append SpecFlow section to existing file
+  - **No**: Create `CLAUDE-SPECFLOW.md` instead and add reference note
+
+**If NOT EXISTS**:
+- Proceed to create new `CLAUDE.md`
+
+## Step 9: Generate Project Files
 
 Read templates from `.specflow/templates/` and generate:
 
 ### Always Generate:
-- `CLAUDE.md` - Use `.specflow/templates/CLAUDE.md.template`
-- `[DOCS_PATH]/ROADMAP.md` - Use `.specflow/templates/docs/ROADMAP.md.template`
-- `[DOCS_PATH]/SESSION_LOG.md` - Use `.specflow/templates/docs/SESSION_LOG.md.template`
-- `[DOCS_PATH]/WORKFLOW.md` - Use `.specflow/templates/docs/WORKFLOW.md.template`
+- `CLAUDE.md` (or append to existing) - Use `.specflow/templates/CLAUDE.md.template`
+- `docs_specflow/.specflow-config.md` - Configuration file
+- `docs_specflow/ROADMAP.md` - Use `.specflow/templates/docs/ROADMAP.md.template`
+- `docs_specflow/SESSION_LOG.md` - Use `.specflow/templates/docs/SESSION_LOG.md.template`
+- `docs_specflow/WORKFLOW.md` - Use `.specflow/templates/docs/WORKFLOW.md.template`
+- `docs_specflow/VISION.md` - Use `.specflow/templates/docs/VISION.md.template`
+- `docs_specflow/OVERVIEW.md` - Use `.specflow/templates/docs/OVERVIEW.md.template`
+- `docs_specflow/ADR.md` - Use `.specflow/templates/docs/ADR.md.template`
 
 ### Generate Session Commands:
 Copy and customize from `.specflow/templates/commands/`:
+- `.claude/commands/explore-project.md` - For adoption mode
 - `.claude/commands/plan-session.md`
 - `.claude/commands/start-session.md`
 - `.claude/commands/end-session.md`
-- `.claude/commands/pivot-session.md`
-
-### For Standard/Full depth:
-- `[DOCS_PATH]/VISION.md` - Use `.specflow/templates/docs/VISION.md.template`
-- `[DOCS_PATH]/OVERVIEW.md` - Use `.specflow/templates/docs/OVERVIEW.md.template`
-- `[DOCS_PATH]/ADR.md` - Use `.specflow/templates/docs/ADR.md.template`
+- `.claude/commands/new-feature.md`
+- `.claude/commands/new-worktree.md` - Advanced, for parallel development
 
 ### For Greenfield/Constrained with PRD/Spec:
-- `[DOCS_PATH]/frozen/PRD.md` - User's PRD
-- `[DOCS_PATH]/frozen/TECH_SPEC.md` - User's Tech Spec
+- `docs_specflow/frozen/PRD.md` - User's PRD
+- `docs_specflow/frozen/TECH_SPEC.md` - User's Tech Spec
 
-### If using worktrees or features:
-- `.claude/commands/new-feature.md` - Use `.specflow/templates/commands/new-feature.md.template`
-- `.claude/commands/new-worktree.md` - Use `.specflow/templates/commands/new-worktree.md.template`
+### Create Gitignore if Needed:
+If docs_specflow/ should be gitignored:
+- Add `docs_specflow/` to `.gitignore`
 
-### For Full depth:
-- `.ai/agents/*.md` - Use `.specflow/templates/agents/*.template` for relevant roles
+## Step 10: Populate from PRD/Tech Spec
 
-## Step 9: Populate from PRD/Tech Spec
+**For Greenfield/Constrained**:
 
 If user provided PRD:
-- Extract features → populate ROADMAP.md (Now/Next/Later)
+- Extract features → Create `docs_specflow/feature_docs/[name]/SPEC.md` for each feature
+- Extract feature tasks → Add to ROADMAP.md tagged with `[feature: name]`
 - Extract vision → populate VISION.md
 - Extract success criteria → add to CLAUDE.md
 
 If user provided Tech Spec:
 - Extract architecture → populate OVERVIEW.md
 - Extract decisions → populate ADR.md
-- Extract patterns → add to CLAUDE.md
+- Extract patterns → add to CLAUDE.md and WORKFLOW.md
 
-## Step 10: Confirm and Create
+**For Adoption**:
+- Suggest: "Run `/explore-project` to scan your codebase"
+- Or: "Run `/new-feature` when ready to plan your first feature"
+
+## Step 11: Confirm and Create
 
 Before creating files:
 1. Show configuration summary
@@ -224,12 +257,13 @@ When processing templates, replace these variables:
 | {{PROJECT_NAME}} | config |
 | {{PROJECT_DESCRIPTION}} | config |
 | {{PROJECT_TYPE}} | config (mode) |
-| {{TECH_STACK}} | config |
+| {{TECH_STACK}} | config (comma-separated languages/frameworks) |
+| {{TEST_COMMAND}} | config |
+| {{BUILD_COMMAND}} | config |
+| {{LINT_COMMAND}} | config |
 | {{GIT_WORKFLOW}} | config |
-| {{DOCS_PATH}} | config (documentation path) |
 | {{DEFAULT_BRANCH}} | config |
 | {{BRANCH_CONVENTION}} | config |
-| {{USES_WORKTREES}} | config |
 | {{TICKETING}} | config |
 | {{TICKET_FORMAT}} | config |
 | {{DATE}} | current date |

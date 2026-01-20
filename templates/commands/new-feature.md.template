@@ -1,165 +1,186 @@
-# New Feature Setup
+# New Feature
 
-You are setting up documentation for a new feature in this project.
+> Create a new feature SPEC and add tasks to central ROADMAP.
 
-## Step 1: Gather Context
+---
 
-{{#if ALLOW_SCAN}}
-First, ask: "May I scan relevant parts of the codebase to understand the context for this feature?"
-
-If yes, scan:
-{{#if IS_DBT}}
-- `models/` directory structure
-- Relevant `schema.yml` files
-- Existing models that may be upstream/downstream
-{{else}}
-- Project structure
-- Relevant existing code
-- Related components/modules
-{{/if}}
-{{/if}}
-
-## Step 2: Understand the Feature
+## Step 1: Gather Feature Information
 
 Ask the user:
 
-1. **What is this feature?**
-   - Brief description of what we're building
-   - Why is it needed?
+1. **Feature name?** (kebab-case, e.g., `user-auth`, `api-v2`, `payment-integration`)
 
-2. **What are the requirements?**
+2. **What is this feature?**
+   - Brief description
+   - Why is it needed?
+   - Target users or use cases
+
+3. **What are the requirements?**
    - Key functionality
    - Inputs and outputs
    - Dependencies on existing code
 
-3. **What are the success criteria?**
+4. **Success criteria?**
    - How will we know it's done?
    - What tests or validations?
 
-4. **Is there a ticket or MR?**
-   - Ticket reference (e.g., DATA-123, JIRA-456)
-   - Existing MR/PR link
-   - Branch name to use
+5. **Ticket reference?** (optional)
+   - {{TICKET_FORMAT}} reference
+   - External link if applicable
 
-If the user provides a spec document or ticket, use that information instead of asking.
+If user provides a spec document, PRD, or ticket, use that information.
 
-## Step 3: Create Feature Documentation
+---
 
-Create the following files:
+## Step 2: Create Feature SPEC
 
-### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md
+Create `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md`:
 
 ```markdown
 # Feature: {{FEATURE_NAME}}
 
-## Ticket
-- {{TICKET_SYSTEM}}: {{TICKET_ID}}
-- MR/PR: {{MR_LINK}}
+> Frozen north star for this feature.
 
-## Overview
-[Description of what this feature does and why]
+---
 
-## Requirements
-[Key requirements gathered from user]
+## Requirements (Frozen)
 
-## Dependencies
-### Upstream
-- [What this feature depends on]
+### Overview
+[What this feature does and why it exists]
 
-### Downstream
-- [What will consume this feature]
+### User Stories
+- As a [user type], I want [goal] so that [benefit]
 
-## Success Criteria
+### Acceptance Criteria
 - [ ] [Criterion 1]
 - [ ] [Criterion 2]
 - [ ] [Criterion 3]
 
-## Open Questions
-- [ ] [Any unresolved questions]
-
-## Decisions Made
-- [Date]: [Decision and rationale]
-```
-
-### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md
-
-```markdown
-# Roadmap: {{FEATURE_NAME}}
-
-**Ticket**: {{TICKET_ID}}
-**MR/PR**: {{MR_LINK}}
-**Branch**: {{BRANCH_NAME}}
-
-## Now
-- [ ] [First task to implement]
-
-## Next
-1. [Second priority task]
-2. [Third priority task]
-
-## Later
-- [Nice to have / future enhancement]
-
-## Done
-- [x] Feature documentation created ({{DATE}})
-
-## Blockers
-- None
-```
-
-### {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md
-
-```markdown
-# Session Log: {{FEATURE_NAME}}
-
-> Append new sessions above this line, newest first.
-
-## Session: {{DATE}}
-
-**Task**: Feature setup
-**Branch**: {{BRANCH_NAME}}
-
-### Summary
-- Created feature specification
-- Created roadmap with initial tasks
-- Set up session logging
-
-### Files Changed
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md (new)
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md (new)
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md (new)
-
-### Next
-- Begin implementation of first task
+### Out of Scope
+[What this feature explicitly does NOT include]
 
 ---
+
+## Implementation Decisions
+
+> Document decisions as you build. Major changes → also add to central ADR.md
+
+### Technical Approach
+[High-level approach - to be filled during implementation]
+
+### Key Decisions
+- **[Decision]**: [Rationale]
+
+---
+
+## Dependencies
+
+### Upstream
+[Features or systems this depends on]
+
+### Downstream
+[Features or systems that depend on this]
+
+---
+
+## Success Criteria
+
+### Functional
+- [ ] [Measurable criterion]
+
+### Non-Functional
+- [ ] Performance: [metric]
+- [ ] Security: [requirement]
+
+---
+
+## Open Questions
+
+- [ ] [Unresolved question 1]
+- [ ] [Unresolved question 2]
+
+---
+
+*Created*: {{DATE}}
+{{#if TICKET_ID}}
+*Ticket*: {{TICKET_ID}}
+{{/if}}
 ```
 
-## Step 4: Summarize and Offer Next Steps
+---
 
-After creating the files, provide a summary:
+## Step 3: Add Tasks to Central ROADMAP
+
+Update `docs_specflow/ROADMAP.md`:
+
+Break feature into tasks and add to appropriate section (Now/Next/Later):
+
+```markdown
+## Now
+- [ ] [First task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
+
+## Next
+1. [Second task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
+2. [Third task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
+```
+
+**Important**: Every task MUST have `[feature: {{FEATURE_NAME}}]` tag.
+
+---
+
+## Step 4: Create Feature Branch (if needed)
+
+{{#if GIT_WORKFLOW_SOLO}}
+Optional: Create feature branch
+```bash
+git checkout -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+```
+{{else}}
+Create feature branch:
+```bash
+git checkout {{DEFAULT_BRANCH}} && git pull
+git checkout -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+```
+{{/if}}
+
+---
+
+## Step 5: Summarize
+
+Provide summary to user:
 
 ```
-Feature documentation created for: {{FEATURE_NAME}}
+Feature created: {{FEATURE_NAME}}
 
-Files created:
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md (feature requirements)
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md (task tracking)
-- {{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md (session history)
+**Created**:
+- docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md
 
-Linked to:
-- Ticket: {{TICKET_ID}}
-- Branch: {{BRANCH_NAME}}
+**Updated**:
+- docs_specflow/ROADMAP.md (added tasks with [feature: {{FEATURE_NAME}}] tags)
 
-Next steps:
+{{#if TICKET_ID}}
+**Linked to**: {{TICKET_ID}}
+{{/if}}
+
+**Next Steps**:
 1. Review SPEC.md and confirm requirements
-2. Run /plan-session --feature {{FEATURE_NAME}} to plan first task
-3. Run /start-session --feature {{FEATURE_NAME}} to begin work
+2. Run `/plan-session` to start working on first task
+   - AI will automatically filter ROADMAP for [feature: {{FEATURE_NAME}}] tasks
+3. Or manually update ROADMAP.md with more detailed tasks
+
+**Working on this feature**:
+- All your sessions will be tagged with [feature: {{FEATURE_NAME}}] in SESSION_LOG.md
+- All tasks should have [feature: {{FEATURE_NAME}}] tag in ROADMAP.md
+- Update SPEC.md as decisions are made during implementation
 ```
+
+---
 
 ## Notes
 
-- Feature name should be kebab-case (e.g., `customer-dimension`, `order-metrics`)
-- If no ticket provided, use branch name as primary identifier
-- Feature docs are self-contained - all context for this feature is in its folder
-- Project-level docs (ADR.md, OVERVIEW.md) are updated only when feature completes
+- Feature name should be kebab-case
+- SPEC.md is the frozen north star - requirements shouldn't change often
+- Implementation decisions get added to SPEC.md as you build
+- Major decisions also go in central ADR.md
+- Tasks live in central ROADMAP.md with feature tags
+- Sessions live in central SESSION_LOG.md with feature tags

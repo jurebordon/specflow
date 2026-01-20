@@ -1,0 +1,75 @@
+# Feature: {{FEATURE_NAME}}
+
+> Frozen north star for this feature. Changes to requirements should be rare and documented in ADR.
+
+---
+
+## Requirements (Frozen)
+
+### Overview
+[What this feature does and why it exists]
+
+### User Stories
+- As a [type of user], I want [goal] so that [benefit]
+- As a [type of user], I want [goal] so that [benefit]
+
+### Acceptance Criteria
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+- [ ] [Criterion 3]
+
+### Out of Scope
+[Explicitly list what this feature does NOT include]
+
+---
+
+## Implementation Decisions
+
+> Document decisions made during development. Major changes → also add to central ADR.md
+
+### Technical Approach
+[High-level approach chosen]
+
+### Key Decisions
+- **[Decision]**: [Rationale]
+- **[Decision]**: [Rationale]
+
+### Trade-offs
+[What was sacrificed or deferred]
+
+---
+
+## Dependencies
+
+### Upstream
+[Features or systems this depends on]
+- None / [Feature name] / [External system]
+
+### Downstream
+[Features or systems that depend on this]
+- None / [Feature name]
+
+---
+
+## Success Criteria
+
+### Functional
+- [ ] [Measurable criterion]
+- [ ] [Measurable criterion]
+
+### Non-Functional
+- [ ] Performance: [specific metric]
+- [ ] Security: [specific requirement]
+- [ ] UX: [specific goal]
+
+---
+
+## Open Questions
+
+[Unresolved items - move to decisions once resolved]
+- [ ] [Question 1]
+- [ ] [Question 2]
+
+---
+
+*Last Updated*: {{CURRENT_DATE}}

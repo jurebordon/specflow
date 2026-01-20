@@ -1,15 +1,30 @@
 # New Worktree
 
-You are setting up a git worktree for parallel feature development.
+> **Advanced option** for parallel feature development. Use only when working on multiple independent features simultaneously.
+
+---
+
+## Warning
+
+Worktrees add complexity. Only use them if:
+- You have 2+ independent features in progress
+- Features have no dependencies on each other
+- You need to switch between them frequently (reviews, blockers, priorities)
+
+If unsure, stick with regular branches.
+
+---
 
 ## Step 1: Confirm Feature
 
 Ask: "What feature should this worktree be for?"
 
-If not already clear from context:
+If not already clear:
 - Feature name (kebab-case, e.g., `user-auth`, `api-v2`)
-- Brief description of the feature
-- Is there an existing branch, or should we create one?
+- Does `/new-feature` need to be run first to create the feature?
+- Is there an existing branch, or create new one?
+
+---
 
 ## Step 2: Verify Prerequisites
 
@@ -23,6 +38,8 @@ git checkout {{DEFAULT_BRANCH}}
 git pull origin {{DEFAULT_BRANCH}}
 ```
 
+---
+
 ## Step 3: Create Worktree
 
 ```bash
@@ -35,73 +52,63 @@ git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} {{BRANCH_CONVENTION}}/{{FE
 
 Worktree location: `../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
 
-## Step 4: Initialize Documentation
+---
 
-Navigate to worktree:
+## Step 4: Set Up Feature (if needed)
 
 ```bash
 cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
 ```
 
-{{#if DOCS_ORGANIZATION_PER_FEATURE}}
-Run `/new-feature` to create feature-specific docs:
-- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SPEC.md`
-- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md`
-- `{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md`
-{{/if}}
+If feature doesn't exist yet, run `/new-feature {{FEATURE_NAME}}` to create:
+- `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md`
+- Tasks in `docs_specflow/ROADMAP.md` with `[feature: {{FEATURE_NAME}}]` tags
 
-{{#if DOCS_ORGANIZATION_CENTRAL}}
-**Tag tasks in central ROADMAP**: Go back to main worktree and update `{{DOCS_PATH}}/ROADMAP.md`:
-
-```bash
-cd ../{{PROJECT_NAME}}
-```
-
-Add `[worktree: {{FEATURE_NAME}}]` tags to relevant tasks:
-```markdown
-## Now
-- [ ] Implement feature X [worktree: {{FEATURE_NAME}}]
-- [ ] Add tests for feature X [worktree: {{FEATURE_NAME}}]
-```
-
-This allows AI agents to filter tasks by worktree when planning sessions.
-{{/if}}
+---
 
 ## Step 5: Summarize
 
-Provide summary to user:
+Provide summary:
 
 ```
-Worktree created for: {{FEATURE_NAME}}
+Worktree created: {{FEATURE_NAME}}
 
-Location: ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
-Branch: {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+**Location**: ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+**Branch**: {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
 
-To work on this feature:
+**To work on this feature**:
   cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+  /plan-session  # AI will detect feature from branch name
 
-Then use:
-  /plan-session --feature {{FEATURE_NAME}}
-  /start-session --feature {{FEATURE_NAME}}
-
-To switch back to main:
+**To switch back to main**:
   cd ../{{PROJECT_NAME}}
 
-Other worktrees:
+**Other worktrees**:
   git worktree list
+
+**When done**:
+  git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
 ```
+
+---
+
+## How Feature Detection Works
+
+When you run `/plan-session` in a worktree:
+1. AI detects branch name (e.g., `feat/user-auth`)
+2. Extracts feature name (`user-auth`)
+3. Filters ROADMAP.md for tasks tagged `[feature: user-auth]`
+4. Prefixes SESSION_LOG entries with `[user-auth]`
+
+No special configuration needed - it just works.
+
+---
 
 ## Notes
 
 - Worktree directory is sibling to main repo (not inside it)
 - Each worktree has its own working directory but shares git history
-{{#if DOCS_ORGANIZATION_PER_FEATURE}}
-- Feature docs travel with the branch
-- Use `[feature-name] YYYY-MM-DD` format in feature SESSION_LOG
-{{/if}}
-{{#if DOCS_ORGANIZATION_CENTRAL}}
-- Tasks in ROADMAP.md must be tagged with `[worktree: name]`
-- Session log entries prefixed with `[worktree-name] YYYY-MM-DD`
-- AI agents filter by current worktree automatically
-{{/if}}
+- Feature docs (`docs_specflow/`) are shared across all worktrees
+- Tasks use `[feature: name]` tags in central ROADMAP.md
+- Sessions use `[feature-name] YYYY-MM-DD` format in central SESSION_LOG.md
 - Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}`

@@ -16,29 +16,29 @@ If tests fail, fix them before proceeding.
 {{#if FEATURE_NAME}}
 ### Feature Mode: {{FEATURE_NAME}}
 
-**{{DOCS_PATH}}/features/{{FEATURE_NAME}}/ROADMAP.md**
+**docs_specflow/features/{{FEATURE_NAME}}/ROADMAP.md**
 - Mark completed task as done (move to Done section with date)
 - Adjust Now/Next if priorities changed
 - Add any new blockers discovered
 
-**{{DOCS_PATH}}/features/{{FEATURE_NAME}}/SESSION_LOG.md**
+**docs_specflow/features/{{FEATURE_NAME}}/SESSION_LOG.md**
 Prepend a new entry (see format below)
 
 **If feature is complete:**
 - Check all success criteria in SPEC.md
-- Update project {{DOCS_PATH}}/ADR.md if significant decisions were made
-- Update project {{DOCS_PATH}}/OVERVIEW.md if architecture changed
-- Consider moving feature to `{{DOCS_PATH}}/features/_completed/`
+- Update project docs_specflow/ADR.md if significant decisions were made
+- Update project docs_specflow/OVERVIEW.md if architecture changed
+- Consider moving feature to `docs_specflow/features/_completed/`
 
 {{else}}
 ### Project Mode
 
-**{{DOCS_PATH}}/ROADMAP.md**
+**docs_specflow/ROADMAP.md**
 - Mark completed task as done (move to Done section with date)
 - Adjust Now/Next if priorities changed
 - Add any new blockers discovered
 
-**{{DOCS_PATH}}/SESSION_LOG.md**
+**docs_specflow/SESSION_LOG.md**
 Prepend a new entry:
 {{/if}}
 
@@ -69,8 +69,8 @@ Prepend a new entry:
 ```
 
 ### Update If Changed:
-- `{{DOCS_PATH}}/OVERVIEW.md` - if architecture or system description changed
-- `{{DOCS_PATH}}/ADR.md` - if significant technical decision was made (append new entry)
+- `docs_specflow/OVERVIEW.md` - if architecture or system description changed
+- `docs_specflow/ADR.md` - if significant technical decision was made (append new entry)
 
 ## 3. Final Commit
 

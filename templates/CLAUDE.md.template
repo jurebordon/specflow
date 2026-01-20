@@ -18,11 +18,11 @@ Read these before making changes:
 
 | Priority | Document | Purpose |
 |----------|----------|---------|
-| 1 | [ROADMAP.md]({{DOCS_PATH}}/ROADMAP.md) | Current tasks and priorities |
-| 2 | [SESSION_LOG.md]({{DOCS_PATH}}/SESSION_LOG.md) | Recent session history |
-| 3 | [OVERVIEW.md]({{DOCS_PATH}}/OVERVIEW.md) | System architecture |
-| 4 | [ADR.md]({{DOCS_PATH}}/ADR.md) | Architecture decisions |
-| 5 | [VISION.md]({{DOCS_PATH}}/VISION.md) | Product direction |
+| 1 | [ROADMAP.md](docs_specflow/ROADMAP.md) | Current tasks and priorities |
+| 2 | [SESSION_LOG.md](docs_specflow/SESSION_LOG.md) | Recent session history |
+| 3 | [OVERVIEW.md](docs_specflow/OVERVIEW.md) | System architecture |
+| 4 | [ADR.md](docs_specflow/ADR.md) | Architecture decisions |
+| 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
 
 {{#if DOCS_EXTERNAL}}
 > Note: Documentation is stored externally at `{{DOCS_EXTERNAL_PATH}}`
@@ -93,7 +93,7 @@ This project uses git worktrees for parallel feature development.
 
 **Session log format:** Use `## [feature-name] YYYY-MM-DD` to avoid merge conflicts.
 
-See [WORKTREES.md]({{DOCS_PATH}}/../configuration/WORKTREES.md) for workflow details.
+See [WORKTREES.md](docs_specflow/../configuration/WORKTREES.md) for workflow details.
 {{/if}}
 
 ## Working Agreements

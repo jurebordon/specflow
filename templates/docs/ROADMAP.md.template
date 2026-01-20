@@ -5,19 +5,20 @@
 
 ## Now (Current Work)
 
-<!-- ONE task in progress at a time -->
-- [ ] {{CURRENT_TASK}}
+<!-- Tag each task with [feature: name] -->
+- [ ] {{CURRENT_TASK}} [feature: {{FEATURE_NAME}}]
 
 ## Next (Queued)
 
 <!-- Priority ordered - top item is next -->
+<!-- Tag each task with [feature: name] -->
 {{#each NEXT_TASKS}}
-{{@index}}. {{this}}
+{{@index}}. {{this}} [feature: {{FEATURE_NAME}}]
 {{/each}}
 
 {{#unless NEXT_TASKS}}
-1. TODO: Define next priority
-2. TODO: Define following priority
+1. TODO: Define next priority [feature: feature-name]
+2. TODO: Define following priority [feature: feature-name]
 {{/unless}}
 
 ## Later (Backlog)
@@ -63,10 +64,7 @@
 - Move items between sections as priorities change
 - Add blockers immediately when encountered
 - Reference tasks by ID in SESSION_LOG entries
-{{#if USES_WORKTREES}}
-{{#if DOCS_ORGANIZATION_CENTRAL}}
-- **Worktree tagging**: Tag each task with `[worktree: name]` to indicate which worktree should work on it
-- Example: `- [ ] Fix auth bug [worktree: auth-fix]`
-- AI agents will filter tasks by current worktree when planning sessions
-{{/if}}
-{{/if}}
+- **Feature tagging**: Every task must be tagged with `[feature: name]`
+  - Example: `- [ ] Add login endpoint [feature: user-auth]`
+  - Use `[feature: infrastructure]` for project-wide work (upgrades, refactors, etc.)
+  - AI agents use feature tags to filter tasks when planning sessions
