@@ -1,115 +1,98 @@
 # Plan Session
 
-> Plan your next implementation session by selecting a task and creating a detailed plan.
+> Quick session planning: detect feature, read context, pick a task, create plan.
 
 ---
 
 ## Step 1: Detect Feature Context
 
-Determine which feature you're working on:
-
 ```bash
-# Get current branch
-CURRENT_BRANCH=$(git branch --show-current)
+git branch --show-current
 ```
 
-Extract feature name from branch:
-- Pattern `feat/user-auth` → feature: `user-auth`
-- Pattern `feature/api-v2` → feature: `api-v2`
-- Pattern `PROJ-123-payment` → feature: `payment`
-- Pattern `user-auth` → feature: `user-auth`
-
-If branch doesn't match a feature pattern, ask user: "Which feature are you working on?"
+Extract feature from branch name:
+- `feat/user-auth` → `user-auth`
+- `feature/api-v2` → `api-v2`
+- `PROJ-123-payment` → `payment`
+- `main` or `master` → Ask user which feature
 
 ---
 
-## Step 2: Read Context
+## Step 2: Read Context Files
 
-### Always Read:
-- `CLAUDE.md` - Project overview and patterns
+**Required**:
+- `CLAUDE.md` - Project overview
 - `docs_specflow/ROADMAP.md` - All tasks
-- `docs_specflow/SESSION_LOG.md` (last 3 entries) - Recent work
+- `docs_specflow/SESSION_LOG.md` - Last 2-3 entries only
 
-### If Feature Detected:
-- `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md` - Feature requirements (north star)
+**If feature detected**:
+- `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md` - Requirements
 
-### As Needed:
-- `docs_specflow/OVERVIEW.md` - System architecture
-- `docs_specflow/ADR.md` - Architecture decisions
-- `docs_specflow/WORKFLOW.md` - Tech-specific commands
+**Optional** (only if unclear):
+- `docs_specflow/OVERVIEW.md` - Architecture
+- `docs_specflow/WORKFLOW.md` - Commands
 
 ---
 
-## Step 3: Filter Tasks by Feature
+## Step 3: Filter & Pick Task
 
-From `docs_specflow/ROADMAP.md`, find tasks tagged with `[feature: {{FEATURE_NAME}}]`:
+Find tasks in ROADMAP.md tagged `[feature: {{FEATURE_NAME}}]`:
+- Pick first unchecked task from "Now" section
+- If "Now" is empty, pick first from "Next" section
 
+Show user:
 ```markdown
-## Now
-- [ ] Add login endpoint [feature: user-auth]  ← Match!
-- [ ] Create user model [feature: user-auth]   ← Match!
-- [ ] Build API schema [feature: api-v2]       ← Skip
-
-## Next
-1. Add password reset [feature: user-auth]     ← Match!
-2. Add API versioning [feature: api-v2]        ← Skip
+**Detected Feature**: {{FEATURE_NAME}}
+**Next Task**: [task description from ROADMAP]
 ```
 
-Only show tasks matching the detected feature.
-
 ---
 
-## Step 4: Create Session Plan
+## Step 4: Create Implementation Plan
 
-Present a plan to the user:
+Present structured plan:
 
 ```markdown
-## Session Plan
+## Session Plan: {{TASK_TITLE}}
 
 **Feature**: {{FEATURE_NAME}}
 **Branch**: {{CURRENT_BRANCH}}
 
-**Session Goal**: [ONE task from filtered ROADMAP, pick from Now or top of Next]
+### Steps
+1. [Specific action 1]
+2. [Specific action 2]
+3. [Specific action 3]
 
-**Implementation Steps**:
-1. [Concrete step 1]
-2. [Concrete step 2]
-3. [Concrete step 3]
+### Files to Modify
+- [file paths]
 
-**Files Likely to Change**:
-- [file1.py]
-- [file2.py]
-- [tests/test_file.py]
+### Tests to Add/Update
+- [test descriptions]
 
-**Success Criteria**:
-- [ ] [How we'll know it's done]
-- [ ] [Tests pass]
+### Success Criteria
+- [ ] Implementation complete
+- [ ] Tests pass: {{TEST_COMMAND}}
+- [ ] [Other criteria]
 
-**Questions/Blockers**:
-- [Any unclear items before starting]
-
-{{#if TICKETING}}
-**Ticket**: {{TICKET_REFERENCE}}
-{{/if}}
+### Questions
+[Any blockers or unclear requirements]
 ```
 
 ---
 
-## Step 5: Wait for Approval
+## Step 5: Get Approval
 
-**Do NOT start implementing.** Present the plan and wait for user confirmation.
+**STOP - Do not implement yet.**
 
-User may:
-- Approve → proceed to `/start-session`
-- Request changes → revise plan
-- Pick different task → update plan
+Ask: "Approve this plan to start implementation?"
+- **Yes** → User runs `/start-session`
+- **No** → Revise plan or pick different task
 
 ---
 
 ## Notes
 
-- Feature detection is automatic from branch name
-- Tasks without feature tags won't be shown (remind user to add tags)
-- If no feature detected and multiple features exist, ask user to clarify
-- Plan should be specific enough to start coding immediately
-- Include test strategy in success criteria
+- Keep plans focused: 1 task = 1 session
+- If task is too large, suggest breaking it down in ROADMAP
+- Feature detection is automatic - zero configuration
+- Tasks without `[feature: name]` tags won't be filtered

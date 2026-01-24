@@ -1,25 +1,14 @@
 # SpecFlow Documentation (AI-assisted development)
 # Add these lines to your .gitignore if you don't want to commit SpecFlow docs
 
-{{#if GITIGNORE_DOCS_FOLDER}}
+{{#if GITIGNORE_DOCS}}
 # SpecFlow documentation folder
-{{DOCS_FOLDER}}/
-{{/if}}
-
-{{#if GITIGNORE_SPECFLOW_FOLDER}}
-# SpecFlow documentation (separate folder)
-specflow_docs/
+docs_specflow/
 {{/if}}
 
 {{#if GITIGNORE_CLAUDE_MD}}
 # AI assistant context file
 CLAUDE.md
-{{/if}}
-
-{{#if GITIGNORE_SESSION_LOG}}
-# Session logs only (keep other docs)
-{{DOCS_FOLDER}}/SESSION_LOG.md
-{{DOCS_FOLDER}}/features/*/SESSION_LOG.md
 {{/if}}
 
 # Note: .claude/commands/ are typically kept in git as they're useful

@@ -162,124 +162,31 @@ The setup process uses these questions to generate appropriate documentation and
 
 ## 6. Documentation Location
 
-**Question**: Where should SpecFlow documentation live?
+**Question**: Should SpecFlow documentation be tracked in git?
 
 | Option | Description | Use Case |
 |--------|-------------|----------|
-| **In Git (default)** | `docs/` folder, committed to repo | Team projects, shared context |
-| **Separate Folder** | `specflow_docs/` folder, committed | Keep AI docs separate from regular docs |
-| **Gitignored** | `docs/` or `specflow_docs/`, added to .gitignore | Personal workflow, team doesn't use AI |
-| **External** | Outside repo (e.g., `~/.specflow/project-name/`) | Multiple repos, single tracking |
+| **Tracked (default)** | `docs_specflow/` committed to repo | Team projects, shared context |
+| **Gitignored** | `docs_specflow/` added to .gitignore | Personal workflow, team doesn't use AI |
 
 ### Follow-up Questions
 
-**For Separate Folder**:
-- Folder name? (default: `specflow_docs/`)
-
 **For Gitignored**:
-- Which folder? (`docs/` or `specflow_docs/`)
 - Should CLAUDE.md also be gitignored? (usually no - it's helpful even for non-AI users)
-
-**For External**:
-- Path? (default: `~/.specflow/<project-name>/`)
-- Should CLAUDE.md still be in repo? (recommended: yes)
 
 ### What Gets Placed Where
 
-| File | In Git | Separate | Gitignored | External |
-|------|--------|----------|------------|----------|
-| CLAUDE.md | repo root | repo root | repo root* | repo root* |
-| docs/*.md | docs/ | specflow_docs/ | docs/ (ignored) | external path |
-| .claude/commands/ | repo | repo | repo | repo |
-| SESSION_LOG.md | docs/ | specflow_docs/ | location (ignored) | external path |
+| File | Tracked | Gitignored |
+|------|---------|------------|
+| CLAUDE.md | repo root | repo root* |
+| docs_specflow/*.md | docs_specflow/ | docs_specflow/ (ignored) |
+| .claude/commands/ | repo | repo |
 
 *\*Can be gitignored if explicitly requested*
 
 ---
 
-## 7. Documentation Depth
-
-**Question**: How much documentation do you want?
-
-| Level | What's Generated |
-|-------|-----------------|
-| **Minimal** | CLAUDE.md, ROADMAP.md, SESSION_LOG.md, WORKFLOW.md |
-| **Standard** | Above + VISION.md, OVERVIEW.md, ADR.md |
-| **Full** | Above + agent guides, tech overlays |
-
-*Recommendation based on mode:*
-- Greenfield: Standard or Full
-- Constrained: Standard or Full
-- Adoption: Minimal, expand over time
-
----
-
-## 7.5. Documentation Organization
-
-**Question**: How should documentation be organized?
-
-| Option | Description | Use Case |
-|--------|-------------|----------|
-| **Central (default)** | Single docs/ folder with all documentation | Simple projects, unified view |
-| **Per-Feature** | Each feature has docs/features/[name]/ with ROADMAP, SESSION_LOG | Large projects, feature isolation |
-
-### Key Differences
-
-**Central Documentation**:
-```
-docs/
-├── ROADMAP.md          # All features
-├── SESSION_LOG.md      # All sessions
-├── VISION.md
-├── OVERVIEW.md
-└── ADR.md
-```
-
-**Per-Feature Documentation**:
-```
-docs/
-├── VISION.md           # Project-wide
-├── OVERVIEW.md         # Project-wide
-├── ADR.md              # Project-wide
-└── features/
-    ├── user-auth/
-    │   ├── SPEC.md
-    │   ├── ROADMAP.md
-    │   └── SESSION_LOG.md
-    └── api-v2/
-        ├── SPEC.md
-        ├── ROADMAP.md
-        └── SESSION_LOG.md
-```
-
-### Important: Independent of Git Workflow
-
-Documentation organization is **separate** from worktree usage:
-
-| Docs Organization | Git Workflow | Behavior |
-|-------------------|--------------|----------|
-| Central | No worktrees | Single ROADMAP, no tags needed |
-| Central | With worktrees | Single ROADMAP, tasks tagged `[worktree: name]` |
-| Per-Feature | No worktrees | Feature ROADMAPs, switch with branches |
-| Per-Feature | With worktrees | Feature ROADMAPs, travel with worktree branches |
-
-**Central + Worktrees** requires task tagging:
-```markdown
-## Now
-- [ ] Fix authentication bug [worktree: auth-fix]
-- [ ] Add API v2 endpoints [worktree: api-v2]
-```
-
-**Per-Feature** doesn't need tags (docs are scoped to feature already).
-
-### Follow-up Questions
-
-**For Per-Feature**:
-- Should strategic docs (VISION, ADR) stay central? (recommended: yes)
-
----
-
-## 8. Agent Roles
+## 7. Agent Roles
 
 **Question**: Which AI agent roles are relevant?
 
@@ -296,7 +203,7 @@ Documentation organization is **separate** from worktree usage:
 
 ---
 
-## 9. Session Commands
+## 8. Session Commands
 
 **Question**: Which session commands do you need?
 

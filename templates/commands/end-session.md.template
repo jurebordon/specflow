@@ -1,183 +1,184 @@
 # End Session
 
-Implementation is complete. Wrap up the session.
+> Wrap up implementation: test, document, commit, merge/PR.
 
-## 1. Run Tests
+---
 
-Verify all tests pass:
+## Step 1: Final Tests
+
+Verify everything works:
 ```bash
 {{TEST_COMMAND}}
 ```
 
-If tests fail, fix them before proceeding.
+Fix any failures before proceeding.
 
-## 2. Update Documentation
+---
 
-{{#if FEATURE_NAME}}
-### Feature Mode: {{FEATURE_NAME}}
+## Step 2: Update ROADMAP
 
-**docs_specflow/features/{{FEATURE_NAME}}/ROADMAP.md**
-- Mark completed task as done (move to Done section with date)
-- Adjust Now/Next if priorities changed
-- Add any new blockers discovered
+Edit `docs_specflow/ROADMAP.md`:
 
-**docs_specflow/features/{{FEATURE_NAME}}/SESSION_LOG.md**
-Prepend a new entry (see format below)
+1. **Mark task complete**: Check the box for completed task
+2. **Move to Done**: If "Now" section is cluttered, move completed items to "Done" with date
+3. **Add blockers**: If you discovered new issues, add them
 
-**If feature is complete:**
-- Check all success criteria in SPEC.md
-- Update project docs_specflow/ADR.md if significant decisions were made
-- Update project docs_specflow/OVERVIEW.md if architecture changed
-- Consider moving feature to `docs_specflow/features/_completed/`
-
-{{else}}
-### Project Mode
-
-**docs_specflow/ROADMAP.md**
-- Mark completed task as done (move to Done section with date)
-- Adjust Now/Next if priorities changed
-- Add any new blockers discovered
-
-**docs_specflow/SESSION_LOG.md**
-Prepend a new entry:
-{{/if}}
-
-### Session Log Entry Format
+Example:
 ```markdown
-## Session: [TODAY'S DATE]
+## Now
+- [x] Add login endpoint [feature: user-auth]  ← Check this
+- [ ] Add password reset [feature: user-auth]
 
-**Role**: [backend/frontend/qa/architecture]
-**Task**: [Task from ROADMAP]
-**Branch**: {{BRANCH_CONVENTION}}/[branch-name]
+## Done
+- [x] Add login endpoint [feature: user-auth] - 2026-01-20
+```
+
+---
+
+## Step 3: Log Session
+
+Prepend entry to `docs_specflow/SESSION_LOG.md`:
+
+```markdown
+## [{{FEATURE_NAME}}] {{CURRENT_DATE}}
+
+**Task**: [Task description from ROADMAP]
+**Branch**: {{CURRENT_BRANCH}}
 
 ### Summary
 - [What was accomplished]
 
 ### Files Changed
-- [List of files modified]
+- [List key files modified]
 
 ### Decisions
-- [Any design decisions made]
+- [Design decisions made, or "None"]
 
 ### Blockers
 - [Issues encountered, or "None"]
 
 ### Next
-- [Suggested focus for next session]
+- [Suggested next task]
 
 ---
 ```
 
-### Update If Changed:
-- `docs_specflow/OVERVIEW.md` - if architecture or system description changed
-- `docs_specflow/ADR.md` - if significant technical decision was made (append new entry)
+---
 
-## 3. Final Commit
+## Step 4: Update Architecture Docs (If Needed)
 
-Ensure all changes are committed:
+Only if significant changes occurred:
+
+**docs_specflow/SPEC.md** (feature-specific):
+- Update "Implementation Decisions" section
+- Move resolved items from "Open Questions"
+
+**docs_specflow/ADR.md** (project-wide):
+- Add entry if major architectural decision was made
+
+**docs_specflow/OVERVIEW.md**:
+- Update if system architecture changed
+
+---
+
+## Step 5: Commit All Changes
+
 ```bash
 git status
 git add .
-git commit -m "{{COMMIT_CONVENTION}}: [description]"
-```
+git commit -m "{{COMMIT_CONVENTION}}: [description]
 
 {{#if TICKETING}}
-Include ticket reference: `{{COMMIT_CONVENTION}}: [description] ({{TICKET_FORMAT}})`
+{{TICKET_FORMAT}}
+
 {{/if}}
-
-## 4. {{GIT_WORKFLOW_NAME}}
-
-{{#if GIT_WORKFLOW_SOLO}}
-### Merge to Main
-
-Option A - Use merge script (if available):
-```bash
-./scripts/merge-to-main.sh
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```
 
-Option B - Manual merge:
+---
+
+## Step 6: Merge or Create PR
+
+{{#if GIT_WORKFLOW_SOLO}}
+### Solo Workflow - Merge to Main
+
 ```bash
 git checkout {{DEFAULT_BRANCH}}
 git pull origin {{DEFAULT_BRANCH}}
-git merge [branch-name]
+git merge {{CURRENT_BRANCH}}
 git push origin {{DEFAULT_BRANCH}}
-git branch -d [branch-name]
+git branch -d {{CURRENT_BRANCH}}
 ```
 {{/if}}
 
 {{#if GIT_WORKFLOW_PR_GITHUB}}
-### Create Pull Request
+### Team Workflow - Create PR
 
 Push branch:
 ```bash
-git push -u origin [branch-name]
+git push -u origin {{CURRENT_BRANCH}}
 ```
 
-Create PR:
+Create pull request:
 ```bash
 gh pr create --title "{{COMMIT_CONVENTION}}: [description]" --body "## Summary
-- [what was done]
+[What was done]
 
 ## Test Plan
-- [how to verify]
+- {{TEST_COMMAND}} passes
+- [Manual testing steps if any]
 
 {{#if TICKETING}}
-## Related
-- Ticket: {{TICKET_FORMAT}}
+Closes {{TICKET_FORMAT}}
 {{/if}}
 "
 ```
 
-**Do NOT merge** - wait for review.
+Wait for review before merging.
 {{/if}}
 
 {{#if GIT_WORKFLOW_PR_GITLAB}}
-### Create Merge Request
+### Team Workflow - Create MR
 
 Push branch:
 ```bash
-git push -u origin [branch-name]
+git push -u origin {{CURRENT_BRANCH}}
 ```
 
-Create MR:
+Create merge request:
 ```bash
 glab mr create --title "{{COMMIT_CONVENTION}}: [description]" --description "## Summary
-- [what was done]
+[What was done]
 
 ## Test Plan
-- [how to verify]
+- {{TEST_COMMAND}} passes
+- [Manual testing steps]
 "
 ```
 
-**Do NOT merge** - wait for review and CI.
+Wait for CI and review before merging.
 {{/if}}
 
-{{#if GIT_WORKFLOW_CICD}}
-### Create Merge Request
+---
 
-Push branch:
-```bash
-git push -u origin [branch-name]
+## Step 7: Session Summary
+
+Provide brief summary to user:
+
+```
+Session complete!
+
+**Accomplished**: [1-2 sentences]
+**Files changed**: [count] files
+**Tests**: Passing ✓
+**Next**: [Suggested next task from ROADMAP]
 ```
 
-Create MR:
-```bash
-{{MR_COMMAND}} --title "{{COMMIT_CONVENTION}}: [description]" --remove-source-branch
-```
+---
 
-The CI/CD pipeline will handle merge after approval.
+## Notes
 
-Check status:
-```bash
-{{MR_STATUS_COMMAND}}
-```
-
-**Do NOT attempt local merge.**
-{{/if}}
-
-## 5. Session Summary
-
-Provide a brief summary:
-- What was accomplished this session
-- Any issues encountered and how they were resolved
-- Suggestions for next session (if applicable)
+- Always update ROADMAP and SESSION_LOG
+- Keep session logs concise - key decisions only
+- Feature tags help track work across worktrees
+- Test before committing, always

@@ -57,29 +57,25 @@ The feature docs live in the worktree and travel with the branch.
 ~/projects/
 ├── my-app/                    # Main worktree (main branch)
 │   ├── CLAUDE.md
-│   ├── docs/
-│   │   ├── ROADMAP.md
-│   │   ├── SESSION_LOG.md
-│   │   └── features/
+│   ├── docs_specflow/
+│   │   ├── ROADMAP.md         # Central - tasks tagged [feature: name]
+│   │   ├── SESSION_LOG.md     # Central - sessions tagged [feature-name]
+│   │   └── feature_docs/
+│   │       └── user-auth/
+│   │           └── SPEC.md    # Feature requirements (frozen)
 │   └── src/
 │
 ├── my-app-user-auth/          # Worktree (feat/user-auth)
 │   ├── CLAUDE.md
-│   ├── docs/
+│   ├── docs_specflow/         # Same structure, diverged content
 │   │   ├── ROADMAP.md
 │   │   ├── SESSION_LOG.md
-│   │   └── features/
-│   │       └── user-auth/
-│   │           ├── SPEC.md
-│   │           ├── ROADMAP.md
-│   │           └── SESSION_LOG.md
+│   │   └── feature_docs/
 │   └── src/
 │
 └── my-app-api-v2/             # Worktree (feat/api-v2)
     ├── CLAUDE.md
-    ├── docs/
-    │   └── features/
-    │       └── api-v2/
+    ├── docs_specflow/
     └── src/
 ```
 
@@ -87,81 +83,50 @@ The feature docs live in the worktree and travel with the branch.
 
 ## Documentation Organization
 
-Worktrees work with **both** documentation organization styles:
+SpecFlow uses **central documentation** with feature tags:
 
-### Central Documentation + Worktrees
-
-Single `docs/` folder shared across all worktrees:
-- **ROADMAP.md**: One file with all tasks, tagged by worktree
-- **SESSION_LOG.md**: One file with all sessions, prefixed by worktree name
+- **ROADMAP.md**: Single file with all tasks, tagged by feature `[feature: name]`
+- **SESSION_LOG.md**: Single file with all sessions, prefixed by feature name `[feature-name]`
 
 **Task format in ROADMAP.md**:
 ```markdown
 ## Now
-- [ ] Fix authentication bug [worktree: auth-fix]
-- [ ] Add API v2 endpoints [worktree: api-v2]
+- [ ] Fix authentication bug [feature: user-auth]
+- [ ] Add API v2 endpoints [feature: api-v2]
 ```
 
 **Session format in SESSION_LOG.md**:
 ```markdown
-## [auth-fix] 2024-01-15
+## [user-auth] 2024-01-15
 
-**Task**: Fix authentication bug
-**Branch**: fix/auth-bug
-**Worktree**: auth-fix
+### Goal
+Fix authentication bug
 
-### Summary
+### Completed
 - Fixed token expiration logic
 - Added test coverage
 ```
 
-AI agents automatically filter tasks by detecting current worktree.
-
-### Per-Feature Documentation + Worktrees
-
-Feature docs travel with branches:
-- **docs/features/[name]/ROADMAP.md**: Feature-specific tasks
-- **docs/features/[name]/SESSION_LOG.md**: Feature-specific sessions
-
-**No tagging needed** - docs are already scoped to the feature.
+AI agents automatically filter tasks by detecting feature from the current branch name.
 
 ---
 
 ## Session Log Format
 
-### For Central Documentation
-
-To avoid merge conflicts, prefix entries with worktree name:
+To avoid merge conflicts, prefix entries with feature name:
 
 ```markdown
-## [worktree-name] 2024-01-15
+## [user-auth] 2024-01-15
 
-**Task**: Implement user authentication
-**Branch**: feat/user-auth
-**Worktree**: auth-fix
+### Goal
+Implement user authentication
 
-### Summary
+### Completed
 - Added login endpoint
 - Created JWT token generation
 
-### Next
+### Next Session
 - Add password reset flow
-
----
-```
-
-### For Per-Feature Documentation
-
-Use regular date format (docs are feature-scoped):
-
-```markdown
-## Session: 2024-01-15
-
-**Task**: Implement user authentication
-**Branch**: feat/user-auth
-
-### Summary
-- Added login endpoint
 
 ---
 ```
@@ -169,7 +134,7 @@ Use regular date format (docs are feature-scoped):
 This format ensures:
 - Entries from different worktrees don't conflict on merge
 - Git can auto-merge when both add at top of file
-- Easy to filter/search by worktree or feature
+- Easy to filter/search by feature name
 
 ---
 
@@ -190,7 +155,7 @@ Simply change directories:
 cd ../project-feature-b
 
 # Check context
-cat docs/features/feature-b/ROADMAP.md
+cat docs_specflow/ROADMAP.md
 ```
 
 No stashing, no branch switching, no lost context.
@@ -213,9 +178,9 @@ No stashing, no branch switching, no lost context.
 ### Feature Documentation
 
 When feature merges to main:
-- Feature's `docs/features/feature-name/` merges in
-- PROJECT-level `SESSION_LOG.md` entries merge (with feature prefix, no conflicts)
-- Feature-specific SESSION_LOG stays in feature folder
+- `docs_specflow/ROADMAP.md` and `SESSION_LOG.md` merge with feature-tagged entries
+- `docs_specflow/feature_docs/[feature-name]/SPEC.md` merges in (if created)
+- Feature-prefixed session entries avoid merge conflicts
 
 ### Handling Conflicts
 
@@ -228,8 +193,8 @@ If conflicts occur in docs:
 
 The main branch now has:
 - Completed feature code
-- Feature documentation in `docs/features/feature-name/`
-- Session history from both main and feature work
+- Feature SPEC in `docs_specflow/feature_docs/[feature-name]/SPEC.md`
+- Session history with feature prefix in `docs_specflow/SESSION_LOG.md`
 
 ---
 
@@ -268,16 +233,16 @@ git worktree prune
 
 When working with a user on a project using worktrees:
 
-1. **Detect parallelizable work**: If ROADMAP.md has multiple independent "Now" items, suggest worktrees
-2. **Context awareness**: Check if you're in main or a feature worktree
+1. **Detect parallelizable work**: If ROADMAP.md has multiple independent "Now" items with different feature tags, suggest worktrees
+2. **Context awareness**: Detect feature from branch name (e.g., `feat/user-auth` → `user-auth`)
 3. **Suggest worktree creation**: When user is blocked or wants to switch focus
-4. **Feature-scoped sessions**: Always use `--feature` flag when in a feature worktree
+4. **Filter by feature**: Show only tasks tagged with the current feature
 
 Example suggestion:
 ```
 I notice ROADMAP.md has two independent tasks in "Now":
-- User authentication (no dependencies)
-- API rate limiting (no dependencies)
+- User authentication [feature: user-auth]
+- API rate limiting [feature: api-v2]
 
 These could be developed in parallel using git worktrees. Would you like me to help set up a worktree for one of these features?
 ```

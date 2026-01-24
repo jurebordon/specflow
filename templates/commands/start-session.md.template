@@ -1,73 +1,82 @@
 # Start Session
 
-> The session plan has been approved. Begin implementation.
+> Plan approved. Verify environment and begin implementation.
 
 ---
 
-## Step 1: Detect Feature
+## Step 1: Confirm Context
 
-Confirm feature context from branch name:
 ```bash
-CURRENT_BRANCH=$(git branch --show-current)
+git branch --show-current
+git status
 ```
 
-Feature detected from plan-session should match current branch.
+- Feature from branch should match the plan
+- Working directory should be clean (or save WIP first)
 
 ---
 
-## Step 2: Verify Environment
+## Step 2: Pre-flight Check
 
-Run baseline checks:
+Run baseline tests:
 ```bash
 {{TEST_COMMAND}}
 ```
 
-Check for uncommitted changes:
+If tests fail, fix them before starting new work.
+
+---
+
+## Step 3: Implement
+
+Follow the approved session plan step-by-step:
+
+1. **Read relevant code** before making changes
+2. **Implement incrementally** - small, testable chunks
+3. **Commit frequently** with clear messages
+4. **Run tests often** - catch issues early
+
+### Commit Convention
 ```bash
-git status
+{{COMMIT_CONVENTION}}: [clear description]
 ```
 
-If tests fail or uncommitted changes exist, resolve before proceeding.
-
-## 2. Create Feature Branch
-
-```bash
-git checkout {{DEFAULT_BRANCH}} && git pull origin {{DEFAULT_BRANCH}}
-git checkout -b {{BRANCH_CONVENTION}}/[description]
-```
-
-Branch naming: `{{BRANCH_CONVENTION}}/short-description`
-Examples: `feat/user-auth`, `fix/login-bug`, `refactor/api-cleanup`
-
 {{#if TICKETING}}
-Include ticket reference: `{{BRANCH_CONVENTION}}/{{TICKET_FORMAT}}-description`
+Include ticket in commits: `{{COMMIT_CONVENTION}}: [description] ({{TICKET_FORMAT}})`
 {{/if}}
 
-## 3. Determine Role
+Examples:
+- `feat: add user authentication endpoint`
+- `fix: handle null values in login form`
+- `refactor: extract validation logic to separate module`
+- `test: add edge cases for password reset`
 
-Based on the task, read the appropriate agent guide:
-- Backend work → `.ai/agents/backend.md`
-{{#if HAS_FRONTEND}}
-- Frontend work → `.ai/agents/frontend.md`
-{{/if}}
-- Testing focus → `.ai/agents/qa.md`
-- Architecture decisions → `.ai/agents/architecture.md`
+---
 
-## 4. Begin Implementation
+## Step 4: Track Progress
 
-- Mark the task as in_progress in your tracking
-- Follow the session plan step by step
-- Commit frequently with clear messages
-- Note any decisions or blockers as you encounter them
+As you work:
+- Note any **decisions** made (for session log)
+- Document **blockers** encountered (for ROADMAP)
+- Track **files changed** (for session log)
+- Consider if decisions need ADR entry
 
-**Commit convention**: `{{COMMIT_CONVENTION}}`
-{{#if TICKETING}}
-Include ticket reference in commits: `{{TICKET_FORMAT}}`
-{{/if}}
+---
 
 ## Guidelines
 
-- Stay within scope - one task, one session
-- Commit after each logical chunk of work
-- If blocked, document it and consider ending session early
-- Don't create backup files - git is your safety net
+- **Stay focused**: One task per session
+- **Test continuously**: Don't accumulate untested code
+- **Commit often**: After each logical change
+- **Ask if stuck**: Don't spend >15min debugging alone
+- **No backup files**: Use git branches instead
+
+---
+
+## When Done
+
+Run `/end-session` to:
+1. Run final tests
+2. Update ROADMAP (mark task complete)
+3. Log session in SESSION_LOG
+4. Create PR or merge to main
