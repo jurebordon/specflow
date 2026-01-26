@@ -230,6 +230,9 @@ Select which layers to enable:
 | **Frontend** | UI components, state management |
 | **QA** | Testing, quality assurance |
 | **Architecture** | Design decisions, system structure |
+| **Build Error Resolver** | Build failures, type errors, dependency issues |
+| **Security Reviewer** | Security auditing, vulnerability detection |
+| **Refactor Cleaner** | Dead code removal, complexity reduction, cleanup |
 | **Data** | DBT, data pipelines, analytics |
 | **DevOps** | Infrastructure, CI/CD, deployment |
 
@@ -248,10 +251,13 @@ Select which layers to enable:
 | `AGENT_MODEL_ARCHITECTURE` | Architecture | `opus` | Reasoning-heavy design decisions |
 | `AGENT_MODEL_BACKEND` | Backend | `sonnet` | Standard implementation work |
 | `AGENT_MODEL_FRONTEND` | Frontend | `sonnet` | Standard implementation work |
+| `AGENT_MODEL_BUILD_ERROR` | Build Error Resolver | `sonnet` | Fast iteration on error fixing |
+| `AGENT_MODEL_SECURITY` | Security Reviewer | `opus` | Reasoning-heavy security analysis |
+| `AGENT_MODEL_REFACTOR` | Refactor Cleaner | `sonnet` | Standard refactoring work |
 
 Available tiers: `opus` (strongest reasoning), `sonnet` (balanced), `haiku` (fastest/cheapest)
 
-*Accept defaults unless you have specific cost or capability preferences. Architecture defaults to opus because design trade-offs benefit from deeper reasoning.*
+*Accept defaults unless you have specific cost or capability preferences. Architecture and Security Reviewer default to opus because design trade-offs and security analysis benefit from deeper reasoning.*
 
 ---
 

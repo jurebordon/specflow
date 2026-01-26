@@ -335,6 +335,9 @@ When processing templates, replace these variables:
 | {{AGENT_MODEL_ARCHITECTURE}} | config (default: opus) |
 | {{AGENT_MODEL_BACKEND}} | config (default: sonnet) |
 | {{AGENT_MODEL_FRONTEND}} | config (default: sonnet) |
+| {{AGENT_MODEL_BUILD_ERROR}} | config (default: sonnet) |
+| {{AGENT_MODEL_SECURITY}} | config (default: opus) |
+| {{AGENT_MODEL_REFACTOR}} | config (default: sonnet) |
 | {{PYTHON}} | detected (boolean) |
 | {{TYPESCRIPT}} | detected (boolean) |
 | {{GO}} | detected (boolean) |
