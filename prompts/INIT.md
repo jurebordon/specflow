@@ -269,6 +269,23 @@ Add statusLine config to `.claude/settings.json`:
 { "statusLine": { "command": "node .claude/statusline.js" } }
 ```
 
+### Generate Agents:
+Copy and customize from `.specflow/templates/agents/`:
+
+**Always generate** (core agents):
+- `.claude/agents/base.md` - Base agent with shared principles and session ritual
+- `.claude/agents/qa.md` - Test writing and quality assurance
+- `.claude/agents/architecture.md` - Architecture review and system design (read-only, advisory)
+- `.claude/agents/backend.md` - Backend implementation patterns
+- `.claude/agents/frontend.md` - Frontend implementation patterns
+
+**Generate based on user selection** (specialist agents — ask in Step 5.5 or default to all if technical layers enabled):
+- `.claude/agents/build-error-resolver.md` - Diagnose and fix build failures, type errors, dependency issues
+- `.claude/agents/security-reviewer.md` - Security auditing, OWASP top 10 review (read-only, advisory)
+- `.claude/agents/refactor-cleaner.md` - Dead code removal, complexity reduction, naming improvements
+
+Each agent template includes YAML frontmatter with a configurable `model` field using `{{AGENT_MODEL_*}}` variables. Defaults are defined in `.specflow/configuration/AGENT_TIERS.md`. Architecture and Security agents default to `opus` (reasoning-heavy advisory roles); all others default to `sonnet`.
+
 ### For Greenfield/Constrained with PRD/Spec:
 - `docs_specflow/frozen/PRD.md` - User's PRD
 - `docs_specflow/frozen/TECH_SPEC.md` - User's Tech Spec
@@ -397,13 +414,13 @@ my-project/
 │   └── configuration/
 ├── .specflow-config.md        # Project settings (tracked)
 ├── CLAUDE.md                  # AI context (tracked)
-├── docs/
+├── docs_specflow/
 │   ├── ROADMAP.md
 │   ├── SESSION_LOG.md
 │   ├── WORKFLOW.md
-│   ├── VISION.md              # Standard/Full
-│   ├── OVERVIEW.md            # Standard/Full
-│   ├── ADR.md                 # Standard/Full
+│   ├── VISION.md
+│   ├── OVERVIEW.md
+│   ├── ADR.md
 │   ├── LEARNED_PATTERNS.md    # Discovered patterns journal
 │   └── frozen/                # If PRD/Spec provided
 │       ├── PRD.md
@@ -430,7 +447,14 @@ my-project/
 │   │   ├── testing.md
 │   │   └── documentation.md
 │   ├── agents/                   # Role-specific agents
-│   │   └── *.md
+│   │   ├── base.md              # Shared principles
+│   │   ├── qa.md                # Test & quality
+│   │   ├── architecture.md      # Architecture review (advisory)
+│   │   ├── backend.md           # Backend patterns
+│   │   ├── frontend.md          # Frontend patterns
+│   │   ├── build-error-resolver.md  # Build failure diagnosis
+│   │   ├── security-reviewer.md     # Security auditing (advisory)
+│   │   └── refactor-cleaner.md      # Dead code & complexity
 │   ├── statusline.js             # If statusline enabled
 │   └── settings.json             # Hooks + statusline config
 ```

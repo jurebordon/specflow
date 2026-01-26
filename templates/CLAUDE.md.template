@@ -25,6 +25,8 @@ Read these before making changes:
 | 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
 | 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
 
+> **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
+
 {{#if DOCS_EXTERNAL}}
 > Note: Documentation is stored externally at `{{DOCS_EXTERNAL_PATH}}`
 {{/if}}
@@ -63,6 +65,23 @@ Always-loaded coding guidelines:
 ### Statusline
 Real-time display: context usage %, current feature, TODO progress, git status.
 {{/if}}
+
+## Agents
+
+Role-specific agents in `.claude/agents/` provide specialized behavior:
+
+| Agent | Role | Model Tier |
+|-------|------|------------|
+| `base.md` | Shared principles and session ritual | {{AGENT_MODEL_BASE}} |
+| `qa.md` | Test writing and quality assurance | {{AGENT_MODEL_QA}} |
+| `architecture.md` | Architecture review and system design (advisory, read-only) | {{AGENT_MODEL_ARCHITECTURE}} |
+| `backend.md` | Backend implementation patterns | {{AGENT_MODEL_BACKEND}} |
+| `frontend.md` | Frontend implementation patterns | {{AGENT_MODEL_FRONTEND}} |
+| `build-error-resolver.md` | Build failures, type errors, dependency issues | {{AGENT_MODEL_BUILD_ERROR}} |
+| `security-reviewer.md` | Security auditing, OWASP review (advisory, read-only) | {{AGENT_MODEL_SECURITY}} |
+| `refactor-cleaner.md` | Dead code removal, complexity reduction | {{AGENT_MODEL_REFACTOR}} |
+
+Advisory agents (architecture, security-reviewer) have read/search access only — they report findings but don't modify code.
 
 ## Key Patterns
 
