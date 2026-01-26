@@ -1,0 +1,69 @@
+# Git Workflow
+
+> Follow these conventions for all git operations.
+
+## Branches
+
+- Create branches from `{{DEFAULT_BRANCH}}` using the `{{BRANCH_CONVENTION}}` pattern.
+- Examples: `feat/add-search`, `fix/null-pointer`, `refactor/auth-module`.
+- Keep branches short-lived. One feature or fix per branch.
+
+## Commits
+
+- Format: `type: concise description` (lowercase, imperative mood, no period).
+- Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
+- Make atomic commits. Each commit should compile and pass tests.
+- Add co-author line for AI-assisted work:
+  ```
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
+
+{{#if TICKETING}}
+## Ticket References
+
+- Include ticket reference in commit body: `{{TICKET_FORMAT}}`.
+- Reference tickets in PR/MR descriptions.
+{{/if}}
+
+## Pre-Commit Checks
+
+Run these before every commit:
+
+{{#if TEST_COMMAND}}
+- Tests: `{{TEST_COMMAND}}`
+{{/if}}
+{{#if LINT_COMMAND}}
+- Lint: `{{LINT_COMMAND}}`
+{{/if}}
+{{#if BUILD_COMMAND}}
+- Build: `{{BUILD_COMMAND}}`
+{{/if}}
+
+Fix failures before committing. Do not commit broken code.
+
+{{#if GIT_WORKFLOW_SOLO}}
+## Solo Workflow
+
+- Work on feature branches, merge to `{{DEFAULT_BRANCH}}` when tests pass.
+- Push frequently to keep the remote in sync.
+- Delete branches after merging.
+- No PR required for small fixes directly on `{{DEFAULT_BRANCH}}`.
+{{/if}}
+
+{{#if GIT_WORKFLOW_PR}}
+## PR Workflow
+
+- Always work on feature branches. Never commit directly to `{{DEFAULT_BRANCH}}`.
+- Push branch and create a PR with a summary of changes and test plan.
+- Wait for review before merging. Do not self-merge unless explicitly allowed.
+- Keep PRs small and focused. Split large changes into stacked PRs.
+{{/if}}
+
+{{#if GIT_WORKFLOW_CICD}}
+## CI/CD Workflow
+
+- Always work on feature branches. Never commit directly to `{{DEFAULT_BRANCH}}`.
+- Create MR/PR and let the pipeline run before requesting review.
+- Do not merge until pipeline passes. Fix pipeline failures immediately.
+- Rebase on `{{DEFAULT_BRANCH}}` if behind, rather than merge commits.
+{{/if}}

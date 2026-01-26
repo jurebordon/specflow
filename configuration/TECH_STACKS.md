@@ -15,6 +15,8 @@
 TEST_COMMAND: pytest
 BUILD_COMMAND: python -m build
 LINT_COMMAND: ruff check .
+FORMAT_COMMAND: ruff format .
+TYPECHECK_COMMAND: mypy .
 ```
 
 ### Common Frameworks
@@ -36,6 +38,8 @@ LINT_COMMAND: ruff check .
 TEST_COMMAND: dbt test
 BUILD_COMMAND: dbt build
 LINT_COMMAND: sqlfluff lint
+FORMAT_COMMAND: sqlfluff fix
+TYPECHECK_COMMAND: # No type check for SQL
 ```
 
 ---
@@ -51,6 +55,8 @@ LINT_COMMAND: sqlfluff lint
 TEST_COMMAND: npm test
 BUILD_COMMAND: npm run build
 LINT_COMMAND: eslint .
+FORMAT_COMMAND: npx prettier --write .
+TYPECHECK_COMMAND: npx tsc --noEmit
 ```
 
 ### Common Frameworks
@@ -72,6 +78,8 @@ LINT_COMMAND: eslint .
 TEST_COMMAND: rspec
 BUILD_COMMAND: bundle install
 LINT_COMMAND: rubocop
+FORMAT_COMMAND: rubocop -A
+TYPECHECK_COMMAND: # No standard type check for Ruby
 ```
 
 ### Common Frameworks
@@ -91,6 +99,8 @@ LINT_COMMAND: rubocop
 TEST_COMMAND: go test ./...
 BUILD_COMMAND: go build
 LINT_COMMAND: golangci-lint run
+FORMAT_COMMAND: gofmt -w .
+TYPECHECK_COMMAND: go vet ./...
 ```
 
 ---
@@ -106,6 +116,8 @@ LINT_COMMAND: golangci-lint run
 TEST_COMMAND: cargo test
 BUILD_COMMAND: cargo build --release
 LINT_COMMAND: cargo clippy
+FORMAT_COMMAND: cargo fmt
+TYPECHECK_COMMAND: cargo check
 ```
 
 ---
@@ -123,6 +135,8 @@ LINT_COMMAND: cargo clippy
 TEST_COMMAND: mvn test
 BUILD_COMMAND: mvn package
 LINT_COMMAND: mvn checkstyle:check
+FORMAT_COMMAND: # Use IDE formatter or google-java-format
+TYPECHECK_COMMAND: mvn compile
 ```
 
 **Gradle**:
@@ -130,13 +144,15 @@ LINT_COMMAND: mvn checkstyle:check
 TEST_COMMAND: ./gradlew test
 BUILD_COMMAND: ./gradlew build
 LINT_COMMAND: ./gradlew checkstyleMain
+FORMAT_COMMAND: # Use IDE formatter or google-java-format
+TYPECHECK_COMMAND: ./gradlew compileJava
 ```
 
 ---
 
 ## Mixed Stack Projects
 
-When multiple languages are detected, store commands as arrays:
+When multiple languages are detected, store commands as arrays. `FORMAT_COMMAND` and `TYPECHECK_COMMAND` follow the same mixed-stack pattern -- use `FORMAT_COMMANDS` and `TYPECHECK_COMMANDS` arrays with context-specific entries, just like the other command types.
 
 ```yaml
 TEST_COMMANDS:
@@ -156,6 +172,18 @@ LINT_COMMANDS:
     command: ruff check .
   - context: SQL
     command: sqlfluff lint
+
+FORMAT_COMMANDS:
+  - context: Python
+    command: ruff format .
+  - context: SQL
+    command: sqlfluff fix
+
+TYPECHECK_COMMANDS:
+  - context: Python
+    command: mypy .
+  - context: SQL
+    command: # No type check for SQL
 ```
 
 AI agents should:
@@ -193,5 +221,7 @@ If no build tool is detected:
 - TEST_COMMAND: "# No test command configured"
 - BUILD_COMMAND: "# No build command configured"
 - LINT_COMMAND: "# No lint command configured"
+- FORMAT_COMMAND: "# No format command configured"
+- TYPECHECK_COMMAND: "# No type check command configured"
 
-AI should ask user: "No build tools detected. What commands should I use for testing/building/linting?"
+AI should ask user: "No build tools detected. What commands should I use for testing/building/linting/formatting/type checking?"

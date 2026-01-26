@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+// Hook: PostToolUse (matcher: Write|Edit)
+// Runs the project's formatter on edited files after write/edit operations.
+
+const path = require('path');
+const { execSync } = require('child_process');
+
+const SKIP_EXTENSIONS = new Set([
+  '.md', '.markdown', '.txt', '.json', '.yaml', '.yml',
+  '.toml', '.ini', '.cfg', '.conf', '.env', '.lock',
+  '.gitignore', '.dockerignore', '.editorconfig'
+]);
+
+async function main() {
+  let input = '';
+  for await (const chunk of process.stdin) input += chunk;
+  const data = JSON.parse(input);
+
+  const toolInput = data.tool_input || {};
+  const filePath = toolInput.file_path || toolInput.path || '';
+
+  if (!filePath) {
+    process.exit(0);
+  }
+
+  const formatCommand = '{{FORMAT_COMMAND}}';
+
+  // Skip if no format command configured or commented out
+  if (!formatCommand || formatCommand.startsWith('#') || formatCommand === '{{FORMAT_COMMAND}}') {
+    process.exit(0);
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  if (SKIP_EXTENSIONS.has(ext) || !ext) {
+    process.exit(0);
+  }
+
+  try {
+    execSync(formatCommand + ' ' + JSON.stringify(filePath), {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 10000
+    });
+  } catch (err) {
+    const stderr = err.stderr ? err.stderr.toString() : err.message;
+    process.stderr.write('auto-format: formatting warning: ' + stderr + '\n');
+  }
+
+  process.exit(0);
+}
+
+main().catch((err) => {
+  process.stderr.write('auto-format: ' + err.message + '\n');
+  process.exit(0);
+});

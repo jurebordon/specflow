@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+// Hook: PreToolUse (matcher: Write|Edit)
+// Blocks edits to frozen documentation files (VISION.md, SPEC.md requirements).
+
+const path = require('path');
+
+async function main() {
+  let input = '';
+  for await (const chunk of process.stdin) input += chunk;
+  const data = JSON.parse(input);
+
+  const toolInput = data.tool_input || {};
+  const filePath = toolInput.file_path || toolInput.path || '';
+
+  if (!filePath) {
+    process.exit(0);
+  }
+
+  const resolved = path.resolve(filePath);
+  const docsPath = path.sep + '{{DOCS_PATH}}' + path.sep;
+
+  // Block edits to VISION.md
+  if (resolved.includes(docsPath) && resolved.endsWith(path.sep + 'VISION.md')) {
+    process.stderr.write(
+      'BLOCKED: {{DOCS_PATH}}/VISION.md is frozen. ' +
+      'This file requires explicit user approval before editing. ' +
+      'Ask the user for permission first.\n'
+    );
+    process.exit(2);
+  }
+
+  // Block edits to feature SPEC.md files
+  const specPattern = new RegExp(
+    '{{DOCS_PATH}}' .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
+    '[/\\\\]feature_docs[/\\\\][^/\\\\]+[/\\\\]SPEC\\.md$'
+  );
+  if (specPattern.test(resolved)) {
+    process.stderr.write(
+      'BLOCKED: Feature SPEC.md files have frozen requirements sections. ' +
+      'Modifications require explicit user approval. ' +
+      'Ask the user for permission first.\n'
+    );
+    process.exit(2);
+  }
+
+  process.exit(0);
+}
+
+main().catch((err) => {
+  process.stderr.write('doc-file-blocker: ' + err.message + '\n');
+  process.exit(0);
+});

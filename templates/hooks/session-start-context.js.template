@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+// Hook: SessionStart
+// Auto-loads ROADMAP.md, recent SESSION_LOG.md entries, and feature SPEC.md into session context.
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+function readFileSafe(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+function readFirstLines(filePath, n) {
+  const content = readFileSafe(filePath);
+  if (!content) return null;
+  return content.split('\n').slice(0, n).join('\n');
+}
+
+function detectFeature() {
+  try {
+    const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+    const match = branch.match(/^(?:feat|feature|fix|refactor)\/(.+)$/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+async function main() {
+  let input = '';
+  for await (const chunk of process.stdin) input += chunk;
+  const data = JSON.parse(input);
+
+  const cwd = data.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  const docsPath = path.join(cwd, '{{DOCS_PATH}}');
+  const sections = [];
+
+  const roadmap = readFileSafe(path.join(docsPath, 'ROADMAP.md'));
+  if (roadmap) {
+    sections.push('## ROADMAP.md\n\n' + roadmap);
+  }
+
+  const sessionLog = readFirstLines(path.join(docsPath, 'SESSION_LOG.md'), 100);
+  if (sessionLog) {
+    sections.push('## SESSION_LOG.md (recent)\n\n' + sessionLog);
+  }
+
+  const feature = detectFeature();
+  if (feature) {
+    const specPath = path.join(docsPath, 'feature_docs', feature, 'SPEC.md');
+    const spec = readFileSafe(specPath);
+    if (spec) {
+      sections.push('## Feature SPEC: ' + feature + '\n\n' + spec);
+    }
+  }
+
+  if (sections.length > 0) {
+    const context = sections.join('\n\n---\n\n');
+    const output = {
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: context
+      }
+    };
+    process.stdout.write(JSON.stringify(output));
+  }
+}
+
+main().catch((err) => {
+  process.stderr.write('session-start-context: ' + err.message + '\n');
+});

@@ -118,6 +118,27 @@ Ask: "May I scan your project to detect the tech stack? This helps generate appr
 
 Store in config for generating tech-adaptive commands.
 
+## Step 5.5: Technical Enforcement Layers
+
+Ask: "Enable technical enforcement layers? These add automated hooks, coding rules, and a statusline to improve AI-assisted development."
+
+Options:
+- **Yes (recommended)**: Generate hooks, rules, and statusline
+- **No**: Skip technical layers (docs and commands only)
+- **Partial**: Choose which layers to enable
+
+If YES: Enable all layers.
+
+If PARTIAL, ask which to enable:
+- **Hooks**: Automated behaviors at session lifecycle points (auto-load context, format code, block frozen doc edits)
+- **Rules**: Always-loaded coding guidelines (style, git, security, testing, documentation conventions)
+- **Statusline**: Real-time display showing context usage, feature name, and TODO progress
+
+Store in config:
+- **Hooks**: enabled/disabled
+- **Rules**: enabled/disabled
+- **Statusline**: enabled/disabled
+
 ## Step 6: Documentation Tracking
 
 Ask: "Should docs_specflow/ be tracked in git or gitignored?"
@@ -171,6 +192,13 @@ Create `docs_specflow/.specflow-config.md` (inherits tracking from docs_specflow
 ## Documentation
 - **Path**: docs_specflow/
 - **Tracking**: [gitignored/tracked]
+
+## Technical Layers
+- **Hooks**: [enabled/disabled]
+- **Rules**: [enabled/disabled]
+- **Statusline**: [enabled/disabled]
+- **Format Command**: [ruff format . / npx prettier --write . / etc.]
+- **Typecheck Command**: [mypy . / npx tsc --noEmit / etc.]
 ```
 
 ## Step 8: Check for Existing CLAUDE.md
@@ -207,6 +235,35 @@ Copy and customize from `.specflow/templates/commands/`:
 - `.claude/commands/end-session.md`
 - `.claude/commands/new-feature.md`
 - `.claude/commands/new-worktree.md` - Advanced, for parallel development
+
+### Generate Technical Layers (if enabled):
+
+**Hooks** (if enabled):
+Copy and customize from `.specflow/templates/hooks/`:
+- `.claude/hooks/session-start-context.js` - Auto-load project context on session start
+- `.claude/hooks/doc-file-blocker.js` - Block edits to frozen documentation
+- `.claude/hooks/auto-format.js` - Auto-format code after edits
+- `.claude/hooks/compact-suggester.js` - Suggest /compact at high context usage
+- `.claude/hooks/git-push-reminder.js` - Remind to push unpushed commits
+- `.claude/hooks/session-end-persist.js` - Save session state snapshot
+
+Merge `.specflow/templates/settings/hooks.json.template` into `.claude/settings.json`
+
+**Rules** (if enabled):
+Copy and customize from `.specflow/templates/rules/`:
+- `.claude/rules/coding-style.md` - Language-specific coding standards
+- `.claude/rules/git-workflow.md` - Branch, commit, and PR conventions
+- `.claude/rules/security.md` - Secret protection and secure coding
+- `.claude/rules/testing.md` - Test commands and quality standards
+- `.claude/rules/documentation.md` - SpecFlow documentation conventions
+
+**Statusline** (if enabled):
+Copy and customize from `.specflow/templates/settings/`:
+- `.claude/statusline.js` - Real-time status display
+Add statusLine config to `.claude/settings.json`:
+```json
+{ "statusLine": { "command": "node .claude/statusline.js" } }
+```
 
 ### For Greenfield/Constrained with PRD/Spec:
 - `docs_specflow/frozen/PRD.md` - User's PRD
@@ -267,6 +324,19 @@ When processing templates, replace these variables:
 | {{TICKETING}} | config |
 | {{TICKET_FORMAT}} | config |
 | {{DATE}} | current date |
+| {{FORMAT_COMMAND}} | config |
+| {{TYPECHECK_COMMAND}} | config |
+| {{DOCS_PATH}} | config (default: docs_specflow) |
+| {{ENABLE_HOOKS}} | config |
+| {{ENABLE_RULES}} | config |
+| {{ENABLE_STATUSLINE}} | config |
+| {{PYTHON}} | detected (boolean) |
+| {{TYPESCRIPT}} | detected (boolean) |
+| {{GO}} | detected (boolean) |
+| {{RUST}} | detected (boolean) |
+| {{RUBY}} | detected (boolean) |
+| {{JAVA}} | detected (boolean) |
+| {{DBT}} | detected (boolean) |
 
 Conditional blocks use Handlebars syntax:
 - {{#if VARIABLE}}...{{/if}}
@@ -326,16 +396,28 @@ my-project/
 │       ├── PRD.md
 │       └── TECH_SPEC.md
 ├── .claude/
-│   └── commands/
-│       ├── plan-session.md
-│       ├── start-session.md
-│       ├── end-session.md
-│       ├── pivot-session.md
-│       ├── new-feature.md     # If using features
-│       └── new-worktree.md    # If using worktrees
-└── .ai/
-    └── agents/                # Full depth only
-        └── *.md
+│   ├── commands/
+│   │   ├── plan-session.md
+│   │   ├── start-session.md
+│   │   ├── end-session.md
+│   │   └── ...
+│   ├── hooks/                    # If hooks enabled
+│   │   ├── session-start-context.js
+│   │   ├── doc-file-blocker.js
+│   │   ├── auto-format.js
+│   │   ├── compact-suggester.js
+│   │   ├── git-push-reminder.js
+│   │   └── session-end-persist.js
+│   ├── rules/                    # If rules enabled
+│   │   ├── coding-style.md
+│   │   ├── git-workflow.md
+│   │   ├── security.md
+│   │   ├── testing.md
+│   │   └── documentation.md
+│   ├── agents/                   # Role-specific agents
+│   │   └── *.md
+│   ├── statusline.js             # If statusline enabled
+│   └── settings.json             # Hooks + statusline config
 ```
 
 ---

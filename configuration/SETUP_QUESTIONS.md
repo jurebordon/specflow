@@ -160,6 +160,40 @@ The setup process uses these questions to generate appropriate documentation and
 
 ---
 
+## 5.5 Technical Enforcement Layers
+
+**Question**: Enable technical enforcement layers?
+
+| Option | Description |
+|--------|-------------|
+| **Yes (recommended)** | Generate hooks, rules, and statusline for automated quality enforcement |
+| **No** | Skip technical layers — generate only documentation and session commands |
+| **Partial** | Choose which layers to enable individually |
+
+### What Gets Generated
+
+| Layer | Files Generated | Purpose |
+|-------|----------------|---------|
+| **Hooks** | `.claude/hooks/*.js` + settings.json config | Automated behaviors: auto-load context, block frozen docs, auto-format, compact suggestions, git push reminders |
+| **Rules** | `.claude/rules/*.md` | Always-loaded guidelines: coding style, git workflow, security, testing, documentation conventions |
+| **Statusline** | `.claude/statusline.js` + settings.json config | Real-time display: context usage %, feature name, TODO progress, git status |
+
+### Follow-up (if Partial)
+
+Select which layers to enable:
+- **Hooks**: Session lifecycle automation
+- **Rules**: Persistent coding guidelines
+- **Statusline**: Real-time status display
+
+### Variables Added to Config
+
+| Variable | Source |
+|----------|--------|
+| **Format Command** | Detected from tech stack (e.g., `ruff format .`, `npx prettier --write .`) |
+| **Typecheck Command** | Detected from tech stack (e.g., `mypy .`, `npx tsc --noEmit`) |
+
+---
+
 ## 6. Documentation Location
 
 **Question**: Should SpecFlow documentation be tracked in git?

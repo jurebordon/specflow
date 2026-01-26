@@ -1,0 +1,78 @@
+# Testing
+
+> Follow these standards for all test code.
+
+## Commands
+
+{{#if TEST_COMMAND}}
+- Run tests: `{{TEST_COMMAND}}`
+{{/if}}
+{{#if LINT_COMMAND}}
+- Run linter: `{{LINT_COMMAND}}`
+{{/if}}
+{{#if TYPECHECK_COMMAND}}
+- Type check: `{{TYPECHECK_COMMAND}}`
+{{/if}}
+
+## When to Test
+
+- Run tests before every commit. Do not commit if tests fail.
+- Add tests alongside new features and bug fixes.
+- Run the full test suite after refactoring, even if changes seem safe.
+
+## Test Quality
+
+- Test behavior, not implementation details. Tests should survive refactoring.
+- One assertion concept per test. Test name should describe what is being verified.
+- Use descriptive test names: `test_expired_token_returns_401`, not `test_auth_3`.
+- Cover edge cases: empty inputs, nulls, boundary values, error paths.
+- Never write flaky tests. If a test depends on timing or external state, mock it.
+- Keep tests fast. Slow tests get skipped.
+
+{{#if PYTHON}}
+## Python Testing
+
+- Use pytest with fixtures for test setup and teardown.
+- Organize tests: `tests/unit/` and `tests/integration/` directories.
+- Use `@pytest.mark.parametrize` for testing multiple inputs.
+- Use `unittest.mock.patch` or `pytest-mock` for mocking external dependencies.
+- Name test files `test_*.py` and test functions `test_*`.
+{{/if}}
+
+{{#if TYPESCRIPT}}
+## TypeScript Testing
+
+- Use the project's configured test runner.
+- Mock external dependencies (APIs, databases, file system).
+- For React components, prefer `@testing-library/react` with `user-event`.
+- Test component behavior from the user's perspective, not internal state.
+- Use `describe` blocks to group related tests.
+{{/if}}
+
+{{#if GO}}
+## Go Testing
+
+- Use table-driven tests for functions with multiple input/output combinations.
+- Use `testify` for assertions and `require` for fatal checks.
+- Run tests with `-race` flag to detect data races.
+- Use `t.Parallel()` for independent tests to speed up the suite.
+- Place tests in `*_test.go` files alongside the code they test.
+{{/if}}
+
+{{#if RUST}}
+## Rust Testing
+
+- Use `#[test]` for unit tests in the same file, `tests/` directory for integration tests.
+- Use `proptest` or `quickcheck` for property-based testing where appropriate.
+- Test error cases explicitly with `assert!(result.is_err())`.
+- Use `#[should_panic]` sparingly. Prefer testing `Result` values.
+- Run `cargo test` with `--all-features` to catch feature-gated issues.
+{{/if}}
+
+{{#if DBT}}
+## dbt Testing
+
+- Add `not_null` and `unique` tests to all primary keys.
+- Add referential integrity tests between related models.
+- Use `dbt test` after every model change.
+{{/if}}

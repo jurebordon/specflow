@@ -1,0 +1,202 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * SpecFlow Statusline Script
+ *
+ * Displays: [model] CTX:nn% | feature-name* | TODO:n/n
+ *
+ * Reads JSON context from stdin (provided by Claude Code),
+ * gathers git and project info, and outputs a single status line.
+ *
+ * Placed at: .claude/statusline.js
+ * Configured in settings.json: { "statusLine": { "command": "node .claude/statusline.js" } }
+ */
+
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const DOCS_PATH = '{{DOCS_PATH}}';
+
+/**
+ * Read and parse JSON from stdin (Claude Code passes context).
+ */
+function readStdin() {
+  try {
+    const input = fs.readFileSync(0, 'utf-8').trim();
+    if (!input) return {};
+    return JSON.parse(input);
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Extract model display name from stdin context.
+ */
+function getModelName(ctx) {
+  try {
+    if (ctx.model && ctx.model.display_name) return ctx.model.display_name;
+    if (ctx.model && typeof ctx.model === 'string') return ctx.model;
+    if (ctx.model_name) return ctx.model_name;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compute context window usage percentage with text-based severity indicators.
+ * - CTX:45%    (normal, <= 70%)
+ * - CTX:75%!   (warning, > 70%)
+ * - CTX:90%!!  (critical, > 85%)
+ */
+function getContextUsage(ctx) {
+  try {
+    let used = null;
+    let total = null;
+
+    // Try common field shapes that Claude Code may provide
+    if (ctx.context_window) {
+      used = ctx.context_window.used || ctx.context_window.tokens_used;
+      total = ctx.context_window.total || ctx.context_window.max_tokens;
+    }
+    if (used == null && ctx.tokens_used != null) used = ctx.tokens_used;
+    if (total == null && ctx.max_tokens != null) total = ctx.max_tokens;
+    if (used == null && ctx.usage && ctx.usage.total_tokens != null) used = ctx.usage.total_tokens;
+    if (total == null && ctx.context_length != null) total = ctx.context_length;
+
+    if (used == null || total == null || total === 0) return null;
+
+    const pct = Math.round((used / total) * 100);
+    let suffix = '';
+    if (pct > 85) suffix = '!!';
+    else if (pct > 70) suffix = '!';
+
+    return `CTX:${pct}%${suffix}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get current git branch, extract feature name, and check dirty state.
+ * - feat/my-feature with dirty working tree -> "my-feature*"
+ * - main with clean working tree -> "main"
+ */
+function getGitInfo() {
+  try {
+    const branch = execSync('git branch --show-current', {
+      encoding: 'utf-8',
+      timeout: 2000,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+
+    if (!branch) return null;
+
+    // Extract feature name from branch pattern (feat/name, fix/name, etc.)
+    const match = branch.match(/^(?:feat|fix|refactor|feature|bugfix)\/(.+)$/);
+    const displayName = match ? match[1] : branch;
+
+    // Check if working tree is dirty
+    let dirty = false;
+    try {
+      const status = execSync('git status --porcelain', {
+        encoding: 'utf-8',
+        timeout: 2000,
+        stdio: ['pipe', 'pipe', 'pipe'],
+      }).trim();
+      dirty = status.length > 0;
+    } catch {
+      // If git status fails, assume clean
+    }
+
+    return `${displayName}${dirty ? '*' : ''}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Read ROADMAP.md and count TODO progress in the "Now" section only.
+ * Returns "TODO:completed/total" (e.g., "TODO:3/7").
+ *
+ * Looks for checked [x] and unchecked [ ] items between the "Now" heading
+ * and the next same-level (or higher) heading.
+ */
+function getTodoProgress() {
+  try {
+    const roadmapPath = path.join(DOCS_PATH, 'ROADMAP.md');
+    const content = fs.readFileSync(roadmapPath, 'utf-8');
+    const lines = content.split('\n');
+
+    let inNowSection = false;
+    let nowHeadingLevel = 0;
+    let checked = 0;
+    let total = 0;
+
+    for (const line of lines) {
+      // Detect heading lines
+      const headingMatch = line.match(/^(#{1,6})\s+(.*)$/);
+
+      if (headingMatch) {
+        const level = headingMatch[1].length;
+        const title = headingMatch[2].trim().toLowerCase();
+
+        if (title === 'now' || title.startsWith('now ')) {
+          inNowSection = true;
+          nowHeadingLevel = level;
+          continue;
+        }
+
+        // If we were in the Now section and hit a same-level or higher heading, stop
+        if (inNowSection && level <= nowHeadingLevel) {
+          break;
+        }
+      }
+
+      if (inNowSection) {
+        if (/\[x\]/i.test(line)) {
+          checked++;
+          total++;
+        } else if (/\[ \]/.test(line)) {
+          total++;
+        }
+      }
+    }
+
+    if (total === 0) return null;
+    return `TODO:${checked}/${total}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Main: gather all components and output a single status line.
+ */
+function main() {
+  const ctx = readStdin();
+  const parts = [];
+
+  const model = getModelName(ctx);
+  if (model) parts.push(model);
+
+  const context = getContextUsage(ctx);
+  if (context) parts.push(context);
+
+  const git = getGitInfo();
+  if (git) parts.push(git);
+
+  const todo = getTodoProgress();
+  if (todo) parts.push(todo);
+
+  if (parts.length > 0) {
+    process.stdout.write(parts.join(' | ') + '\n');
+  }
+
+  process.exit(0);
+}
+
+main();

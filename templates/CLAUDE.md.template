@@ -39,17 +39,40 @@ Use these commands to structure your work:
 
 Commands are in `.claude/commands/`.
 
+{{#if TECHNICAL_LAYERS}}
+## Technical Enforcement
+
+### Hooks (`.claude/hooks/`)
+Automated behaviors at session lifecycle points:
+- **SessionStart**: Auto-loads ROADMAP, SESSION_LOG, and feature SPEC into context
+- **PreToolUse**: Blocks edits to frozen docs (VISION.md, SPEC.md requirements)
+- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage
+- **Stop**: Reminds to push unpushed commits
+- **SessionEnd**: Saves session state snapshot for continuity
+
+### Rules (`.claude/rules/`)
+Always-loaded coding guidelines:
+- `coding-style.md` — Language-specific style and patterns
+- `git-workflow.md` — Branch, commit, and merge conventions
+- `security.md` — Secret protection and secure coding
+- `testing.md` — Test commands and quality standards
+- `documentation.md` — SpecFlow documentation conventions
+
+### Statusline
+Real-time display: context usage %, current feature, TODO progress, git status.
+{{/if}}
+
 ## Key Patterns
 
 {{#if BACKEND_STACK}}
 ### Backend ({{BACKEND_STACK}})
-- See `.ai/agents/backend.md` for patterns
+- See `.claude/agents/backend.md` for patterns
 - Structure: {{BACKEND_STRUCTURE}}
 {{/if}}
 
 {{#if FRONTEND_STACK}}
 ### Frontend ({{FRONTEND_STACK}})
-- See `.ai/agents/frontend.md` for patterns
+- See `.claude/agents/frontend.md` for patterns
 - Structure: {{FRONTEND_STRUCTURE}}
 {{/if}}
 
