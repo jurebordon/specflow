@@ -233,6 +233,7 @@ Copy and customize from `.specflow/templates/commands/`:
 - `.claude/commands/plan-session.md`
 - `.claude/commands/start-session.md`
 - `.claude/commands/end-session.md`
+- `.claude/commands/verify.md` - Validate docs consistency and project health
 - `.claude/commands/new-feature.md`
 - `.claude/commands/new-worktree.md` - Advanced, for parallel development
 
@@ -408,6 +409,7 @@ my-project/
 │   │   ├── plan-session.md
 │   │   ├── start-session.md
 │   │   ├── end-session.md
+│   │   ├── verify.md
 │   │   └── ...
 │   ├── hooks/                    # If hooks enabled
 │   │   ├── session-start-context.js

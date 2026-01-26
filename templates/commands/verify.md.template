@@ -1,0 +1,212 @@
+# Verify
+
+> Validate SpecFlow documentation consistency, project health, and configuration integrity.
+
+---
+
+## Step 1: Check Required Files
+
+Verify all required SpecFlow files exist:
+
+**Documentation** (in `docs_specflow/`):
+- [ ] `docs_specflow/.specflow-config.md` — Project configuration
+- [ ] `docs_specflow/ROADMAP.md` — Task tracking
+- [ ] `docs_specflow/SESSION_LOG.md` — Session history
+- [ ] `docs_specflow/VISION.md` — Product direction
+- [ ] `docs_specflow/OVERVIEW.md` — System architecture
+- [ ] `docs_specflow/ADR.md` — Architecture decisions
+- [ ] `docs_specflow/WORKFLOW.md` — Development workflow
+
+**Project Root**:
+- [ ] `CLAUDE.md` — AI assistant context
+
+**Commands** (in `.claude/commands/`):
+- [ ] `plan-session.md`
+- [ ] `start-session.md`
+- [ ] `end-session.md`
+
+Report any missing files. Suggest creating them from `.specflow/templates/` if the framework is available.
+
+---
+
+## Step 2: Validate ROADMAP Structure
+
+Read `docs_specflow/ROADMAP.md` and check:
+
+### Feature Tags
+- [ ] Every task has a `[feature: name]` tag
+- Report untagged tasks:
+  ```
+  WARN: Untagged task: "Add login endpoint" (line 15) — needs [feature: name]
+  ```
+
+### Section Structure
+- [ ] Has "Now", "Next", and "Later" (or "Done") sections
+- [ ] "Now" section has at most 3-5 active tasks (focused scope)
+- Report if "Now" has too many items:
+  ```
+  WARN: "Now" has 8 tasks — consider moving some to "Next"
+  ```
+
+### Completed Tasks
+- [ ] Completed tasks (`[x]`) in "Now" should be moved to "Done"
+- Report stale completed items:
+  ```
+  WARN: Completed task still in "Now": "[x] Add login endpoint [feature: user-auth]"
+  ```
+
+---
+
+## Step 3: Validate SESSION_LOG Format
+
+Read `docs_specflow/SESSION_LOG.md` and check:
+
+### Entry Format
+- [ ] Entries follow `## [feature-name] YYYY-MM-DD` heading format
+- [ ] Each entry has at minimum: Goal, Completed, Files Changed sections
+- Report malformed entries:
+  ```
+  WARN: Session entry missing feature tag: "## 2026-01-20" (line 45)
+  ```
+
+### Consistency with ROADMAP
+- [ ] Feature names in SESSION_LOG match feature tags in ROADMAP
+- Report orphaned features (in log but not in roadmap):
+  ```
+  WARN: Feature "old-feature" in SESSION_LOG but not in ROADMAP
+  ```
+
+---
+
+## Step 4: Validate Feature Docs
+
+Check `docs_specflow/feature_docs/` if it exists:
+
+- [ ] Each feature directory has a `SPEC.md`
+- [ ] Feature directory names match `[feature: name]` tags in ROADMAP
+- Report mismatches:
+  ```
+  WARN: Feature dir "user-auth/" exists but no [feature: user-auth] in ROADMAP
+  OK: Feature "payments" has SPEC.md and matching ROADMAP tasks
+  ```
+
+---
+
+## Step 5: Validate Configuration
+
+Read `docs_specflow/.specflow-config.md` and check:
+
+### Required Fields
+- [ ] Project Name is set (not placeholder)
+- [ ] Mode is valid (greenfield / constrained / adoption)
+- [ ] Tech Stack is specified
+- [ ] Git Workflow is set (solo / pr-review / ci-cd-gated)
+- [ ] Test Command is defined
+- [ ] Build Command is defined
+- [ ] Lint Command is defined
+
+### Tech Commands Work
+Run a quick validation (dry-run if possible):
+```bash
+# Check that configured commands exist
+which {{TEST_COMMAND_BINARY}} 2>/dev/null || echo "WARN: Test command binary not found"
+which {{BUILD_COMMAND_BINARY}} 2>/dev/null || echo "WARN: Build command binary not found"
+which {{LINT_COMMAND_BINARY}} 2>/dev/null || echo "WARN: Lint command binary not found"
+```
+
+---
+
+{{#if TECHNICAL_LAYERS}}
+## Step 6: Validate Technical Layers
+
+{{#if ENABLE_HOOKS}}
+### Hooks
+Check `.claude/hooks/` files exist and are valid:
+- [ ] `session-start-context.js`
+- [ ] `doc-file-blocker.js`
+- [ ] `auto-format.js`
+- [ ] `compact-suggester.js`
+- [ ] `git-push-reminder.js`
+- [ ] `session-end-persist.js`
+- [ ] Hooks are registered in `.claude/settings.json`
+
+Validate JavaScript syntax:
+```bash
+for f in .claude/hooks/*.js; do node --check "$f" 2>&1 || echo "ERROR: $f has syntax errors"; done
+```
+{{/if}}
+
+{{#if ENABLE_RULES}}
+### Rules
+Check `.claude/rules/` files exist:
+- [ ] `coding-style.md`
+- [ ] `git-workflow.md`
+- [ ] `security.md`
+- [ ] `testing.md`
+- [ ] `documentation.md`
+{{/if}}
+
+{{#if ENABLE_STATUSLINE}}
+### Statusline
+- [ ] `.claude/statusline.js` exists
+- [ ] Syntax is valid: `node --check .claude/statusline.js`
+- [ ] `settings.json` has `statusLine` config
+{{/if}}
+
+{{/if}}
+
+## Step {{#if TECHNICAL_LAYERS}}7{{else}}6{{/if}}: Git Health
+
+```bash
+git status
+```
+
+Check:
+- [ ] No uncommitted changes to SpecFlow docs (unless mid-session)
+- [ ] Current branch follows naming convention (`{{BRANCH_CONVENTION}}`)
+- [ ] Not behind remote:
+  ```bash
+  git fetch --dry-run 2>&1
+  ```
+
+---
+
+## Step {{#if TECHNICAL_LAYERS}}8{{else}}7{{/if}}: Report
+
+Present a summary:
+
+```
+SpecFlow Verification Report
+=============================
+
+Files:        [X/Y] required files present
+ROADMAP:      [X] tasks checked, [Y] warnings
+SESSION_LOG:  [X] entries checked, [Y] warnings
+Feature Docs: [X] features, [Y] mismatches
+Config:       [OK / X warnings]
+{{#if TECHNICAL_LAYERS}}
+Hooks:        [OK / X issues]
+Rules:        [OK / X missing]
+Statusline:   [OK / missing]
+{{/if}}
+Git:          [clean / X issues]
+
+Warnings:
+- [list any WARN messages from above]
+
+Errors:
+- [list any ERROR messages from above]
+
+Suggestions:
+- [actionable fixes for any issues found]
+```
+
+---
+
+## Notes
+
+- Run `/verify` anytime — it's read-only, no files are modified
+- Good to run after `/end-session` as a final check
+- Good to run at the start of a new day/session for project health
+- Warnings are advisory — not all need immediate fixing
+- Focus on errors first, then warnings

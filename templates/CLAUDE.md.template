@@ -35,6 +35,7 @@ Use these commands to structure your work:
 - `/plan-session` - Prepare for implementation
 - `/start-session` - Begin coding
 - `/end-session` - Wrap up and merge
+- `/verify` - Validate docs consistency and project health
 - `/pivot-session` - Reassess direction
 
 Commands are in `.claude/commands/`.
