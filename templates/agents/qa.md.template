@@ -1,3 +1,20 @@
+---
+name: QA Agent
+description: Quality assurance through testing, coverage analysis, and test infrastructure
+model: {{AGENT_MODEL_QA}}
+extends: base.md
+tools:
+  - read
+  - edit
+  - search
+  - terminal
+triggers:
+  - writing or fixing tests
+  - investigating test failures
+  - improving test coverage
+  - test infrastructure changes
+---
+
 # QA Agent
 
 > Read `base.md` first. This file adds quality assurance-specific guidelines.
@@ -14,7 +31,7 @@ Ensure code quality through testing, identify gaps in coverage, and maintain tes
 - **E2E Testing**: {{E2E_TEST_FRAMEWORK}}
 - **Coverage Tool**: {{COVERAGE_TOOL}}
 {{else}}
-- See `.ai/templates/tech_overlays/` for stack-specific testing patterns
+- See project `.specflow-config.md` for stack-specific testing configuration
 {{/if}}
 
 ## Structure

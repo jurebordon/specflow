@@ -237,6 +237,24 @@ Select which layers to enable:
 
 ---
 
+## 7.5 Agent Model Tiers
+
+**Question**: Which AI model should each agent role use?
+
+| Variable | Role | Default | Rationale |
+|----------|------|---------|-----------|
+| `AGENT_MODEL_BASE` | Base (general) | `sonnet` | Balanced speed and capability |
+| `AGENT_MODEL_QA` | QA / Testing | `sonnet` | Standard implementation work |
+| `AGENT_MODEL_ARCHITECTURE` | Architecture | `opus` | Reasoning-heavy design decisions |
+| `AGENT_MODEL_BACKEND` | Backend | `sonnet` | Standard implementation work |
+| `AGENT_MODEL_FRONTEND` | Frontend | `sonnet` | Standard implementation work |
+
+Available tiers: `opus` (strongest reasoning), `sonnet` (balanced), `haiku` (fastest/cheapest)
+
+*Accept defaults unless you have specific cost or capability preferences. Architecture defaults to opus because design trade-offs benefit from deeper reasoning.*
+
+---
+
 ## 8. Session Commands
 
 **Question**: Which session commands do you need?

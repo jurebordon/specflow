@@ -1,3 +1,20 @@
+---
+name: Backend Agent
+description: Backend logic, API development, data access, and server-side testing
+model: {{AGENT_MODEL_BACKEND}}
+extends: base.md
+tools:
+  - read
+  - edit
+  - search
+  - terminal
+triggers:
+  - implementing API endpoints
+  - backend business logic
+  - database operations or migrations
+  - server-side bug fixes
+---
+
 # Backend Development Agent
 
 > Read `base.md` first. This file adds backend-specific guidelines.
@@ -14,7 +31,7 @@ Implement and maintain backend logic consistent with domain rules, architecture 
 - **ORM/DB**: {{BACKEND_ORM}}
 - **Testing**: {{BACKEND_TESTING}}
 {{else}}
-- See `.ai/templates/tech_overlays/` for stack-specific patterns
+- See project `.specflow-config.md` for stack-specific configuration
 {{/if}}
 
 ## Structure

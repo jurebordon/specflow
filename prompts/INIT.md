@@ -330,6 +330,11 @@ When processing templates, replace these variables:
 | {{ENABLE_HOOKS}} | config |
 | {{ENABLE_RULES}} | config |
 | {{ENABLE_STATUSLINE}} | config |
+| {{AGENT_MODEL_BASE}} | config (default: sonnet) |
+| {{AGENT_MODEL_QA}} | config (default: sonnet) |
+| {{AGENT_MODEL_ARCHITECTURE}} | config (default: opus) |
+| {{AGENT_MODEL_BACKEND}} | config (default: sonnet) |
+| {{AGENT_MODEL_FRONTEND}} | config (default: sonnet) |
 | {{PYTHON}} | detected (boolean) |
 | {{TYPESCRIPT}} | detected (boolean) |
 | {{GO}} | detected (boolean) |

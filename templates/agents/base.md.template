@@ -1,3 +1,16 @@
+---
+name: Base Agent
+description: Core behavior and guidelines for all AI agents working on this project
+model: {{AGENT_MODEL_BASE}}
+tools:
+  - read
+  - edit
+  - search
+  - terminal
+triggers:
+  - default agent for general development tasks
+---
+
 # AI Agent Base Instructions
 
 > Core behavior for all AI agents working on this project.

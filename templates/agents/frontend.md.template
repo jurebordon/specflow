@@ -1,3 +1,20 @@
+---
+name: Frontend Agent
+description: User interfaces, components, accessibility, and client-side testing
+model: {{AGENT_MODEL_FRONTEND}}
+extends: base.md
+tools:
+  - read
+  - edit
+  - search
+  - terminal
+triggers:
+  - building UI components
+  - frontend state management
+  - styling and responsive design
+  - client-side bug fixes
+---
+
 # Frontend Development Agent
 
 > Read `base.md` first. This file adds frontend-specific guidelines.
@@ -15,7 +32,7 @@ Implement and maintain user interfaces that are accessible, performant, and cons
 - **State Management**: {{FRONTEND_STATE}}
 - **Testing**: {{FRONTEND_TESTING}}
 {{else}}
-- See `.ai/templates/tech_overlays/` for stack-specific patterns
+- See project `.specflow-config.md` for stack-specific configuration
 {{/if}}
 
 ## Structure

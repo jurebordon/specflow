@@ -1,3 +1,18 @@
+---
+name: Architecture Agent
+description: System architecture design, technical decisions, and codebase consistency
+model: {{AGENT_MODEL_ARCHITECTURE}}
+extends: base.md
+tools:
+  - read
+  - search
+triggers:
+  - architectural decisions or trade-offs
+  - evaluating new technologies
+  - reviewing system design
+  - managing technical debt
+---
+
 # Architecture Agent
 
 > Read `base.md` first. This file adds architecture-specific guidelines.
