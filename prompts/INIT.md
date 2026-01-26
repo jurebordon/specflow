@@ -36,6 +36,7 @@ If YES: Read these reference files to understand the templates:
 - .specflow/templates/docs/*.template
 - .specflow/templates/commands/*.template
 - .specflow/configuration/SETUP_QUESTIONS.md
+- .specflow/configuration/AGENT_TIERS.md
 
 If NO: Ask the user to run:
   git clone https://github.com/jurebordon/specflow .specflow
