@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+// Hook: PostToolUse
+// Periodically reminds the AI to capture learned patterns in LEARNED_PATTERNS.md.
+// Triggers after Write/Edit tool calls and checks if patterns may be worth documenting.
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const REMINDER_INTERVAL = 30;
+
+function getCounterPath() {
+  const sessionId = process.env.CLAUDE_SESSION_ID || 'default';
+  return path.join(os.tmpdir(), 'specflow-learning-count-' + sessionId + '.txt');
+}
+
+function readCounter(counterPath) {
+  try {
+    const content = fs.readFileSync(counterPath, 'utf8').trim();
+    return parseInt(content, 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function learnedPatternsExists(cwd) {
+  const filePath = path.join(cwd, '{{DOCS_PATH}}', 'LEARNED_PATTERNS.md');
+  return fs.existsSync(filePath);
+}
+
+async function main() {
+  let input = '';
+  for await (const chunk of process.stdin) input += chunk;
+  const data = JSON.parse(input);
+
+  const cwd = data.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
+
+  if (!learnedPatternsExists(cwd)) {
+    process.exit(0);
+  }
+
+  const counterPath = getCounterPath();
+  const count = readCounter(counterPath) + 1;
+
+  try {
+    fs.writeFileSync(counterPath, String(count), 'utf8');
+  } catch {
+    // Ignore write errors to temp file
+  }
+
+  if (count > 0 && count % REMINDER_INTERVAL === 0) {
+    process.stderr.write(
+      '\n--- SpecFlow Learning Reminder ---\n' +
+      'You have made ' + count + ' edits this session.\n' +
+      'If you discovered any patterns, conventions, or gotchas, consider adding them to\n' +
+      '{{DOCS_PATH}}/LEARNED_PATTERNS.md so future sessions can benefit.\n' +
+      '----------------------------------\n\n'
+    );
+  }
+
+  process.exit(0);
+}
+
+main().catch((err) => {
+  process.stderr.write('continuous-learning: ' + err.message + '\n');
+  process.exit(0);
+});

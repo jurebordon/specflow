@@ -226,6 +226,7 @@ Read templates from `.specflow/templates/` and generate:
 - `docs_specflow/VISION.md` - Use `.specflow/templates/docs/VISION.md.template`
 - `docs_specflow/OVERVIEW.md` - Use `.specflow/templates/docs/OVERVIEW.md.template`
 - `docs_specflow/ADR.md` - Use `.specflow/templates/docs/ADR.md.template`
+- `docs_specflow/LEARNED_PATTERNS.md` - Use `.specflow/templates/docs/LEARNED_PATTERNS.md.template`
 
 ### Generate Session Commands:
 Copy and customize from `.specflow/templates/commands/`:
@@ -247,6 +248,7 @@ Copy and customize from `.specflow/templates/hooks/`:
 - `.claude/hooks/compact-suggester.js` - Suggest /compact at high context usage
 - `.claude/hooks/git-push-reminder.js` - Remind to push unpushed commits
 - `.claude/hooks/session-end-persist.js` - Save session state snapshot
+- `.claude/hooks/continuous-learning.js` - Periodic reminder to capture learned patterns
 
 Merge `.specflow/templates/settings/hooks.json.template` into `.claude/settings.json`
 
@@ -401,6 +403,7 @@ my-project/
 │   ├── VISION.md              # Standard/Full
 │   ├── OVERVIEW.md            # Standard/Full
 │   ├── ADR.md                 # Standard/Full
+│   ├── LEARNED_PATTERNS.md    # Discovered patterns journal
 │   └── frozen/                # If PRD/Spec provided
 │       ├── PRD.md
 │       └── TECH_SPEC.md
@@ -417,7 +420,8 @@ my-project/
 │   │   ├── auto-format.js
 │   │   ├── compact-suggester.js
 │   │   ├── git-push-reminder.js
-│   │   └── session-end-persist.js
+│   │   ├── session-end-persist.js
+│   │   └── continuous-learning.js
 │   ├── rules/                    # If rules enabled
 │   │   ├── coding-style.md
 │   │   ├── git-workflow.md

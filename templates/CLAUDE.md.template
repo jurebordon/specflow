@@ -23,6 +23,7 @@ Read these before making changes:
 | 3 | [OVERVIEW.md](docs_specflow/OVERVIEW.md) | System architecture |
 | 4 | [ADR.md](docs_specflow/ADR.md) | Architecture decisions |
 | 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
+| 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
 
 {{#if DOCS_EXTERNAL}}
 > Note: Documentation is stored externally at `{{DOCS_EXTERNAL_PATH}}`
@@ -47,7 +48,7 @@ Commands are in `.claude/commands/`.
 Automated behaviors at session lifecycle points:
 - **SessionStart**: Auto-loads ROADMAP, SESSION_LOG, and feature SPEC into context
 - **PreToolUse**: Blocks edits to frozen docs (VISION.md, SPEC.md requirements)
-- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage
+- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage, reminds to capture learned patterns
 - **Stop**: Reminds to push unpushed commits
 - **SessionEnd**: Saves session state snapshot for continuity
 

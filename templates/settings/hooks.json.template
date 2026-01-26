@@ -38,6 +38,15 @@
             "command": "node .claude/hooks/compact-suggester.js"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/continuous-learning.js"
+          }
+        ]
       }
     ],
     "Stop": [
