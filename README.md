@@ -21,21 +21,35 @@ SpecFlow solves this with:
 
 ## Quick Start
 
-### 1. Install SpecFlow in Your Project
+### Option A: CLI (Recommended)
+
+```bash
+cd your-project
+
+# Interactive setup — answers questions, detects tech stack, generates all files
+npx specflow init
+
+# Start working
+/plan-session
+```
+
+The CLI walks you through project mode, git workflow, tech stack detection, and technical layers. All files are generated automatically.
+
+To update commands and agents to the latest templates:
+
+```bash
+npx specflow update
+```
+
+### Option B: Manual (AI-Assisted)
 
 ```bash
 cd your-project
 
 # Clone the framework
 git clone https://github.com/jurebordon/specflow .specflow
-
-# Add to gitignore (it's tooling, not a dependency)
 echo ".specflow/" >> .gitignore
-```
 
-### 2. Initialize Your Project
-
-```bash
 # Start Claude Code (or your AI assistant)
 claude
 
@@ -44,7 +58,7 @@ claude
 # Review and confirm generated files
 ```
 
-### 3. Start Working
+### Start Working
 
 ```bash
 # Plan your first session
@@ -151,14 +165,22 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
 ## Updating
 
-To get the latest templates:
+### CLI
+
+```bash
+npx specflow update
+```
+
+This re-generates commands, hooks, rules, and agents from the latest templates. Your documentation and config are preserved.
+
+### Manual
 
 ```bash
 cd your-project/.specflow
 git pull
 ```
 
-Your project files are unaffected - only the templates update.
+Your project files are unaffected — only the templates update. Re-run the INIT prompt to regenerate files from updated templates.
 
 ## License
 

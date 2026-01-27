@@ -2,6 +2,8 @@
 
 > Copy this prompt into your AI assistant to initialize SpecFlow in any project.
 
+**Prefer the CLI?** Run `npx specflow init` for an interactive setup that handles everything below automatically. The manual prompt below is for AI-assisted initialization without the CLI.
+
 ---
 
 ## Prerequisites
