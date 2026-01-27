@@ -17,7 +17,7 @@ SpecFlow uses a three-layer documentation system designed for AI-assisted develo
 ├─────────────────────────────────────────────────────────────┤
 │  OPERATIONAL (every session)                                 │
 │  ├── SESSION_LOG.md - Session journal (newest first)        │
-│  ├── .ai/agents/*   - Role-specific AI guides               │
+│  ├── .claude/agents/* - Role-specific AI guides               │
 │  └── .claude/commands/* - Session commands                  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -134,7 +134,7 @@ Append-only journal (newest entries first):
 
 **Update when**: Every session end.
 
-### .ai/agents/*.md
+### .claude/agents/*.md
 
 Role-specific guidance for AI assistants:
 - `backend.md` - Backend development patterns
@@ -154,22 +154,16 @@ Generated session commands:
 
 **Update when**: Tech stack or git workflow changes (regenerate from templates).
 
-## Frozen Baselines
+## Frozen Documents
 
-Some documents are intentionally frozen:
+Some documents are intentionally frozen after creation:
 
-```
-docs/frozen/
-├── PRD_V0.md        # Original product requirements
-└── TECH_SPEC_V0.md  # Original technical specification
-```
+- `feature_docs/*/SPEC.md` — Per-feature specification (north star, never edited after creation)
 
-These are **never edited** after creation. They serve as:
+These serve as:
 - Historical record of initial intent
 - Baseline for measuring drift
 - Reference for pivot decisions
-
-New versions (PRD_V1, TECH_SPEC_V1) can be created alongside, but V0 remains untouched.
 
 ## Update Rules Summary
 
@@ -181,9 +175,9 @@ New versions (PRD_V1, TECH_SPEC_V1) can be created alongside, but V0 remains unt
 | ROADMAP.md | Human/AI | Task changes | Edit in place |
 | WORKFLOW.md | Human | Process changes | Edit in place |
 | SESSION_LOG.md | AI | Every session end | Prepend entry |
-| .ai/agents/* | Human/AI | Pattern changes | Edit in place |
+| .claude/agents/* | Human/AI | Pattern changes | Edit in place |
 | .claude/commands/* | AI | Regenerate on config change | Overwrite |
-| docs/frozen/* | Nobody | Never | Read only |
+| feature_docs/*/SPEC.md | Nobody | Never | Read only |
 
 ## Documentation Drift
 

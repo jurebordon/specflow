@@ -133,30 +133,26 @@ Full documentation suite:
 ```
 project/
 ├── CLAUDE.md
-├── docs/
-│   ├── frozen/
-│   │   ├── PRD_V0.md
-│   │   └── TECH_SPEC_V0.md
+├── docs_specflow/
 │   ├── VISION.md
 │   ├── ADR.md
 │   ├── OVERVIEW.md
 │   ├── ROADMAP.md
 │   ├── WORKFLOW.md
-│   └── SESSION_LOG.md
+│   ├── SESSION_LOG.md
+│   └── feature_docs/
 ├── .claude/
-│   └── commands/
-│       ├── plan-session.md
-│       ├── start-session.md
-│       ├── end-session.md
-│       └── pivot-session.md
-└── .ai/
-    ├── templates/
-    │   └── agent_base.md
-    └── agents/
-        ├── backend.md
-        ├── frontend.md (if applicable)
-        ├── qa.md
-        └── architecture.md
+│   ├── commands/
+│   │   ├── plan-session.md
+│   │   ├── start-session.md
+│   │   ├── end-session.md
+│   │   └── verify.md
+│   └── agents/
+│       ├── base.md
+│       ├── backend.md
+│       ├── frontend.md (if applicable)
+│       ├── qa.md
+│       └── architecture.md
 ```
 
 ## Discovery Questions

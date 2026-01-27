@@ -142,7 +142,6 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 - [Setup Questions](configuration/SETUP_QUESTIONS.md) - Discovery flow
 - [Git Workflows](configuration/GIT_WORKFLOWS.md) - Solo, PR-review, CI/CD
 - [Integrations](configuration/INTEGRATIONS.md) - Ticketing, CI/CD
-- [Feature Documentation](configuration/FEATURES.md) - Per-feature tracking
 - [Git Worktrees](configuration/WORKTREES.md) - Parallel feature development
 
 ### Prompts

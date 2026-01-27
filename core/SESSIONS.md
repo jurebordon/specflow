@@ -103,10 +103,10 @@ A clear plan with:
    ```
 
 2. **Determine role**
-   - Backend work → Read `.ai/agents/backend.md`
-   - Frontend work → Read `.ai/agents/frontend.md`
-   - Testing focus → Read `.ai/agents/qa.md`
-   - Architecture changes → Read `.ai/agents/architecture.md`
+   - Backend work → Read `.claude/agents/backend.md`
+   - Frontend work → Read `.claude/agents/frontend.md`
+   - Testing focus → Read `.claude/agents/qa.md`
+   - Architecture changes → Read `.claude/agents/architecture.md`
 
 3. **Implement**
    - Follow the plan

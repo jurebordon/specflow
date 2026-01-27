@@ -507,15 +507,14 @@ What type of project is this?
 **Config** (.specflow-config.md):
 - Mode: Greenfield
 - Git: PR Review, GitHub, worktrees
-- Docs: docs/, Standard
+- Docs: docs_specflow/, Standard
 - Integrations: GitHub Issues (#123), GitHub Actions
 
 **Files** (15 total):
 - .specflow-config.md
 - CLAUDE.md
-- docs/ROADMAP.md, SESSION_LOG.md, WORKFLOW.md
-- docs/VISION.md, OVERVIEW.md, ADR.md
-- docs/frozen/PRD.md, TECH_SPEC.md
+- docs_specflow/ROADMAP.md, SESSION_LOG.md, WORKFLOW.md
+- docs_specflow/VISION.md, OVERVIEW.md, ADR.md, LEARNED_PATTERNS.md
 - .claude/commands/plan-session.md, start-session.md, end-session.md, pivot-session.md, new-feature.md, new-worktree.md
 
 Proceed?

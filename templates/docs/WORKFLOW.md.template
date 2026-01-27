@@ -8,8 +8,8 @@
 |-------|-----------|------------------|
 | **Strategic** | VISION.md, ADR.md | Rarely (pivots, major decisions) |
 | **Tactical** | OVERVIEW.md, ROADMAP.md, WORKFLOW.md | Per milestone/feature |
-| **Operational** | SESSION_LOG.md, .ai/agents/* | Every session |
-| **Frozen** | docs/frozen/* | Never (historical baseline) |
+| **Operational** | SESSION_LOG.md, .claude/agents/* | Every session |
+| **Frozen** | feature_docs/*/SPEC.md | Never (feature north star) |
 
 ## Session Lifecycle
 
@@ -99,8 +99,7 @@ main ←── CI/CD ←── MR ←── feature/branch
 
 ### Never Update
 
-- `docs/frozen/PRD_V0.md` - Historical baseline
-- `docs/frozen/TECH_SPEC_V0.md` - Historical baseline
+- `feature_docs/*/SPEC.md` - Feature north star (frozen after creation)
 
 ## Metrics Policy
 

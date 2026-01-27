@@ -117,16 +117,17 @@ Similar to greenfield, but:
 ```
 project/
 ├── CLAUDE.md              # Includes constraints
-├── docs/
-│   ├── frozen/
-│   │   ├── CONSTRAINTS.md # Your constraints doc
-│   │   ├── PRD_V0.md
-│   │   └── TECH_SPEC_V0.md
-│   └── ...                # Standard docs
+├── docs_specflow/
+│   ├── VISION.md
+│   ├── ADR.md
+│   ├── OVERVIEW.md
+│   ├── ROADMAP.md
+│   ├── WORKFLOW.md
+│   ├── SESSION_LOG.md
+│   └── feature_docs/
 ├── .claude/
-│   └── commands/          # Process-aware commands
-└── .ai/
-    └── agents/            # Constraint-aware guides
+│   ├── commands/          # Process-aware commands
+│   └── agents/            # Constraint-aware guides
 ```
 
 ## Handling Conflicts

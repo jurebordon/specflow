@@ -10,10 +10,10 @@
 Read CLAUDE.md to get project context.
 
 Then check the current state:
-- docs/ROADMAP.md - for current and upcoming tasks
-- docs/SESSION_LOG.md (last 3 entries) - for recent context
-- docs/OVERVIEW.md - for system understanding
-- docs/ADR.md - for relevant decisions
+- docs_specflow/ROADMAP.md - for current and upcoming tasks
+- docs_specflow/SESSION_LOG.md (last 3 entries) - for recent context
+- docs_specflow/OVERVIEW.md - for system understanding
+- docs_specflow/ADR.md - for relevant decisions
 
 Create a session plan including:
 - Session goal: ONE task from ROADMAP (Now or top of Next)
@@ -48,10 +48,10 @@ Examples: feat/user-auth, fix/login-bug, refactor/api-cleanup
 
 ## 3. Determine Role
 Based on the task, read the appropriate agent guide:
-- Backend work → .ai/agents/backend.md
-- Frontend work → .ai/agents/frontend.md
-- Testing → .ai/agents/qa.md
-- Architecture → .ai/agents/architecture.md
+- Backend work → .claude/agents/backend.md
+- Frontend work → .claude/agents/frontend.md
+- Testing → .claude/agents/qa.md
+- Architecture → .claude/agents/architecture.md
 
 ## 4. Begin Implementation
 - Mark task as in_progress (use TodoWrite if available)
@@ -78,18 +78,18 @@ If tests fail, fix them before proceeding.
 ## 2. Update Documentation
 
 ### Always Update:
-- docs/ROADMAP.md
+- docs_specflow/ROADMAP.md
   - Mark completed task as done (move to Done section)
   - Adjust Now/Next if priorities changed
   - Add any new blockers discovered
 
-- docs/SESSION_LOG.md
+- docs_specflow/SESSION_LOG.md
   - Prepend new entry with today's date
   - Include: role, task, files changed, summary, decisions, next steps
 
 ### Update If Changed:
-- docs/OVERVIEW.md - if architecture or system description changed
-- docs/ADR.md - if significant technical decision was made (append only)
+- docs_specflow/OVERVIEW.md - if architecture or system description changed
+- docs_specflow/ADR.md - if significant technical decision was made (append only)
 
 ## 3. Final Commit
 Ensure all changes are committed:
@@ -201,10 +201,10 @@ This is a pivot session to reassess project direction.
 ## 1. Review Current State
 
 Check these documents:
-- docs/ROADMAP.md - Is this still accurate?
-- docs/VISION.md - Is the direction still valid?
-- docs/SESSION_LOG.md (last 5-10 entries) - What patterns emerge?
-- docs/ADR.md - Any decisions that need revisiting?
+- docs_specflow/ROADMAP.md - Is this still accurate?
+- docs_specflow/VISION.md - Is the direction still valid?
+- docs_specflow/SESSION_LOG.md (last 5-10 entries) - What patterns emerge?
+- docs_specflow/ADR.md - Any decisions that need revisiting?
 
 ## 2. Identify Drift
 
@@ -241,7 +241,7 @@ Answer these questions:
 If tech stack or git workflow changed:
 - Update configuration
 - Regenerate .claude/commands/
-- Update .ai/agents/ if patterns changed
+- Update .claude/agents/ if patterns changed
 
 ## 6. Document the Pivot
 

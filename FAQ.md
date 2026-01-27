@@ -12,7 +12,7 @@ Common questions and troubleshooting for SpecFlow.
 |--------|----------|----------|
 | Focus | Documentation + workflow | Specification → code |
 | Installation | None (prompts only) | CLI tool required |
-| Structure | `docs/` + `.ai/` + `.claude/` | `.specify/` folder |
+| Structure | `docs_specflow/` + `.claude/` | `.specify/` folder |
 | Workflow | Session-based | Phase-based |
 | Flexibility | Adapts to existing projects | Greenfield focused |
 
@@ -52,8 +52,7 @@ Delete what you don't need. SpecFlow suggests a structure, but you own it. Keep 
 
 ```bash
 # Keep only essentials for a simple project
-rm docs/VISION.md docs/ADR.md
-rm -rf .ai/agents/
+rm docs_specflow/VISION.md docs_specflow/ADR.md
 ```
 
 You can always add them back later.
@@ -62,14 +61,13 @@ You can always add them back later.
 
 Yes. The suggested structure is:
 ```
-docs/           # Documentation
-.claude/commands/  # Session commands
-.ai/agents/     # Role guides
+docs_specflow/        # Documentation
+.claude/commands/     # Session commands
+.claude/agents/       # Role guides
 ```
 
 But you can:
-- Put everything in `docs/`
-- Rename `.claude/` to `.cursor/` or `.ai/`
+- Put everything in `docs_specflow/`
 - Skip folders entirely
 
 Just update references in CLAUDE.md.
@@ -193,7 +191,7 @@ Moving to GraphQL...
 
 ### Do I need to keep PRD and TECH_SPEC in sync with reality?
 
-No. `docs/frozen/PRD_V0.md` and `TECH_SPEC_V0.md` are historical baselines. They show original intent.
+No. `PRD_V0.md` and `TECH_SPEC_V0.md` are historical baselines. They show original intent.
 
 Living reality goes in:
 - **OVERVIEW.md** - What the system actually is

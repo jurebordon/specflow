@@ -77,7 +77,7 @@ After approval:
 - ADR.md: Add new entry
 - OVERVIEW.md: Update architecture
 - VISION.md: Update tech stack section
-- .ai/agents/*: Update patterns
+- .claude/agents/*: Update patterns
 - .claude/commands/*: Regenerate if workflow affected
 
 ## 6. Create Migration Tasks
@@ -168,7 +168,7 @@ Review WORKFLOW.md:
 
 ### If Team Structure Changed:
 - Update WORKFLOW.md
-- Update .ai/agents/ if roles changed
+- Update .claude/agents/ if roles changed
 
 ## 4. Communicate Change
 - Document in SESSION_LOG as pivot session

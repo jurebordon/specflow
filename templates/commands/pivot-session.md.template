@@ -86,7 +86,7 @@ Regenerate if:
 - Git workflow changed
 - Integrations changed
 
-### .ai/agents/
+### .claude/agents/
 Update if:
 - Patterns changed
 - New conventions established
