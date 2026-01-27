@@ -125,6 +125,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
 ### Getting Started
 - [Installation Guide](INSTALLATION.md) - How to install and update
+- [Migration Guide](configuration/MIGRATION.md) - Upgrading from pre-2026-01-20 versions
 - [FAQ](FAQ.md) - Common questions and troubleshooting
 
 ### Core Concepts
