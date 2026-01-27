@@ -39,6 +39,7 @@ If YES: Read these reference files to understand the templates:
 - .specflow/templates/commands/*.template
 - .specflow/configuration/SETUP_QUESTIONS.md
 - .specflow/configuration/AGENT_TIERS.md
+- .specflow/examples/CLAUDE_GREENFIELD.md, CLAUDE_CONSTRAINED.md, CLAUDE_ADOPTION.md (rendered examples for each mode — use as reference when generating CLAUDE.md)
 
 If NO: Ask the user to run:
   git clone https://github.com/jurebordon/specflow .specflow

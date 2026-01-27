@@ -1,79 +1,90 @@
 # TaskFlow API
 
-> Simple task management API for personal projects.
+> This file provides context for AI assistants working on this project.
 
 ## Project Overview
 
-A self-hosted task management API that lets developers track tasks across projects without the complexity of full project management tools.
+A self-hosted task management API that lets developers track tasks across projects without the complexity of full project management tools. REST API with user authentication, project/task CRUD, labels, and deadline reminders.
 
 ## Quick Context
 
 - **Type**: Greenfield (fresh project)
-- **Stack**: Python 3.11, FastAPI, PostgreSQL, Docker
+- **Stack**: Python 3.12, FastAPI, PostgreSQL, Docker
 - **Git Workflow**: Solo (direct merge to main)
 
 ## Documentation
 
+Read these before making changes:
+
 | Priority | Document | Purpose |
 |----------|----------|---------|
-| 1 | [ROADMAP.md](docs/ROADMAP.md) | Current tasks and priorities |
-| 2 | [SESSION_LOG.md](docs/SESSION_LOG.md) | Recent session history |
-| 3 | [OVERVIEW.md](docs/OVERVIEW.md) | System architecture |
-| 4 | [ADR.md](docs/ADR.md) | Architecture decisions |
-| 5 | [VISION.md](docs/VISION.md) | Product direction |
+| 1 | [ROADMAP.md](docs_specflow/ROADMAP.md) | Current tasks and priorities |
+| 2 | [SESSION_LOG.md](docs_specflow/SESSION_LOG.md) | Recent session history |
+| 3 | [OVERVIEW.md](docs_specflow/OVERVIEW.md) | System architecture |
+| 4 | [ADR.md](docs_specflow/ADR.md) | Architecture decisions |
+| 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
+| 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
+
+> **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
 
 ## Session Commands
+
+Use these commands to structure your work:
 
 - `/plan-session` - Prepare for implementation
 - `/start-session` - Begin coding
 - `/end-session` - Wrap up and merge
+- `/verify` - Validate docs consistency and project health
 - `/pivot-session` - Reassess direction
 
 Commands are in `.claude/commands/`.
 
-## Project Structure
+## Technical Enforcement
 
-```
-taskflow/
-├── app/
-│   ├── main.py           # FastAPI app entry
-│   ├── config.py         # Settings and env vars
-│   ├── database.py       # DB connection
-│   ├── models/           # SQLAlchemy models
-│   ├── routes/           # API endpoints
-│   ├── services/         # Business logic
-│   └── schemas/          # Pydantic schemas
-├── tests/
-│   ├── unit/
-│   └── integration/
-├── docker-compose.yml
-├── Dockerfile
-└── requirements.txt
-```
+### Hooks (`.claude/hooks/`)
+Automated behaviors at session lifecycle points:
+- **SessionStart**: Auto-loads ROADMAP, SESSION_LOG, and feature SPEC into context
+- **PreToolUse**: Blocks edits to frozen docs (VISION.md, SPEC.md requirements)
+- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage, reminds to capture learned patterns
+- **Stop**: Reminds to push unpushed commits
+- **SessionEnd**: Saves session state snapshot for continuity
+
+### Rules (`.claude/rules/`)
+Always-loaded coding guidelines:
+- `coding-style.md` — Python style: ruff, type hints, docstrings for public APIs
+- `git-workflow.md` — Branch, commit, and merge conventions
+- `security.md` — Secret protection and secure coding
+- `testing.md` — pytest commands and quality standards
+- `documentation.md` — SpecFlow documentation conventions
+
+### Statusline
+Real-time display: context usage %, current feature, TODO progress, git status.
+
+## Agents
+
+Role-specific agents in `.claude/agents/` provide specialized behavior:
+
+| Agent | Role | Model Tier |
+|-------|------|------------|
+| `base.md` | Shared principles and session ritual | sonnet |
+| `qa.md` | Test writing and quality assurance | sonnet |
+| `architecture.md` | Architecture review and system design (advisory, read-only) | opus |
+| `backend.md` | Backend implementation patterns | sonnet |
+| `frontend.md` | Frontend implementation patterns | sonnet |
+| `build-error-resolver.md` | Build failures, type errors, dependency issues | sonnet |
+| `security-reviewer.md` | Security auditing, OWASP review (advisory, read-only) | opus |
+| `refactor-cleaner.md` | Dead code removal, complexity reduction | sonnet |
+
+Advisory agents (architecture, security-reviewer) have read/search access only — they report findings but don't modify code.
 
 ## Key Patterns
 
 ### Backend (FastAPI)
-- See `.ai/agents/backend.md` for detailed patterns
-- Routes → Services → Repositories pattern
-- Pydantic for validation
-- SQLAlchemy 2.0 async
-
-### Testing
-- pytest with httpx for API tests
-- Factory pattern for test data
-- Run: `pytest tests/`
-
-## API Overview
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| /api/projects | POST | Create project |
-| /api/projects | GET | List projects |
-| /api/projects/{id}/tasks | POST | Create task |
-| /api/projects/{id}/tasks | GET | List tasks |
-| /api/tasks/{id} | PATCH | Update task |
-| /api/tasks/{id} | DELETE | Delete task |
+- See `.claude/agents/backend.md` for patterns
+- Structure: `app/routes/` → `app/services/` → `app/repositories/`
+- Pydantic for request/response validation
+- SQLAlchemy 2.0 async with Alembic migrations
+- Dependency injection via FastAPI `Depends()`
 
 ## Invariants
 
@@ -83,29 +94,20 @@ These rules must always hold:
 - Every project must belong to a user
 - Task status must be one of: todo, in_progress, done
 - API keys must be unique and 64 characters
+- All timestamps stored in UTC
 
 ## Git Workflow
 
-- Work on feature branches: `feat/description`, `fix/description`
+- Work on feature branches
 - Merge directly to main when tests pass
 - Use `./scripts/merge-to-main.sh` for clean merges
-
-```bash
-# Start work
-git checkout main && git pull
-git checkout -b feat/my-feature
-
-# End work
-pytest tests/
-./scripts/merge-to-main.sh
-```
 
 ## Working Agreements
 
 1. **One task per session** - Don't mix unrelated changes
-2. **Update docs** - SESSION_LOG after every session
+2. **Update docs** - SESSION_LOG.md after every session, ROADMAP.md when tasks change
 3. **Ask when unclear** - Don't invent requirements
-4. **Tests required** - New features need tests
+4. **No manual metrics** - Automated or nothing
 
 ## Getting Started
 
@@ -114,22 +116,6 @@ pytest tests/
 3. Run `/start-session` to begin
 4. When done, run `/end-session`
 
-## Common Commands
-
-```bash
-# Start services
-docker-compose up -d
-
-# Run tests
-pytest tests/
-
-# Run specific test
-pytest tests/unit/test_task_service.py -v
-
-# Check logs
-docker-compose logs -f api
-```
-
 ---
 
-*This project uses [SpecFlow](https://github.com/yourname/specflow) for AI-assisted development.*
+*This project uses [SpecFlow](https://github.com/jurebordon/specflow) for AI-assisted development.*
