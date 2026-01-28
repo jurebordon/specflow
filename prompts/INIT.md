@@ -133,23 +133,42 @@ For each "yes", ask:
 
 ### Step 5a: Search Existing Documentation First
 
-**If EXISTING_DOCS_PATH is set in config** (or user provided existing docs location), search those files FIRST:
+**If EXISTING_DOCS_PATH is set in config** (or user provided existing docs location), search those files FIRST.
 
-1. **Read all markdown files** in the existing docs path
-2. **Search for testing methodology**:
-   - Look for headings: "Testing", "Tests", "How to Test", "Running Tests"
-   - Search code blocks for: `pytest`, `test`, `jest`, `dbt test`, `just`, `make`
-   - Check for tool-specific docs (e.g., `PYTEST.md`, `TESTING.md`, `DEVELOPMENT.md`)
-3. **Search for build/lint/format commands**:
-   - Look for "Usage:", "Run:", "Commands:" sections
-   - Search README files for developer setup instructions
-4. **Check for task runners**:
-   - `justfile` or `Makefile` — these often have canonical commands
-   - Search for targets like `test`, `lint`, `build`, `format`
-5. **Ask if unclear**: If docs mention testing but don't specify exact commands:
-   "I found testing documentation at [path] but couldn't determine the exact command. What command should I use?"
+**CRITICAL: Extract commands EXACTLY as written in the docs. Do not modify, simplify, or "improve" them.**
 
-**Always prefer documented commands over generic patterns.** Project documentation reflects actual team practices.
+1. **List and read all markdown files** in the existing docs path:
+   - Pay special attention to: README, DEVELOPMENT, TESTING, GETTING_STARTED, CONTRIBUTING
+   - Read thoroughly — commands may be in code blocks anywhere in the document
+
+2. **Extract test commands VERBATIM**:
+   - Look for sections titled "Tests", "Testing", "Running Tests", "How to Test"
+   - Find code blocks that show how to run tests
+   - **Copy the exact command** from the documentation — do not construct your own
+   - Example: if docs say `uv run dbt_job.py t_logineko sandbox test`, use exactly that
+
+3. **Extract build/lint/format commands VERBATIM**:
+   - Look for "Linting", "Build", "Format", "Usage", "Commands" sections
+   - Find code blocks showing these commands
+   - **Copy exactly** — including any tool wrappers, paths, or arguments
+
+4. **Check for task runners** (justfile, Makefile):
+   - Read these files — they define canonical project commands
+   - For justfile: look for recipes like `test`, `lint`, `build`
+   - Use `just <recipe>` as the command if found
+
+5. **Report what you found BEFORE confirming**:
+   Show: "I found these commands in your documentation:"
+   - Test: `[exact command]` (source: [filename])
+   - Build: `[exact command]` (source: [filename])
+   - Lint: `[exact command]` (source: [filename])
+
+   Ask: "Are these correct?"
+
+6. **Ask if commands are unclear or missing**:
+   "I couldn't find a clear test command in your docs. What command should I use?"
+
+**Always use documented commands over generic patterns.** The docs reflect how the team actually works.
 
 ### Step 5b: Fallback — Auto-Detect from File Patterns
 
