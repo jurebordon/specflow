@@ -20,6 +20,15 @@
 
 ```
 ai-vibe-framework/
+├── cli/                   # NPM package for `npx specflow init/update`
+│   ├── src/
+│   │   ├── index.js       # CLI entry point
+│   │   ├── init.js        # `specflow init` command
+│   │   ├── update.js      # `specflow update` command
+│   │   ├── config.js      # Shared config utilities (deriveGitVariables)
+│   │   ├── detect.js      # Tech stack detection (used by update)
+│   │   └── questions.js   # Interactive prompts
+│   └── package.json
 ├── .claude/
 │   └── commands/          # Claude Code commands for this repo
 │       ├── plan-session.md
@@ -30,21 +39,13 @@ ai-vibe-framework/
 ├── templates/
 │   ├── CLAUDE.md.template # Project context template
 │   ├── commands/          # Command templates
-│   │   ├── plan-session.md.template
-│   │   ├── start-session.md.template
-│   │   ├── end-session.md.template
-│   │   ├── new-feature.md.template
-│   │   ├── new-worktree.md.template
-│   │   └── explore-project.md.template
 │   ├── docs/              # Documentation templates
-│   │   ├── ROADMAP.md.template
-│   │   ├── SESSION_LOG.md.template
-│   │   ├── VISION.md.template
-│   │   ├── ADR.md.template
-│   │   ├── OVERVIEW.md.template
-│   │   └── WORKFLOW.md.template
+│   ├── hooks/             # Hook script templates
+│   ├── rules/             # Coding rule templates
+│   ├── agents/            # Agent templates
+│   ├── settings/          # Settings templates (hooks.json, statusline.js)
 │   ├── feature_docs/
-│   │   └── SPEC.md.template  # Per-feature spec template
+│   │   └── SPEC.md.template
 │   └── gitignore-specflow.template
 ├── configuration/
 │   └── TECH_STACKS.md     # Tech detection reference
@@ -163,16 +164,18 @@ SpecFlow has no automated tests. Manual validation checklist:
 
 See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 
-1. **Cleanup from refactoring** - Remove obsolete files, update docs
-2. **Add examples** - Realistic CLAUDE.md examples for each mode
-3. **Test end-to-end** - Validate INIT flow with real project
-4. **Migration guide** - Help users transition to new structure
+1. **CLI Simplification** - CLI scaffolds with placeholders, `/init` detects tech stack
+2. **Documentation audit** - Ensure docs reflect the simplified CLI flow
+3. **End-to-end testing** - Validate full flow: `specflow init` → `/init` → `specflow update`
 
 ---
 
 ## Key Files to Know
 
-- `prompts/INIT.md` - Main entry point, initializes SpecFlow in a project
+- `cli/src/init.js` - CLI `specflow init` command (scaffolds with placeholders)
+- `cli/src/update.js` - CLI `specflow update` command (re-renders templates)
+- `cli/src/config.js` - Shared utilities (deriveGitVariables)
+- `prompts/INIT.md` - AI `/init` command (detects tech stack, populates config)
 - `templates/commands/plan-session.md.template` - Core workflow command
 - `docs_specflow/ROADMAP.md` - Current tasks (gitignored, not templates)
 - `docs_specflow/ADR.md` - Architecture decisions for SpecFlow itself

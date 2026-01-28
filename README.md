@@ -26,14 +26,20 @@ SpecFlow solves this with:
 ```bash
 cd your-project
 
-# Interactive setup — answers questions, detects tech stack, generates all files
+# Interactive setup — scaffolds config, commands, hooks, rules, agents
 npx specflow init
+
+# AI detects tech stack, populates config, generates documentation
+/init
+
+# Re-render templates with detected values
+npx specflow update
 
 # Start working
 /plan-session
 ```
 
-The CLI walks you through project mode, git workflow, tech stack detection, and technical layers. All files are generated automatically.
+The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase to detect tech stack and populate documentation. Finally, `specflow update` re-renders templates with the real values.
 
 To update commands and agents to the latest templates:
 

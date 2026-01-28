@@ -11,7 +11,7 @@ Common questions and troubleshooting for SpecFlow.
 | Aspect | SpecFlow | spec-kit |
 |--------|----------|----------|
 | Focus | Documentation + workflow | Specification → code |
-| Installation | None (prompts only) | CLI tool required |
+| Installation | CLI (`npx specflow init`) or prompts | CLI tool required |
 | Structure | `docs_specflow/` + `.claude/` | `.specify/` folder |
 | Workflow | Session-based | Phase-based |
 | Flexibility | Adapts to existing projects | Greenfield focused |

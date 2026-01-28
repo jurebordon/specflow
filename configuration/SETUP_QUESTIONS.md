@@ -54,6 +54,12 @@ The setup process uses these questions to generate appropriate documentation and
 
 ## 3. Tech Stack
 
+> **Note**: The CLI no longer asks tech stack questions. It scaffolds files with placeholder values (e.g., `# Detected by /init`). The `/init` command then detects your tech stack automatically and populates the config.
+
+### For Full Manual Setup (prompts/INIT.md)
+
+If using the manual prompt flow (no CLI), these questions help gather tech context:
+
 ### For Greenfield
 
 - **Backend language and framework?** (e.g., Python/FastAPI, Node/Express, Go)
@@ -220,44 +226,30 @@ Select which layers to enable:
 
 ---
 
-## 7. Agent Roles
+## 7. Agent Generation
 
-**Question**: Which AI agent roles are relevant?
+> **Note**: The CLI now generates **all 8 agents by default** (5 core + 3 specialist). Agent selection questions have been removed from the CLI setup flow.
 
-| Role | When Relevant |
-|------|---------------|
-| **Backend** | API development, services, data access |
-| **Frontend** | UI components, state management |
-| **QA** | Testing, quality assurance |
-| **Architecture** | Design decisions, system structure |
-| **Build Error Resolver** | Build failures, type errors, dependency issues |
-| **Security Reviewer** | Security auditing, vulnerability detection |
-| **Refactor Cleaner** | Dead code removal, complexity reduction, cleanup |
-| **Data** | DBT, data pipelines, analytics |
-| **DevOps** | Infrastructure, CI/CD, deployment |
+All agents are generated because they're harmless if unused. The `/init` command reports which agents are most relevant for your detected tech stack.
 
-*Select roles that match your work. Irrelevant roles won't be generated.*
+| Agent | Purpose | Default Model |
+|-------|---------|---------------|
+| **base.md** | Shared principles and session ritual | sonnet |
+| **qa.md** | Test writing and quality assurance | sonnet |
+| **architecture.md** | Architecture review (advisory, read-only) | opus |
+| **backend.md** | Backend implementation patterns | sonnet |
+| **frontend.md** | Frontend implementation patterns | sonnet |
+| **build-error-resolver.md** | Build failures, type errors, dependencies | sonnet |
+| **security-reviewer.md** | Security auditing (advisory, read-only) | opus |
+| **refactor-cleaner.md** | Dead code removal, complexity reduction | sonnet |
 
----
+### Model Tier Defaults
 
-## 7.5 Agent Model Tiers
-
-**Question**: Which AI model should each agent role use?
-
-| Variable | Role | Default | Rationale |
-|----------|------|---------|-----------|
-| `AGENT_MODEL_BASE` | Base (general) | `sonnet` | Balanced speed and capability |
-| `AGENT_MODEL_QA` | QA / Testing | `sonnet` | Standard implementation work |
-| `AGENT_MODEL_ARCHITECTURE` | Architecture | `opus` | Reasoning-heavy design decisions |
-| `AGENT_MODEL_BACKEND` | Backend | `sonnet` | Standard implementation work |
-| `AGENT_MODEL_FRONTEND` | Frontend | `sonnet` | Standard implementation work |
-| `AGENT_MODEL_BUILD_ERROR` | Build Error Resolver | `sonnet` | Fast iteration on error fixing |
-| `AGENT_MODEL_SECURITY` | Security Reviewer | `opus` | Reasoning-heavy security analysis |
-| `AGENT_MODEL_REFACTOR` | Refactor Cleaner | `sonnet` | Standard refactoring work |
+Model tiers use sensible defaults. Architecture and Security agents default to `opus` (reasoning-heavy advisory roles); all others default to `sonnet`.
 
 Available tiers: `opus` (strongest reasoning), `sonnet` (balanced), `haiku` (fastest/cheapest)
 
-*Accept defaults unless you have specific cost or capability preferences. Architecture and Security Reviewer default to opus because design trade-offs and security analysis benefit from deeper reasoning.*
+To customize model tiers, edit `docs_specflow/.specflow-config.md` after setup and run `specflow update`.
 
 ---
 
