@@ -125,12 +125,25 @@ function parseConfigFile(configPath) {
     'Existing Docs': 'EXISTING_DOCS_PATH',
   };
 
+  // Command fields that may have backticks or multiple commands
+  const commandFields = ['Test Command', 'Build Command', 'Lint Command', 'Format Command', 'Typecheck Command'];
+
   for (const line of content.split('\n')) {
     const match = line.match(/^- \*\*(.+?)\*\*:\s*(.+)$/);
     if (match) {
       const label = match[1].trim();
-      const value = match[2].trim();
+      let value = match[2].trim();
       const varName = fieldMap[label];
+
+      // For command fields, extract just the command from backticks
+      // Handles formats like: `cmd arg` or `cmd arg` (description), `cmd2`
+      if (commandFields.includes(label) && value.includes('`')) {
+        const cmdMatch = value.match(/`([^`]+)`/);
+        if (cmdMatch) {
+          value = cmdMatch[1];
+        }
+      }
+
       if (varName) {
         config[varName] = value;
       }
