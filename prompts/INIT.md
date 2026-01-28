@@ -131,7 +131,29 @@ For each "yes", ask:
 
 **Full Flow**: Ask: "May I scan your project to detect the tech stack?"
 
-### Detection Process
+### Step 5a: Search Existing Documentation First
+
+**If EXISTING_DOCS_PATH is set in config** (or user provided existing docs location), search those files FIRST:
+
+1. **Read all markdown files** in the existing docs path
+2. **Search for testing methodology**:
+   - Look for headings: "Testing", "Tests", "How to Test", "Running Tests"
+   - Search code blocks for: `pytest`, `test`, `jest`, `dbt test`, `just`, `make`
+   - Check for tool-specific docs (e.g., `PYTEST.md`, `TESTING.md`, `DEVELOPMENT.md`)
+3. **Search for build/lint/format commands**:
+   - Look for "Usage:", "Run:", "Commands:" sections
+   - Search README files for developer setup instructions
+4. **Check for task runners**:
+   - `justfile` or `Makefile` — these often have canonical commands
+   - Search for targets like `test`, `lint`, `build`, `format`
+5. **Ask if unclear**: If docs mention testing but don't specify exact commands:
+   "I found testing documentation at [path] but couldn't determine the exact command. What command should I use?"
+
+**Always prefer documented commands over generic patterns.** Project documentation reflects actual team practices.
+
+### Step 5b: Fallback — Auto-Detect from File Patterns
+
+**Only if no existing docs** or docs don't specify commands, use generic detection.
 
 Scan for common files (reference: `.specflow/configuration/TECH_STACKS.md`):
 
@@ -154,7 +176,7 @@ Scan for common files (reference: `.specflow/configuration/TECH_STACKS.md`):
 ### Confirm Findings
 
 Show: "Detected: [languages] + [frameworks]"
-- TEST_COMMAND: [command]
+- TEST_COMMAND: [command] (source: existing docs / auto-detected)
 - BUILD_COMMAND: [command]
 - LINT_COMMAND: [command]
 - FORMAT_COMMAND: [command]
