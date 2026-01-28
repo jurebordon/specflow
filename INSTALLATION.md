@@ -104,6 +104,8 @@ npx specflow-ai init --mode adoption
 npx specflow-ai init --mode constrained
 ```
 
+> **Note**: The `--yes` flag skips all prompts and uses defaults. If your project has existing documentation you want `/init` to read, run the interactive mode (without `--yes`) which asks for the existing docs path.
+
 ### Update Templates Only
 
 After changing `.specflow-config.md`, re-render templates:
