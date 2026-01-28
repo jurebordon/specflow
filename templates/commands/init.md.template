@@ -127,19 +127,37 @@ Update these sections (leave the rest as-is):
 
 ---
 
-## Step 4: Update Config with Detected Stack
+## Step 4: Update Config & Report Agent Relevance
 
-If the config file (`docs_specflow/.specflow-config.md`) shows `Languages: Unknown` or has placeholder commands (`# No test command configured`), update it with the tech stack you discovered during codebase analysis.
+**This step always runs** — the CLI scaffolds with placeholder values that need real detection.
 
-Read the current config, then update these fields:
+### 4a. Update Configuration
+
+Read `docs_specflow/.specflow-config.md` and update these fields with detected values:
+
 - **Languages**: the detected tech stack (e.g. "Python, DBT", "TypeScript, React")
+- **Frameworks**: detected frameworks (e.g. "FastAPI", "React", "DBT")
 - **Test Command**: the project's actual test command
 - **Build Command**: the project's actual build command
 - **Lint Command**: the project's actual lint command
-- **Format Command**: the project's actual format command (in Technical Layers section)
-- **Typecheck Command**: the project's actual typecheck command (in Technical Layers section)
+- **Format Command**: the project's actual format command
+- **Typecheck Command**: the project's actual typecheck command
 
-This ensures `specflow update` can re-render commands and rules with correct values later.
+### 4b. Report Agent Relevance
+
+Based on detected stack, report which agents are most relevant:
+
+| Stack | Highly Relevant Agents | Less Relevant Agents |
+|-------|------------------------|----------------------|
+| Full-stack (frontend + backend) | All 8 agents | — |
+| Backend only (Python, Go, Java) | base, qa, architecture, backend, build-error-resolver, security-reviewer | frontend |
+| Frontend only (React, Vue) | base, qa, architecture, frontend, refactor-cleaner | backend, security-reviewer |
+| Data/DBT | base, qa, architecture, backend | frontend, security-reviewer |
+| Infrastructure/DevOps | base, architecture, security-reviewer | frontend, backend, qa |
+
+Show: "Based on your [stack], these agents are most relevant: [list]. The others are generated but you may not need them."
+
+**Note**: All 8 agents are always generated — this guidance just helps users know which to invoke.
 
 ---
 
@@ -173,19 +191,24 @@ Documentation populated! Here's what was created:
 - CLAUDE.md — Key patterns and invariants
 
 The /init command has been archived to docs_specflow/INIT_PROMPT.md.
+
+Tech stack config updated with detected values.
 ```
 
-If the tech stack config was updated from `Unknown` to a detected stack, add:
+Always include:
 ```
-Tech stack config updated. Run `specflow update` to re-render
-commands and rules with the correct test/build/lint commands.
+Run this command to re-render templates with your tech stack:
+
+  specflow update
+
+This will update commands, hooks, and rules with your actual test/build/lint commands.
 ```
 
 Final next steps:
 ```
 Next steps:
 1. Review the generated documentation
-2. Run `specflow update` if tech stack was updated (re-renders commands/rules)
+2. Run `specflow update` to re-render commands/rules with detected values
 3. Run /plan-session to start your first session
 ```
 

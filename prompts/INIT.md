@@ -5,12 +5,13 @@
 ## Option A: CLI + AI (Recommended)
 
 ```bash
-npx specflow init          # Interactive setup: config, commands, hooks, rules, agents
+npx specflow init          # Interactive setup: scaffolds config, commands, hooks, rules, agents
 # Then in Claude Code:
-/init                      # AI populates OVERVIEW, VISION, ROADMAP, ADR, CLAUDE.md
+/init                      # AI detects tech stack, populates config, generates documentation
+specflow update            # Re-renders commands/hooks/rules with detected values
 ```
 
-The CLI generates structural files (commands, hooks, rules, agents) with your config values. The `/init` command then uses AI to analyze your codebase and populate documentation with real content.
+The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase to detect tech stack, update config, and populate documentation. Finally, `specflow update` re-renders templates with the real values.
 
 ## Option B: Full Manual Prompt
 
@@ -41,23 +42,35 @@ This gives the AI access to templates at `.specflow/templates/`.
 ```
 You are initializing SpecFlow, a spec-driven framework for AI-assisted development.
 
-## Step 0: Verify Framework
+## Step 0: Detect Setup Context
 
-Check if `.specflow/` exists in this project.
+Determine which initialization path to follow:
 
-If YES: Read these reference files to understand the templates:
-- .specflow/templates/CLAUDE.md.template
-- .specflow/templates/docs/*.template
-- .specflow/templates/commands/*.template
-- .specflow/configuration/SETUP_QUESTIONS.md
-- .specflow/configuration/AGENT_TIERS.md
-- .specflow/examples/CLAUDE_GREENFIELD.md, CLAUDE_CONSTRAINED.md, CLAUDE_ADOPTION.md (rendered examples for each mode — use as reference when generating CLAUDE.md)
+**Check 1**: Does `docs_specflow/.specflow-config.md` exist?
 
-If NO: Ask the user to run:
+**If YES (CLI already ran)** → **Post-CLI Flow**:
+- Read `.specflow-config.md` to get project settings
+- Check for placeholder values like `# Detected by /init` in TEST_COMMAND, BUILD_COMMAND, etc.
+- If placeholders found: Skip to **Step 5** (Tech Stack Detection) — the CLI already gathered basic config
+- After detection: Update config, then suggest `specflow update` to re-render templates
+
+**If NO (fresh start)** → **Full Flow**:
+- Check if `.specflow/` exists
+- If YES: Read reference files below
+- If NO: Ask user to run:
+  ```bash
   git clone https://github.com/jurebordon/specflow .specflow
   echo ".specflow/" >> .gitignore
+  ```
 
-Then continue.
+**Reference files to read** (for both flows):
+- .specflow/templates/CLAUDE.md.template
+- .specflow/templates/docs/*.template
+- .specflow/configuration/SETUP_QUESTIONS.md
+- .specflow/configuration/TECH_STACKS.md (for detection patterns)
+- .specflow/examples/CLAUDE_GREENFIELD.md, CLAUDE_CONSTRAINED.md, CLAUDE_ADOPTION.md (rendering examples)
+
+Then continue with the appropriate flow.
 
 ## Step 1: Determine Project Mode
 
@@ -114,25 +127,42 @@ For each "yes", ask:
 
 ## Step 5: Tech Stack Detection
 
-Ask: "May I scan your project to detect the tech stack? This helps generate appropriate test/build/lint commands."
+**Post-CLI Flow**: This step always runs — the CLI uses placeholder values that need detection.
 
-**If YES**:
-- Scan for common files:
-  - `package.json` → Node.js
-  - `requirements.txt` or `pyproject.toml` → Python
-  - `dbt_project.yml` → DBT
-  - `Gemfile` → Ruby
-  - `go.mod` → Go
-  - `Cargo.toml` → Rust
-  - `pom.xml` or `build.gradle` → Java
-- Identify: language(s), framework(s), test runner, build tool
-- Show findings: "Found: Python + DBT + pytest"
-- Ask: "Is this correct? Any additional tools to note?"
+**Full Flow**: Ask: "May I scan your project to detect the tech stack?"
 
-**If NO**:
-- Ask: "Please describe your tech stack (language, framework, test tool, build tool)"
+### Detection Process
 
-Store in config for generating tech-adaptive commands.
+Scan for common files (reference: `.specflow/configuration/TECH_STACKS.md`):
+
+| File | Stack | Test Command | Build Command | Lint Command |
+|------|-------|--------------|---------------|--------------|
+| `package.json` | Node.js/TypeScript | `npm test` | `npm run build` | `npm run lint` |
+| `requirements.txt` / `pyproject.toml` | Python | `pytest` | `python -m build` | `ruff check .` |
+| `dbt_project.yml` | DBT | `dbt test` | `dbt build` | `sqlfluff lint` |
+| `Gemfile` | Ruby | `bundle exec rspec` | `bundle exec rake build` | `bundle exec rubocop` |
+| `go.mod` | Go | `go test ./...` | `go build ./...` | `golangci-lint run` |
+| `Cargo.toml` | Rust | `cargo test` | `cargo build` | `cargo clippy` |
+| `pom.xml` / `build.gradle` | Java | `mvn test` / `gradle test` | `mvn package` / `gradle build` | `mvn checkstyle:check` |
+
+### Also Detect
+
+- **Frameworks**: FastAPI, Flask, Django, React, Vue, Next.js, Express, etc.
+- **Format Command**: `ruff format .`, `npx prettier --write .`, `go fmt ./...`, etc.
+- **Typecheck Command**: `mypy .`, `npx tsc --noEmit`, etc.
+
+### Confirm Findings
+
+Show: "Detected: [languages] + [frameworks]"
+- TEST_COMMAND: [command]
+- BUILD_COMMAND: [command]
+- LINT_COMMAND: [command]
+- FORMAT_COMMAND: [command]
+- TYPECHECK_COMMAND: [command]
+
+Ask: "Is this correct? Any adjustments needed?"
+
+**If user declines scan**: Ask them to describe their tech stack manually.
 
 ## Step 5.5: Technical Enforcement Layers
 
@@ -154,6 +184,54 @@ Store in config:
 - **Hooks**: enabled/disabled
 - **Rules**: enabled/disabled
 - **Statusline**: enabled/disabled
+
+## Step 5.6: Update Config & Report Agent Relevance
+
+**This step always runs after tech stack detection.**
+
+### Update Configuration
+
+Update `docs_specflow/.specflow-config.md` with detected values:
+
+```markdown
+## Tech Stack
+- **Languages**: [detected languages]
+- **Frameworks**: [detected frameworks]
+- **Test Command**: [detected command]
+- **Build Command**: [detected command]
+- **Lint Command**: [detected command]
+- **Format Command**: [detected command]
+- **Typecheck Command**: [detected command]
+```
+
+### Report Agent Relevance
+
+Based on detected stack, report which agents are most relevant:
+
+| Stack | Highly Relevant Agents | Less Relevant Agents |
+|-------|------------------------|----------------------|
+| Full-stack (frontend + backend) | All 8 agents | — |
+| Backend only (Python, Go, Java) | base, qa, architecture, backend, build-error-resolver, security-reviewer | frontend |
+| Frontend only (React, Vue) | base, qa, architecture, frontend, refactor-cleaner | backend, security-reviewer |
+| Data/DBT | base, qa, architecture, backend | frontend, security-reviewer |
+| Infrastructure/DevOps | base, architecture, security-reviewer | frontend, backend, qa |
+
+Show: "Based on your [stack], these agents are most relevant: [list]. The others are generated but you may not need them."
+
+**Note**: All 8 agents are always generated (they're harmless if unused). This guidance helps users know which to invoke.
+
+### Post-CLI Flow: Trigger Re-render
+
+If this is a post-CLI run (config had placeholders):
+
+Show:
+```
+Config updated with detected values. Run this to re-render templates:
+
+  specflow update
+
+This will update commands, hooks, and rules with your actual tech stack commands.
+```
 
 ## Step 6: Documentation Tracking
 

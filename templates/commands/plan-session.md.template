@@ -4,6 +4,16 @@
 
 ---
 
+## Step 0: Context Check
+
+If this conversation has significant prior history (multiple tool calls, long outputs, prior implementation work), suggest to the user:
+
+> **Tip:** This session has existing context. For a clean planning slate, run `/clear` first, then re-run `/plan-session`.
+
+If the conversation is fresh (no prior messages or only a greeting), skip this step silently.
+
+---
+
 ## Step 1: Detect Feature Context
 
 ```bash
