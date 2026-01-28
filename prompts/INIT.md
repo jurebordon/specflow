@@ -7,11 +7,10 @@
 ```bash
 npx specflow-ai init          # Interactive setup: scaffolds config, commands, hooks, rules, agents
 # Then in Claude Code:
-/init                      # AI detects tech stack, populates config, generates documentation
-specflow-ai update            # Re-renders commands/hooks/rules with detected values
+/init                      # AI detects tech stack, populates config AND updates command files
 ```
 
-The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase to detect tech stack, update config, and populate documentation. Finally, `specflow-ai update` re-renders templates with the real values.
+The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase, detects tech stack, updates config, populates documentation, AND updates command files with the actual test/build/lint commands. No additional steps needed.
 
 ## Option B: Full Manual Prompt
 
@@ -52,7 +51,7 @@ Determine which initialization path to follow:
 - Read `.specflow-config.md` to get project settings
 - Check for placeholder values like `# Detected by /init` in TEST_COMMAND, BUILD_COMMAND, etc.
 - If placeholders found: Skip to **Step 5** (Tech Stack Detection) — the CLI already gathered basic config
-- After detection: Update config, then suggest `specflow-ai update` to re-render templates
+- After detection: Update config AND command files directly (start-session.md, end-session.md, testing.md)
 
 **If NO (fresh start)** → **Full Flow**:
 - Check if `.specflow/` exists
@@ -226,7 +225,7 @@ Store in config:
 - **Rules**: enabled/disabled
 - **Statusline**: enabled/disabled
 
-## Step 5.6: Update Config & Report Agent Relevance
+## Step 5.6: Update Config & Command Files
 
 **This step always runs after tech stack detection.**
 
@@ -245,6 +244,29 @@ Update `docs_specflow/.specflow-config.md` with detected values:
 - **Typecheck Command**: [detected command]
 ```
 
+### Update Command Files Directly
+
+**IMPORTANT**: Also update these command files with the detected test commands:
+
+1. **`.claude/commands/start-session.md`** — Find the "Pre-flight Check" section and replace `# Detected by /init` with actual command(s)
+
+2. **`.claude/commands/end-session.md`** — Find the "Final Tests" section and replace `# Detected by /init` with actual command(s)
+
+3. **`.claude/rules/testing.md`** — Update the Commands section with actual test/lint/typecheck commands
+
+For mixed stacks (e.g., Python + DBT), include ALL relevant test commands:
+```markdown
+## Step 2: Pre-flight Check
+
+Run baseline tests:
+```bash
+just pytest_components  # Python component tests
+uv run dbt_job.py <tenant> sandbox test  # DBT model tests
+```
+```
+
+**Do NOT leave `# Detected by /init` placeholders** — replace them with actual commands.
+
 ### Report Agent Relevance
 
 Based on detected stack, report which agents are most relevant:
@@ -261,17 +283,19 @@ Show: "Based on your [stack], these agents are most relevant: [list]. The others
 
 **Note**: All 8 agents are always generated (they're harmless if unused). This guidance helps users know which to invoke.
 
-### Post-CLI Flow: Trigger Re-render
+### Post-CLI Flow: Confirm Updates
 
 If this is a post-CLI run (config had placeholders):
 
 Show:
 ```
-Config updated with detected values. Run this to re-render templates:
+Config and command files updated with detected values:
+- .specflow-config.md — Tech stack configuration
+- start-session.md — Pre-flight test commands
+- end-session.md — Final test commands
+- testing.md — Test/lint/typecheck commands
 
-  specflow-ai update
-
-This will update commands, hooks, and rules with your actual tech stack commands.
+No need to run 'specflow-ai update' — all files are ready to use.
 ```
 
 ## Step 6: Documentation Tracking

@@ -199,12 +199,30 @@ Update `docs_specflow/.specflow-config.md` with detected/discovered values:
 - **Format Command**: from existing docs OR auto-detected
 - **Typecheck Command**: from existing docs OR auto-detected
 
-When writing commands to config, include context if helpful:
+### 4d. Update Command Files Directly
+
+**IMPORTANT**: Also update these command files with the detected test commands:
+
+1. **`.claude/commands/start-session.md`** — Find the "Pre-flight Check" section and replace the test command placeholder with the actual command(s)
+
+2. **`.claude/commands/end-session.md`** — Find the "Final Tests" section and replace the test command placeholder with the actual command(s)
+
+3. **`.claude/rules/testing.md`** — Update the Commands section with actual test/lint/typecheck commands
+
+For mixed stacks (e.g., Python + DBT), include ALL relevant test commands:
 ```markdown
-- **Test Command**: `just pytest_components` (from tools/justfile), `dbt test` (DBT models)
+## Step 2: Pre-flight Check
+
+Run baseline tests:
+```bash
+just pytest_components  # Python component tests
+uv run dbt_job.py <tenant> sandbox test  # DBT model tests
+```
 ```
 
-### 4d. Report Agent Relevance
+**Do NOT leave `# Detected by /init` placeholders** — replace them with actual commands.
+
+### 4e. Report Agent Relevance
 
 Based on detected stack, report which agents are most relevant:
 
@@ -243,26 +261,19 @@ mv .claude/commands/init.md docs_specflow/INIT_PROMPT.md
 
 Report to the user:
 ```
-Documentation populated! Here's what was created:
+Documentation populated! Here's what was updated:
 
 - OVERVIEW.md — System architecture and patterns
 - VISION.md — Problem statement and direction
 - ROADMAP.md — Initial task breakdown
 - ADR.md — Tech stack decisions
 - CLAUDE.md — Key patterns and invariants
+- .specflow-config.md — Tech stack and commands
+- start-session.md — Pre-flight test commands
+- end-session.md — Final test commands
+- testing.md — Test/lint/typecheck commands
 
 The /init command has been archived to docs_specflow/INIT_PROMPT.md.
-
-Tech stack config updated with detected values.
-```
-
-Always include:
-```
-Run this command to re-render templates with your tech stack:
-
-  specflow-ai update
-
-This will update commands, hooks, and rules with your actual test/build/lint commands.
 ```
 
 Final next steps:
