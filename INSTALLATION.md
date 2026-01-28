@@ -1,59 +1,77 @@
 # Installing SpecFlow
 
-SpecFlow is installed as a gitignored clone within your project. This keeps templates accessible to the AI while not polluting your project's git history.
+SpecFlow provides two installation methods: **CLI** (recommended) or **manual clone**.
 
 ---
 
-## Quick Install
+## Quick Install (Recommended)
 
 ```bash
 cd your-project
 
-# Clone SpecFlow
-git clone https://github.com/jurebordon/specflow .specflow
+# 1. Interactive setup — scaffolds config, commands, hooks, rules, agents
+npx specflow init
 
-# Add to gitignore
-echo ".specflow/" >> .gitignore
+# 2. AI detects tech stack and populates config
+/init
+
+# 3. Re-render templates with detected values
+npx specflow update
 ```
 
-That's it. Now you can run the INIT prompt.
+The CLI handles everything: creating directories, rendering templates, and setting up your project.
 
 ---
 
-## What Gets Installed
+## What Gets Created
 
 ```
 your-project/
-└── .specflow/              # Gitignored
-    ├── README.md
-    ├── INSTALLATION.md     # This file
-    ├── FAQ.md
-    ├── core/               # Principles and concepts
-    ├── configuration/      # Setup questions and guides
-    ├── modes/              # Greenfield, Constrained, Adoption
-    ├── prompts/            # INIT and other prompts
-    └── templates/          # Document and command templates
+├── CLAUDE.md                    # AI context file
+├── docs_specflow/               # SpecFlow documentation (gitignored by default)
+│   ├── .specflow-config.md      # Project settings
+│   ├── OVERVIEW.md
+│   ├── VISION.md
+│   ├── ROADMAP.md
+│   ├── ADR.md
+│   ├── WORKFLOW.md
+│   ├── SESSION_LOG.md
+│   └── LEARNED_PATTERNS.md
+└── .claude/
+    ├── commands/                # Session workflow commands
+    ├── agents/                  # 8 specialized agents
+    ├── hooks/                   # Automation hooks
+    ├── rules/                   # Coding standards
+    ├── settings.json
+    └── statusline.js
 ```
 
 ---
 
-## Initialize a Project
+## The Three-Step Flow
 
-After installing, start Claude Code and paste the INIT prompt:
+### Step 1: `npx specflow init`
 
-```bash
-# Start Claude in your project
-cd your-project
-claude
+Interactive CLI that asks about your project:
+- Project type (greenfield, adoption, constrained)
+- Git workflow (solo, PR-based)
+- Documentation preferences
+- Technical layers (hooks, rules, statusline)
 
-# Then paste the prompt from .specflow/prompts/INIT.md
-```
+Generates ~40 files with placeholder values for tech-specific commands.
 
-The AI will:
-1. Read templates from `.specflow/templates/`
-2. Ask discovery questions
-3. Generate project files (CLAUDE.md, docs/, .claude/commands/)
-4. Create `.specflow-config.md` with your settings
+### Step 2: `/init` (in Claude Code)
+
+Open your project in Claude Code and run the `/init` command. The AI will:
+- Scan your codebase to detect tech stack
+- Update `.specflow-config.md` with real commands
+- Report which agents are relevant for your stack
+
+### Step 3: `npx specflow update`
+
+Re-renders commands, hooks, rules, and agents with the values detected by `/init`.
+
+After this, your project has fully customized SpecFlow configuration.
 
 ---
 
@@ -61,44 +79,58 @@ The AI will:
 
 | Path | Tracked | Purpose |
 |------|---------|---------|
-| `.specflow/` | No | Framework templates (gitignored) |
-| `.specflow-config.md` | Yes | Project-specific settings |
 | `CLAUDE.md` | Yes | AI context file |
-| `docs/` | Yes* | Project documentation |
+| `docs_specflow/` | No* | SpecFlow documentation |
 | `.claude/commands/` | Yes | Session commands |
+| `.claude/agents/` | Yes | Specialized agents |
+| `.claude/hooks/` | Yes | Automation hooks |
+| `.claude/rules/` | Yes | Coding standards |
 
-*Unless you chose gitignored docs location during setup
+*By default, `docs_specflow/` is gitignored. You can choose to track it during setup.
 
 ---
 
-## Updating SpecFlow
+## CLI Options
 
-Get the latest templates:
+### Non-Interactive Mode
 
 ```bash
-cd your-project/.specflow
-git pull
+# Accept all defaults
+npx specflow init --yes
+
+# Specify project mode
+npx specflow init --mode greenfield
+npx specflow init --mode adoption
+npx specflow init --mode constrained
 ```
 
-Your project files are unaffected - only the templates update.
+### Update Templates Only
+
+After changing `.specflow-config.md`, re-render templates:
+
+```bash
+npx specflow update
+```
+
+This updates commands, hooks, rules, and agents without touching your documentation.
 
 ---
 
-## Multiple Projects
+## Alternative: Manual Installation
 
-Each project gets its own `.specflow/` clone:
+If you prefer not to use the CLI:
 
+```bash
+cd your-project
+
+# Clone SpecFlow repository
+git clone https://github.com/jurebordon/specflow .specflow
+
+# Add to gitignore
+echo ".specflow/" >> .gitignore
 ```
-~/Dev/
-├── project-a/
-│   └── .specflow/    # Independent clone
-├── project-b/
-│   └── .specflow/    # Independent clone
-└── project-c/
-    └── .specflow/    # Independent clone
-```
 
-This allows different projects to use different versions if needed.
+Then in Claude Code, paste the contents of `.specflow/prompts/INIT.md` to run the setup prompt manually.
 
 ---
 
@@ -106,30 +138,29 @@ This allows different projects to use different versions if needed.
 
 When a team member clones your project:
 
-1. They clone your project (`.specflow/` is gitignored, so not included)
-2. They run the install command:
-   ```bash
-   git clone https://github.com/jurebordon/specflow .specflow
-   ```
-3. They can now use the same session commands
+1. They clone your project (generated files are included)
+2. They can immediately use `/plan-session`, `/start-session`, etc.
+3. If they want to update templates, they run `npx specflow update`
 
-The `.specflow-config.md` IS tracked, so they get your project settings automatically.
+The `.specflow-config.md` and `.claude/` directory are tracked, so the team shares the same configuration.
 
 ---
 
-## Alternative: Global Install
+## Updating SpecFlow
 
-If you prefer a single SpecFlow installation:
+To get the latest CLI and templates:
 
 ```bash
-# Clone once to a global location
-git clone https://github.com/jurebordon/specflow ~/.specflow
-
-# In each project, symlink or reference it
-ln -s ~/.specflow .specflow
+# Clear npx cache and get latest
+npx specflow@latest init --help
 ```
 
-Note: This means all projects share the same version.
+Or if using manual installation:
+
+```bash
+cd your-project/.specflow
+git pull
+```
 
 ---
 
@@ -138,8 +169,9 @@ Note: This means all projects share the same version.
 To remove SpecFlow from a project:
 
 ```bash
-rm -rf .specflow
-# Remove the .specflow/ line from .gitignore
+rm -rf docs_specflow/ .claude/
+rm CLAUDE.md
+# Remove docs_specflow/ line from .gitignore if present
 ```
 
-Your project files (CLAUDE.md, docs/, commands/) remain and continue to work.
+Your project code remains unchanged.
