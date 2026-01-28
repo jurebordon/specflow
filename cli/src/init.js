@@ -3,19 +3,62 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
-import { askSetupQuestions, getDefaults } from './questions.js';
-import { detectTechStack } from './detect.js';
+import { askBasicQuestions, getDefaults } from './questions.js';
 import {
   getTemplatesRoot,
-  buildFileManifest,
+  buildStructuralManifest,
   generateFiles,
   generateConfig,
   generateSettings,
+  generateSkeletonDocs,
+  generateSkeletonClaudeMd,
   updateGitignore,
 } from './generate.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const cliRoot = resolve(__dirname, '..');
+
+/**
+ * Derive GIT_WORKFLOW boolean flags and template variables from config.
+ *
+ * @param {Record<string, unknown>} config - Configuration with GIT_WORKFLOW string
+ */
+function deriveGitVariables(config) {
+  // Boolean flags for {{#if}} blocks in templates
+  config.GIT_WORKFLOW_SOLO = config.GIT_WORKFLOW === 'solo';
+  config.GIT_WORKFLOW_PR = config.GIT_WORKFLOW === 'pr-review';
+  config.GIT_WORKFLOW_CICD = config.GIT_WORKFLOW === 'ci-cd-gated';
+  config.GIT_WORKFLOW_PR_GITHUB = config.GIT_WORKFLOW_PR && config.GIT_PLATFORM === 'GitHub';
+  config.GIT_WORKFLOW_PR_GITLAB = config.GIT_WORKFLOW_PR && config.GIT_PLATFORM === 'GitLab';
+
+  // Derived template variables used in commands and workflow docs
+  config.COMMIT_CONVENTION = 'feat|fix|refactor|docs';
+  config.GIT_BRANCH_CONVENTION = config.BRANCH_CONVENTION || 'feat/description';
+
+  if (config.GIT_WORKFLOW_SOLO) {
+    config.GIT_MERGE_INSTRUCTION = 'Merge feature branch to main locally';
+    config.MR_COMMAND = '';
+  } else if (config.GIT_WORKFLOW_PR) {
+    if (config.GIT_PLATFORM === 'GitHub') {
+      config.GIT_MERGE_INSTRUCTION = 'Create PR for review (do not merge locally)';
+      config.MR_COMMAND = 'gh pr create';
+    } else if (config.GIT_PLATFORM === 'GitLab') {
+      config.GIT_MERGE_INSTRUCTION = 'Create MR for review (do not merge locally)';
+      config.MR_COMMAND = 'glab mr create';
+    } else {
+      config.GIT_MERGE_INSTRUCTION = 'Create PR/MR for review (do not merge locally)';
+      config.MR_COMMAND = '';
+    }
+  } else if (config.GIT_WORKFLOW_CICD) {
+    if (config.GIT_PLATFORM === 'GitLab') {
+      config.GIT_MERGE_INSTRUCTION = 'Create MR and let CI/CD pipeline handle merge';
+      config.MR_COMMAND = 'glab mr create';
+    } else {
+      config.GIT_MERGE_INSTRUCTION = 'Create PR and let CI/CD pipeline handle merge';
+      config.MR_COMMAND = 'gh pr create';
+    }
+  }
+}
 
 /**
  * Main init command handler.
@@ -38,50 +81,47 @@ export async function init(options) {
     return;
   }
 
-  // ── Gather configuration ──────────────────────────────────────────
+  // ── Phase 1a: Basic questions ──────────────────────────────────────
   let config;
   if (options.yes) {
     config = getDefaults();
     console.log(chalk.dim('Using default configuration (--yes)'));
     console.log('');
   } else {
-    config = await askSetupQuestions(options);
+    config = await askBasicQuestions(options);
     console.log('');
   }
 
-  // ── Tech stack detection ──────────────────────────────────────────
-  if (config.SCAN_TECH_STACK) {
-    console.log(chalk.dim('Scanning project for tech stack...'));
-    const detection = detectTechStack(projectDir);
+  // ── Phase 1b: Set placeholder values for tech stack ────────────────
+  // Tech detection is deferred to /init (AI-powered codebase analysis).
+  // CLI sets placeholders; /init detects and populates; `specflow update` re-renders.
+  config.TECH_STACK = config.TECH_STACK || 'Unknown';
+  config.TEST_COMMAND = '# Detected by /init';
+  config.BUILD_COMMAND = '# Detected by /init';
+  config.LINT_COMMAND = '# Detected by /init';
+  config.FORMAT_COMMAND = '# Detected by /init';
+  config.TYPECHECK_COMMAND = '# Detected by /init';
 
-    if (detection.detected.length > 0) {
-      console.log(chalk.green(`Detected: ${detection.techStack}`));
-    } else {
-      console.log(chalk.yellow('No tech stack detected.'));
-    }
+  // ── Phase 1c: Set default agent config ────────────────────────────
+  // All 8 agents are always generated (harmless if unused).
+  // /init can later advise which agents are relevant based on codebase analysis.
+  config.AGENT_ROLES = [
+    'backend', 'frontend', 'qa', 'architecture',
+    'build-error-resolver', 'security-reviewer', 'refactor-cleaner',
+  ];
+  config.AGENT_MODEL_BASE = 'sonnet';
+  config.AGENT_MODEL_QA = 'sonnet';
+  config.AGENT_MODEL_ARCHITECTURE = 'opus';
+  config.AGENT_MODEL_BACKEND = 'sonnet';
+  config.AGENT_MODEL_FRONTEND = 'sonnet';
+  config.AGENT_MODEL_BUILD_ERROR = 'sonnet';
+  config.AGENT_MODEL_SECURITY = 'opus';
+  config.AGENT_MODEL_REFACTOR = 'sonnet';
 
-    config.TECH_STACK = config.TECH_STACK || detection.techStack;
-    config.TEST_COMMAND = detection.commands.TEST_COMMAND;
-    config.BUILD_COMMAND = detection.commands.BUILD_COMMAND;
-    config.LINT_COMMAND = detection.commands.LINT_COMMAND;
-    config.FORMAT_COMMAND = detection.commands.FORMAT_COMMAND;
-    config.TYPECHECK_COMMAND = detection.commands.TYPECHECK_COMMAND;
+  // ── Derive GIT_WORKFLOW booleans and template variables ────────────
+  deriveGitVariables(config);
 
-    // Set boolean flags for conditional template blocks
-    Object.assign(config, detection.booleanFlags);
-
-    config.MIXED_STACK = detection.detected.length > 1;
-    console.log('');
-  }
-
-  // Ensure commands have fallback values
-  config.TEST_COMMAND = config.TEST_COMMAND || '# No test command configured';
-  config.BUILD_COMMAND = config.BUILD_COMMAND || '# No build command configured';
-  config.LINT_COMMAND = config.LINT_COMMAND || '# No lint command configured';
-  config.FORMAT_COMMAND = config.FORMAT_COMMAND || '# No format command configured';
-  config.TYPECHECK_COMMAND = config.TYPECHECK_COMMAND || '# No type check command configured';
-
-  // ── Build file manifest ───────────────────────────────────────────
+  // ── Build structural file manifest ─────────────────────────────────
   const templatesRoot = getTemplatesRoot(cliRoot);
 
   if (!existsSync(templatesRoot)) {
@@ -91,9 +131,14 @@ export async function init(options) {
     process.exit(1);
   }
 
-  const manifest = buildFileManifest(templatesRoot, config);
+  const manifest = buildStructuralManifest(templatesRoot, config);
 
   // ── Show summary ──────────────────────────────────────────────────
+  // Count total files: manifest + skeleton docs (4) + CLAUDE.md + config + settings
+  const skeletonDocCount = 4; // OVERVIEW, VISION, ROADMAP, ADR
+  const extraFileCount = 3;   // .specflow-config.md, settings.json, CLAUDE.md
+  const totalFiles = manifest.length + skeletonDocCount + extraFileCount;
+
   console.log(chalk.bold('Configuration Summary'));
   console.log(chalk.dim('─'.repeat(40)));
   console.log(`  Mode:          ${config.PROJECT_TYPE}`);
@@ -102,10 +147,12 @@ export async function init(options) {
   console.log(`  Git:           ${config.GIT_WORKFLOW} (${config.GIT_PLATFORM})`);
   console.log(`  Docs tracking: ${config.DOCS_GITIGNORED ? 'gitignored' : 'tracked'}`);
   console.log(`  Tech layers:   ${formatLayers(config)}`);
-  console.log(`  Agents:        ${formatAgents(config)}`);
+  console.log(`  Agents:        ${formatAgents()}`);
+  if (config.EXISTING_DOCS_PATH) {
+    console.log(`  Existing docs: ${config.EXISTING_DOCS_PATH}`);
+  }
   console.log('');
-  console.log(chalk.bold(`Files to create: ${manifest.length + 2}`));
-  console.log(chalk.dim('  (includes .specflow-config.md and .claude/settings.json)'));
+  console.log(chalk.bold(`Files to create: ~${totalFiles}`));
   console.log('');
 
   // ── Confirm ───────────────────────────────────────────────────────
@@ -136,7 +183,8 @@ export async function init(options) {
     });
   }
 
-  const { created, skipped } = generateFiles(
+  // 1. Render structural files (commands, hooks, rules, agents, renderable docs)
+  const { created: structCreated, skipped: structSkipped } = generateFiles(
     projectDir,
     templatesRoot,
     manifest,
@@ -144,27 +192,52 @@ export async function init(options) {
     { overwrite: false },
   );
 
+  // 2. Write skeleton docs (OVERVIEW, VISION, ROADMAP, ADR)
+  const { created: skelCreated, skipped: skelSkipped } = generateSkeletonDocs(
+    projectDir,
+    config,
+    { overwrite: false },
+  );
+
+  // 3. Write skeleton CLAUDE.md
+  const claudeResult = generateSkeletonClaudeMd(
+    projectDir,
+    config,
+    { overwrite: claudeMdExists ? overwriteClaudeMd : true },
+  );
+
   // Handle CLAUDE.md specially if it was skipped but user said no
-  if (claudeMdExists && !overwriteClaudeMd && skipped.includes('CLAUDE.md')) {
+  if (claudeMdExists && !overwriteClaudeMd && claudeResult.skipped) {
     console.log(chalk.dim('  (Existing CLAUDE.md preserved. Add SpecFlow context manually or re-run with overwrite.)'));
   }
 
+  // 4. Config and settings
   generateConfig(projectDir, config);
   generateSettings(projectDir, templatesRoot, config);
   updateGitignore(projectDir, config);
 
   // ── Done ──────────────────────────────────────────────────────────
+  const allCreated = [...structCreated, ...skelCreated];
+  if (claudeResult.created) allCreated.push('CLAUDE.md');
+  const allSkipped = [...structSkipped, ...skelSkipped];
+  if (claudeResult.skipped) allSkipped.push('CLAUDE.md');
+
   console.log('');
   console.log(chalk.bold.green('SpecFlow initialized!'));
   console.log('');
-  console.log(`  Created ${created.length} files`);
-  if (skipped.length > 0) {
-    console.log(`  Skipped ${skipped.length} files (already exist)`);
+  console.log(`  Created ${allCreated.length} files`);
+  if (allSkipped.length > 0) {
+    console.log(`  Skipped ${allSkipped.length} files (already exist)`);
   }
   console.log('');
-  console.log(chalk.dim('Next steps:'));
-  console.log('  1. Review docs_specflow/ and fill in TODOs');
-  console.log('  2. Run /plan-session to start your first session');
+  console.log(chalk.bold('Next steps:'));
+  console.log('');
+  console.log(`  ${chalk.cyan('1.')} Open Claude Code in this project`);
+  console.log(`  ${chalk.cyan('2.')} Run ${chalk.bold('/init')} to populate docs with AI-analyzed content`);
+  console.log(`  ${chalk.cyan('3.')} Then run ${chalk.bold('/plan-session')} to start your first session`);
+  console.log('');
+  console.log(chalk.dim('The /init command will scan your codebase and fill in OVERVIEW, VISION,'));
+  console.log(chalk.dim('ROADMAP, ADR, and CLAUDE.md with project-specific content.'));
   console.log('');
 }
 
@@ -177,11 +250,6 @@ function formatLayers(config) {
   return parts.join(', ') || 'none';
 }
 
-function formatAgents(config) {
-  const core = ['base', 'qa', 'architecture', 'backend', 'frontend'];
-  const specialist = (config.AGENT_ROLES || []).filter(r => !core.includes(r));
-  if (specialist.length > 0) {
-    return `5 core + ${specialist.length} specialist (${specialist.join(', ')})`;
-  }
-  return '5 core';
+function formatAgents() {
+  return '5 core + 3 specialist (all generated)';
 }

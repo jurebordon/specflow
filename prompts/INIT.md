@@ -1,8 +1,20 @@
 # SpecFlow Initialization Prompt
 
-> Copy this prompt into your AI assistant to initialize SpecFlow in any project.
+> Two ways to initialize SpecFlow in any project.
 
-**Prefer the CLI?** Run `npx specflow init` for an interactive setup that handles everything below automatically. The manual prompt below is for AI-assisted initialization without the CLI.
+## Option A: CLI + AI (Recommended)
+
+```bash
+npx specflow init          # Interactive setup: config, commands, hooks, rules, agents
+# Then in Claude Code:
+/init                      # AI populates OVERVIEW, VISION, ROADMAP, ADR, CLAUDE.md
+```
+
+The CLI generates structural files (commands, hooks, rules, agents) with your config values. The `/init` command then uses AI to analyze your codebase and populate documentation with real content.
+
+## Option B: Full Manual Prompt
+
+Copy the prompt below into your AI assistant to do everything in one step (no CLI needed).
 
 ---
 

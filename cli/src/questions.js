@@ -1,13 +1,15 @@
 import { select, input, confirm, checkbox } from '@inquirer/prompts';
+// Note: checkbox kept for Technical Layers partial selection
 
 /**
- * Run the full interactive setup questionnaire.
- * Returns a config object with all collected answers.
+ * Ask setup questions: project context, git workflow, integrations,
+ * technical layers, and documentation preferences.
+ * Tech detection and agent config are handled by /init and init.js defaults.
  *
  * @param {object} options - CLI options (e.g. --mode, --yes)
- * @returns {Promise<Record<string, unknown>>} Collected configuration
+ * @returns {Promise<Record<string, unknown>>} Partial configuration
  */
-export async function askSetupQuestions(options = {}) {
+export async function askBasicQuestions(options = {}) {
   const config = {};
 
   // ── 1. Project Mode ──────────────────────────────────────────────
@@ -89,21 +91,8 @@ export async function askSetupQuestions(options = {}) {
     config.TICKET_FORMAT = '';
   }
 
-  // ── 5. Tech Stack Detection ──────────────────────────────────────
-  // Handled separately in detect.js — questions.js only asks for manual input
-  // when auto-detection is declined or finds nothing.
-  config.SCAN_TECH_STACK = await confirm({
-    message: 'May I scan your project to detect the tech stack?',
-    default: true,
-  });
-
-  if (!config.SCAN_TECH_STACK) {
-    config.TECH_STACK = await input({
-      message: 'Describe your tech stack (language, framework, test tool, build tool):',
-    });
-  }
-
-  // ── 5.5 Technical Enforcement Layers ──────────────────────────────
+  // ── 5. Technical Enforcement Layers ────────────────────────────────
+  // Tech stack detection is deferred to /init (AI-powered analysis)
   const techLayersChoice = await select({
     message: 'Enable technical enforcement layers (hooks, rules, statusline)?',
     choices: [
@@ -138,9 +127,9 @@ export async function askSetupQuestions(options = {}) {
     config.ENABLE_STATUSLINE = layers.includes('statusline');
   }
 
-  // ── 6. Documentation Tracking ────────────────────────────────────
+  // ── 6. Documentation ──────────────────────────────────────────────
   const docsTracked = await select({
-    message: 'Should docs_specflow/ be tracked in git?',
+    message: 'Should SpecFlow docs be tracked in git?',
     choices: [
       { name: 'Gitignored (recommended) - Start personal, share later', value: 'gitignored' },
       { name: 'Tracked - Team shares docs from day one', value: 'tracked' },
@@ -148,54 +137,16 @@ export async function askSetupQuestions(options = {}) {
   });
 
   config.DOCS_GITIGNORED = docsTracked === 'gitignored';
-  config.DOCS_PATH = 'docs_specflow';
 
-  // ── 7. Agent Roles ───────────────────────────────────────────────
-  config.AGENT_ROLES = await checkbox({
-    message: 'Which AI agent roles are relevant? (select all that apply)',
-    choices: [
-      { name: 'Backend - API, services, data access', value: 'backend', checked: true },
-      { name: 'Frontend - UI components, state management', value: 'frontend', checked: true },
-      { name: 'QA - Testing, quality assurance', value: 'qa', checked: true },
-      { name: 'Architecture - Design decisions (advisory)', value: 'architecture', checked: true },
-      { name: 'Build Error Resolver - Build failures, type errors', value: 'build-error-resolver' },
-      { name: 'Security Reviewer - Security auditing (advisory)', value: 'security-reviewer' },
-      { name: 'Refactor Cleaner - Dead code, complexity reduction', value: 'refactor-cleaner' },
-    ],
+  config.DOCS_PATH = await input({
+    message: 'SpecFlow documentation folder:',
+    default: 'docs_specflow',
   });
 
-  // Agent model tiers — use defaults (only ask if user wants to customize)
-  config.AGENT_MODEL_BASE = 'sonnet';
-  config.AGENT_MODEL_QA = 'sonnet';
-  config.AGENT_MODEL_ARCHITECTURE = 'opus';
-  config.AGENT_MODEL_BACKEND = 'sonnet';
-  config.AGENT_MODEL_FRONTEND = 'sonnet';
-  config.AGENT_MODEL_BUILD_ERROR = 'sonnet';
-  config.AGENT_MODEL_SECURITY = 'opus';
-  config.AGENT_MODEL_REFACTOR = 'sonnet';
-
-  const customizeTiers = await confirm({
-    message: 'Customize agent model tiers? (defaults: sonnet for most, opus for architecture/security)',
-    default: false,
+  config.EXISTING_DOCS_PATH = await input({
+    message: 'Path to existing project documentation (leave empty if none):',
+    default: '',
   });
-
-  if (customizeTiers) {
-    const tierChoices = [
-      { name: 'opus - Strongest reasoning', value: 'opus' },
-      { name: 'sonnet - Balanced (default)', value: 'sonnet' },
-      { name: 'haiku - Fastest/cheapest', value: 'haiku' },
-    ];
-
-    for (const role of config.AGENT_ROLES) {
-      const varName = `AGENT_MODEL_${role.toUpperCase().replace(/-/g, '_')}`;
-      const currentDefault = config[varName] || 'sonnet';
-      config[varName] = await select({
-        message: `Model tier for ${role}:`,
-        choices: tierChoices,
-        default: currentDefault,
-      });
-    }
-  }
 
   // ── Set date ─────────────────────────────────────────────────────
   config.DATE = new Date().toISOString().split('T')[0];
@@ -219,22 +170,13 @@ export function getDefaults() {
     BRANCH_CONVENTION: 'feat/description',
     TICKETING: 'None',
     TICKET_FORMAT: '',
-    SCAN_TECH_STACK: true,
     TECHNICAL_LAYERS: true,
     ENABLE_HOOKS: true,
     ENABLE_RULES: true,
     ENABLE_STATUSLINE: true,
     DOCS_GITIGNORED: true,
     DOCS_PATH: 'docs_specflow',
-    AGENT_ROLES: ['backend', 'frontend', 'qa', 'architecture'],
-    AGENT_MODEL_BASE: 'sonnet',
-    AGENT_MODEL_QA: 'sonnet',
-    AGENT_MODEL_ARCHITECTURE: 'opus',
-    AGENT_MODEL_BACKEND: 'sonnet',
-    AGENT_MODEL_FRONTEND: 'sonnet',
-    AGENT_MODEL_BUILD_ERROR: 'sonnet',
-    AGENT_MODEL_SECURITY: 'opus',
-    AGENT_MODEL_REFACTOR: 'sonnet',
+    EXISTING_DOCS_PATH: '',
     DATE: new Date().toISOString().split('T')[0],
     CURRENT_DATE: new Date().toISOString().split('T')[0],
   };

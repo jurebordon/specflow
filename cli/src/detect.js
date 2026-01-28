@@ -1,5 +1,5 @@
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { resolve, join } from 'node:path';
 
 /**
  * Tech stack detection rules.
@@ -99,17 +99,69 @@ const DETECTION_RULES = [
   },
 ];
 
+/** Directories to skip during recursive scanning. */
+const SKIP_DIRS = new Set([
+  'node_modules', '.git', 'venv', '.venv', '__pycache__', 'target',
+  'dist', 'build', '.next', '.nuxt', '.cache', 'vendor', '.specflow',
+]);
+
+/**
+ * Collect all file names from a directory up to `maxDepth` levels deep.
+ * Returns a Set of relative paths (e.g. "tools/pyproject.toml").
+ *
+ * @param {string} dir - Directory to scan
+ * @param {number} maxDepth - Maximum depth (0 = root only)
+ * @param {number} currentDepth - Internal recursion tracker
+ * @returns {Set<string>}
+ */
+function collectFiles(dir, maxDepth, currentDepth = 0) {
+  const files = new Set();
+
+  let entries;
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return files;
+  }
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry);
+
+    let stat;
+    try {
+      stat = statSync(fullPath);
+    } catch {
+      continue;
+    }
+
+    if (stat.isFile()) {
+      files.add(entry); // Only need the filename for matching
+    } else if (stat.isDirectory() && currentDepth < maxDepth && !SKIP_DIRS.has(entry) && !entry.startsWith('.')) {
+      const subFiles = collectFiles(fullPath, maxDepth, currentDepth + 1);
+      for (const f of subFiles) {
+        files.add(f);
+      }
+    }
+  }
+
+  return files;
+}
+
 /**
  * Scan the project directory for known tech stack markers.
+ * Scans up to `maxDepth` levels deep (default 2) to find indicator files.
  *
  * @param {string} projectDir - Absolute path to the project root
+ * @param {object} options - { maxDepth: number }
  * @returns {{ detected: Array<{language: string, label: string, commands: Record<string, string>, booleanFlag: string}>, techStack: string, commands: Record<string, string>, booleanFlags: Record<string, boolean> }}
  */
-export function detectTechStack(projectDir) {
+export function detectTechStack(projectDir, options = {}) {
+  const maxDepth = options.maxDepth ?? 3;
+  const projectFiles = collectFiles(projectDir, maxDepth);
   const detected = [];
 
   for (const rule of DETECTION_RULES) {
-    const found = rule.files.some(file => existsSync(resolve(projectDir, file)));
+    const found = rule.files.some(file => projectFiles.has(file));
     if (found) {
       detected.push(rule);
     }

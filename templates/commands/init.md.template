@@ -1,0 +1,200 @@
+# Initialize SpecFlow Documentation
+
+> Populate skeleton docs with AI-analyzed content. Run once after `specflow init`.
+
+---
+
+## Step 1: Read Configuration
+
+Read the SpecFlow config to understand this project:
+
+```
+docs_specflow/.specflow-config.md
+```
+
+Extract:
+- **Mode**: greenfield / constrained / adoption
+- **Tech Stack**: detected languages and tools
+- **Existing Docs**: path to existing project documentation (if any)
+
+---
+
+## Step 2: Gather Context (based on mode)
+
+### For Adoption Mode:
+
+1. **Read existing documentation first** (if `Existing Docs` path is set in config):
+   - README, CONTRIBUTING, architecture docs, API docs
+   - Any existing ADRs or design documents
+
+2. **Scan the codebase**:
+   ```bash
+   # Directory structure (top 3 levels)
+   find . -maxdepth 3 -type d -not -path '*/\.*' -not -path '*/node_modules/*' -not -path '*/venv/*' -not -path '*/__pycache__/*' -not -path '*/target/*' | head -60
+
+   # Key configuration files
+   ls -la | grep -E "(package\.json|requirements\.txt|Gemfile|go\.mod|Cargo\.toml|pom\.xml|dbt_project\.yml|Makefile|Dockerfile|\.env\.example)"
+   ```
+
+3. **Identify patterns**:
+   - Code organization and naming conventions
+   - Module/package structure
+   - Test patterns and locations
+   - Database models / key entities
+   - API endpoints (if applicable)
+   - Key dependencies and their roles
+
+### For Greenfield Mode:
+
+1. **Ask for PRD/Tech Spec**:
+   - "Do you have a PRD or product requirements document? Paste it or provide the file path."
+   - "Do you have a Tech Spec? If not, I can help draft one from the PRD."
+
+2. **Extract from documents**:
+   - Product description and problem statement
+   - Target users
+   - Core features / user journeys
+   - Technical architecture decisions
+   - Success metrics
+
+### For Constrained Mode:
+
+1. **Ask for constraints**:
+   - "What technologies are mandated (must use)?"
+   - "What technologies are forbidden (cannot use)?"
+   - "What integration requirements exist?"
+
+2. **Ask for PRD/Tech Spec** (same as greenfield)
+
+3. **Extract within boundaries**: Same as greenfield, noting constraints in ADR
+
+---
+
+## Step 3: Populate Documentation
+
+Using gathered context, update each skeleton doc. **Read each file first**, then replace TODO markers with real content.
+
+### 3a. OVERVIEW.md (`docs_specflow/OVERVIEW.md`)
+
+Fill in:
+- **Section 1 (What This Product Does)**: 2-3 sentence product description
+- **Section 2 (Core User Journeys)**: 2-4 concrete user journeys with IDs (UJ1, UJ2, ...)
+- **Section 3 (Architecture)**:
+  - Backend stack, directory structure (as a tree), main modules
+  - Frontend section (if applicable, otherwise mark as N/A)
+  - Data: primary database, key entities
+  - Integrations: external services used
+- **Section 4 (External Contracts)**: API specs, events, data schemas (if found)
+- **Section 5 (Invariants)**: 3-5 rules that must always hold
+
+### 3b. VISION.md (`docs_specflow/VISION.md`)
+
+Fill in:
+- **Problem Statement**: What problem does this project solve?
+- **Solution Hypothesis**: How does it solve it?
+- **Target Users**: Who benefits?
+- **Success Metrics**: Qualitative indicators (don't invent numbers)
+- **Non-Goals**: What is explicitly out of scope?
+- **Tech Stack**: Confirm detected stack
+
+### 3c. ROADMAP.md (`docs_specflow/ROADMAP.md`)
+
+Fill in:
+- **Current Phase**: Name the current development phase
+- **Now**: 1-3 immediate tasks tagged with `[feature: name]`
+  - For adoption: focus on understanding/documenting existing code
+  - For greenfield: focus on initial scaffolding and first feature
+  - For constrained: focus on setting up within constraints
+- **Next**: 2-3 queued priorities tagged with `[feature: name]`
+- **Later**: 2-3 backlog ideas
+
+### 3d. ADR.md (`docs_specflow/ADR.md`)
+
+Update **ADR-0001**:
+- Fill in the **Decision** section with actual tech stack details:
+  - Backend: language, framework, key libraries
+  - Frontend: framework, state management (if applicable)
+  - Database: type, ORM/query layer
+  - Infrastructure: hosting, CI/CD, deployment approach
+- Update **Consequences** with specific implications of the stack choices
+
+### 3e. CLAUDE.md (root `CLAUDE.md`)
+
+Update these sections (leave the rest as-is):
+- **Key Patterns**: 3-5 discovered codebase patterns (naming conventions, file organization, etc.)
+- **Invariants**: Copy from OVERVIEW.md invariants section
+- Verify **Git Workflow** section is accurate
+
+---
+
+## Step 4: Update Config with Detected Stack
+
+If the config file (`docs_specflow/.specflow-config.md`) shows `Languages: Unknown` or has placeholder commands (`# No test command configured`), update it with the tech stack you discovered during codebase analysis.
+
+Read the current config, then update these fields:
+- **Languages**: the detected tech stack (e.g. "Python, DBT", "TypeScript, React")
+- **Test Command**: the project's actual test command
+- **Build Command**: the project's actual build command
+- **Lint Command**: the project's actual lint command
+- **Format Command**: the project's actual format command (in Technical Layers section)
+- **Typecheck Command**: the project's actual typecheck command (in Technical Layers section)
+
+This ensures `specflow update` can re-render commands and rules with correct values later.
+
+---
+
+## Step 5: Validate
+
+After populating all docs, run a quick consistency check:
+- OVERVIEW.md tech stack matches ADR-0001 decisions
+- ROADMAP tasks are realistic for the current state
+- CLAUDE.md Key Patterns reflect actual codebase conventions
+- No TODO markers remain in populated sections
+
+---
+
+## Step 6: Self-Archive
+
+This `/init` command has served its purpose. Archive it:
+
+```bash
+# Move to docs for reference
+mv .claude/commands/init.md docs_specflow/INIT_PROMPT.md
+```
+
+Report to the user:
+```
+Documentation populated! Here's what was created:
+
+- OVERVIEW.md — System architecture and patterns
+- VISION.md — Problem statement and direction
+- ROADMAP.md — Initial task breakdown
+- ADR.md — Tech stack decisions
+- CLAUDE.md — Key patterns and invariants
+
+The /init command has been archived to docs_specflow/INIT_PROMPT.md.
+```
+
+If the tech stack config was updated from `Unknown` to a detected stack, add:
+```
+Tech stack config updated. Run `specflow update` to re-render
+commands and rules with the correct test/build/lint commands.
+```
+
+Final next steps:
+```
+Next steps:
+1. Review the generated documentation
+2. Run `specflow update` if tech stack was updated (re-renders commands/rules)
+3. Run /plan-session to start your first session
+```
+
+---
+
+## Notes
+
+- **Don't invent information** — if something is unclear, mark it as "TBD" rather than guessing
+- **Be concise** — these docs are for AI context, not human prose
+- **Adoption mode**: prioritize what EXISTS, not what SHOULD exist
+- **Greenfield mode**: prioritize what's PLANNED, with clear TODOs for what's not yet decided
+- For **existing docs path**: if the config specifies an existing docs path, read those files FIRST — they're the best source of project context
