@@ -249,7 +249,7 @@ Model tiers use sensible defaults. Architecture and Security agents default to `
 
 Available tiers: `opus` (strongest reasoning), `sonnet` (balanced), `haiku` (fastest/cheapest)
 
-To customize model tiers, edit `docs_specflow/.specflow-config.md` after setup and run `specflow update`.
+To customize model tiers, edit `docs_specflow/.specflow-config.md` after setup and run `specflow-ai update`.
 
 ---
 

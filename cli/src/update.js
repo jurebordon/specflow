@@ -26,7 +26,7 @@ export async function update() {
   const configPath = resolve(projectDir, 'docs_specflow/.specflow-config.md');
   if (!existsSync(configPath)) {
     console.log(chalk.red('Error: This project has not been initialized with SpecFlow.'));
-    console.log(chalk.red('Run `specflow init` first.'));
+    console.log(chalk.red('Run `specflow-ai init` first.'));
     process.exit(1);
   }
 

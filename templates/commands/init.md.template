@@ -1,6 +1,6 @@
 # Initialize SpecFlow Documentation
 
-> Populate skeleton docs with AI-analyzed content. Run once after `specflow init`.
+> Populate skeleton docs with AI-analyzed content. Run once after `specflow-ai init`.
 
 ---
 
@@ -199,7 +199,7 @@ Always include:
 ```
 Run this command to re-render templates with your tech stack:
 
-  specflow update
+  specflow-ai update
 
 This will update commands, hooks, and rules with your actual test/build/lint commands.
 ```
@@ -208,7 +208,7 @@ Final next steps:
 ```
 Next steps:
 1. Review the generated documentation
-2. Run `specflow update` to re-render commands/rules with detected values
+2. Run `specflow-ai update` to re-render commands/rules with detected values
 3. Run /plan-session to start your first session
 ```
 

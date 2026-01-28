@@ -19,7 +19,7 @@ The 2026-01-20 refactoring ([ADR-007](../docs_specflow/ADR.md)) simplified SpecF
 | **Agent path** | `.ai/agents/` | `.claude/agents/` |
 | **Tech commands** | Manual configuration | Auto-detected (TEST/BUILD/LINT/FORMAT/TYPECHECK) |
 | **Technical layers** | Not available | Hooks, rules, statusline (opt-in) |
-| **Installation** | Manual git clone only | CLI (`npx specflow init`) or manual |
+| **Installation** | Manual git clone only | CLI (`npx specflow-ai init`) or manual |
 
 ---
 
@@ -36,7 +36,7 @@ Or use the CLI instead of migrating manually:
 
 ```bash
 # The CLI handles everything — recommended for most users
-npx specflow init
+npx specflow-ai init
 ```
 
 > **Note**: The CLI will detect an existing project and ask before overwriting files. However, it creates a fresh setup rather than migrating in place. If you have significant content in your existing docs, follow the manual steps below to preserve it.
@@ -181,7 +181,7 @@ Commands have been updated for the new structure. Regenerate them from templates
 
 **Option A — CLI:**
 ```bash
-npx specflow update
+npx specflow-ai update
 ```
 
 **Option B — Manual:**
@@ -224,7 +224,7 @@ The new version supports hooks, rules, and a statusline. To enable them:
 
 **Option A — CLI:**
 ```bash
-npx specflow init
+npx specflow-ai init
 # Answer "Yes" when asked about technical enforcement layers
 ```
 

@@ -20,11 +20,11 @@
 
 ```
 ai-vibe-framework/
-├── cli/                   # NPM package for `npx specflow init/update`
+├── cli/                   # NPM package for `npx specflow-ai init/update`
 │   ├── src/
 │   │   ├── index.js       # CLI entry point
-│   │   ├── init.js        # `specflow init` command
-│   │   ├── update.js      # `specflow update` command
+│   │   ├── init.js        # `specflow-ai init` command
+│   │   ├── update.js      # `specflow-ai update` command
 │   │   ├── config.js      # Shared config utilities (deriveGitVariables)
 │   │   ├── detect.js      # Tech stack detection (used by update)
 │   │   └── questions.js   # Interactive prompts
@@ -166,14 +166,14 @@ See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 
 1. **CLI Simplification** - CLI scaffolds with placeholders, `/init` detects tech stack
 2. **Documentation audit** - Ensure docs reflect the simplified CLI flow
-3. **End-to-end testing** - Validate full flow: `specflow init` → `/init` → `specflow update`
+3. **End-to-end testing** - Validate full flow: `specflow-ai init` → `/init` → `specflow-ai update`
 
 ---
 
 ## Key Files to Know
 
-- `cli/src/init.js` - CLI `specflow init` command (scaffolds with placeholders)
-- `cli/src/update.js` - CLI `specflow update` command (re-renders templates)
+- `cli/src/init.js` - CLI `specflow-ai init` command (scaffolds with placeholders)
+- `cli/src/update.js` - CLI `specflow-ai update` command (re-renders templates)
 - `cli/src/config.js` - Shared utilities (deriveGitVariables)
 - `prompts/INIT.md` - AI `/init` command (detects tech stack, populates config)
 - `templates/commands/plan-session.md.template` - Core workflow command

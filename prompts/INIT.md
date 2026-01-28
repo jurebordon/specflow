@@ -5,13 +5,13 @@
 ## Option A: CLI + AI (Recommended)
 
 ```bash
-npx specflow init          # Interactive setup: scaffolds config, commands, hooks, rules, agents
+npx specflow-ai init          # Interactive setup: scaffolds config, commands, hooks, rules, agents
 # Then in Claude Code:
 /init                      # AI detects tech stack, populates config, generates documentation
-specflow update            # Re-renders commands/hooks/rules with detected values
+specflow-ai update            # Re-renders commands/hooks/rules with detected values
 ```
 
-The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase to detect tech stack, update config, and populate documentation. Finally, `specflow update` re-renders templates with the real values.
+The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase to detect tech stack, update config, and populate documentation. Finally, `specflow-ai update` re-renders templates with the real values.
 
 ## Option B: Full Manual Prompt
 
@@ -52,7 +52,7 @@ Determine which initialization path to follow:
 - Read `.specflow-config.md` to get project settings
 - Check for placeholder values like `# Detected by /init` in TEST_COMMAND, BUILD_COMMAND, etc.
 - If placeholders found: Skip to **Step 5** (Tech Stack Detection) — the CLI already gathered basic config
-- After detection: Update config, then suggest `specflow update` to re-render templates
+- After detection: Update config, then suggest `specflow-ai update` to re-render templates
 
 **If NO (fresh start)** → **Full Flow**:
 - Check if `.specflow/` exists
@@ -228,7 +228,7 @@ Show:
 ```
 Config updated with detected values. Run this to re-render templates:
 
-  specflow update
+  specflow-ai update
 
 This will update commands, hooks, and rules with your actual tech stack commands.
 ```

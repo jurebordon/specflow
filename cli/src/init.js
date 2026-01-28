@@ -35,7 +35,7 @@ export async function init(options) {
   // ── Check for existing SpecFlow ───────────────────────────────────
   if (existsSync(resolve(projectDir, 'docs_specflow/.specflow-config.md'))) {
     console.log(chalk.yellow('This project already has SpecFlow initialized.'));
-    console.log(chalk.yellow('Use `specflow update` to update templates, or delete docs_specflow/.specflow-config.md to re-init.'));
+    console.log(chalk.yellow('Use `specflow-ai update` to update templates, or delete docs_specflow/.specflow-config.md to re-init.'));
     console.log('');
     return;
   }
@@ -53,7 +53,7 @@ export async function init(options) {
 
   // ── Phase 1b: Set placeholder values for tech stack ────────────────
   // Tech detection is deferred to /init (AI-powered codebase analysis).
-  // CLI sets placeholders; /init detects and populates; `specflow update` re-renders.
+  // CLI sets placeholders; /init detects and populates; `specflow-ai update` re-renders.
   config.TECH_STACK = config.TECH_STACK || 'Unknown';
   config.TEST_COMMAND = '# Detected by /init';
   config.BUILD_COMMAND = '# Detected by /init';

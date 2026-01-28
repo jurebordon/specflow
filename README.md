@@ -27,24 +27,24 @@ SpecFlow solves this with:
 cd your-project
 
 # Interactive setup — scaffolds config, commands, hooks, rules, agents
-npx specflow init
+npx specflow-ai init
 
 # AI detects tech stack, populates config, generates documentation
 /init
 
 # Re-render templates with detected values
-npx specflow update
+npx specflow-ai update
 
 # Start working
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase to detect tech stack and populate documentation. Finally, `specflow update` re-renders templates with the real values.
+The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase to detect tech stack and populate documentation. Finally, `specflow-ai update` re-renders templates with the real values.
 
 To update commands and agents to the latest templates:
 
 ```bash
-npx specflow update
+npx specflow-ai update
 ```
 
 ### Option B: Manual (AI-Assisted)
@@ -174,7 +174,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 ### CLI
 
 ```bash
-npx specflow update
+npx specflow-ai update
 ```
 
 This re-generates commands, hooks, rules, and agents from the latest templates. Your documentation and config are preserved.

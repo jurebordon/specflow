@@ -5,7 +5,7 @@
 
 /**
  * Derive GIT_WORKFLOW boolean flags and template variables from config.
- * Used by both `specflow init` and `specflow update` to ensure consistent
+ * Used by both `specflow-ai init` and `specflow-ai update` to ensure consistent
  * template variable derivation.
  *
  * @param {Record<string, unknown>} config - Configuration with GIT_WORKFLOW string

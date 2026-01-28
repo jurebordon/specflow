@@ -39,7 +39,7 @@ export function getConfigRoot(cliRoot) {
 
 /**
  * Build manifest for files the CLI can render (has the template variables for).
- * Used by `specflow init` — excludes docs that need AI content.
+ * Used by `specflow-ai init` — excludes docs that need AI content.
  *
  * @param {string} templatesRoot - Path to the templates directory
  * @param {Record<string, unknown>} config - User configuration
@@ -132,7 +132,7 @@ export function buildStructuralManifest(templatesRoot, config) {
 }
 
 /**
- * Build the full list of files to generate (used by `specflow update`).
+ * Build the full list of files to generate (used by `specflow-ai update`).
  * Includes ALL files — both structural and doc templates.
  *
  * @param {string} templatesRoot - Path to the templates directory
