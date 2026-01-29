@@ -2,3 +2,9 @@
 
 # SpecFlow operational docs (not to be confused with framework templates)
 docs_specflow/
+
+# SpecFlow's own generated files (we maintain templates/, not rendered output)
+.claude/
+
+# Root package-lock (CLI has its own in cli/)
+package-lock.json
