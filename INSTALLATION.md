@@ -12,14 +12,14 @@ cd your-project
 # 1. Interactive setup — scaffolds config, commands, hooks, rules, agents
 npx specflow-ai init
 
-# 2. AI detects tech stack and populates config
+# 2. AI detects tech stack, populates config, updates command files
 /init
 
-# 3. Re-render templates with detected values
-npx specflow-ai update
+# Start working
+/plan-session
 ```
 
-The CLI handles everything: creating directories, rendering templates, and setting up your project.
+The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
 
 ---
 
@@ -36,7 +36,8 @@ your-project/
 │   ├── ADR.md
 │   ├── WORKFLOW.md
 │   ├── SESSION_LOG.md
-│   └── LEARNED_PATTERNS.md
+│   ├── LEARNED_PATTERNS.md
+│   └── CUSTOM.md                # Project-specific extensions
 └── .claude/
     ├── commands/                # Session workflow commands
     ├── agents/                  # 8 specialized agents
@@ -48,7 +49,7 @@ your-project/
 
 ---
 
-## The Three-Step Flow
+## The Two-Step Flow
 
 ### Step 1: `npx specflow-ai init`
 
@@ -64,14 +65,12 @@ Generates ~40 files with placeholder values for tech-specific commands.
 
 Open your project in Claude Code and run the `/init` command. The AI will:
 - Scan your codebase to detect tech stack
-- Update `.specflow-config.md` with real commands
+- Read existing documentation (if path configured) and extract commands verbatim
+- Update `.specflow-config.md` with detected values
+- Update command files directly (start-session.md, end-session.md, testing.md)
 - Report which agents are relevant for your stack
 
-### Step 3: `npx specflow-ai update`
-
-Re-renders commands, hooks, rules, and agents with the values detected by `/init`.
-
-After this, your project has fully customized SpecFlow configuration.
+After this, your project has fully customized SpecFlow configuration. No additional steps needed.
 
 ---
 
@@ -95,7 +94,7 @@ After this, your project has fully customized SpecFlow configuration.
 ### Non-Interactive Mode
 
 ```bash
-# Accept all defaults
+# Accept all defaults - not recommended if you have existing docs
 npx specflow-ai init --yes
 
 # Specify project mode

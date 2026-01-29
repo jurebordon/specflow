@@ -29,19 +29,16 @@ cd your-project
 # Interactive setup — scaffolds config, commands, hooks, rules, agents
 npx specflow-ai init
 
-# AI detects tech stack, populates config, generates documentation
+# AI detects tech stack, populates config, updates command files
 /init
-
-# Re-render templates with detected values
-npx specflow-ai update
 
 # Start working
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase to detect tech stack and populate documentation. Finally, `specflow-ai update` re-renders templates with the real values.
+The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
 
-To update commands and agents to the latest templates:
+To update commands and agents to the latest templates (after SpecFlow releases):
 
 ```bash
 npx specflow-ai update

@@ -164,9 +164,9 @@ SpecFlow has no automated tests. Manual validation checklist:
 
 See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 
-1. **CLI Simplification** - CLI scaffolds with placeholders, `/init` detects tech stack
-2. **Documentation audit** - Ensure docs reflect the simplified CLI flow
-3. **End-to-end testing** - Validate full flow: `specflow-ai init` → `/init` → `specflow-ai update`
+1. **CLI Simplification** - CLI scaffolds with placeholders, `/init` detects tech stack and updates command files directly
+2. **Documentation audit** - Ensure docs reflect the simplified two-step flow
+3. **CUSTOM.md extension** - User-extensible project context file for project-specific customizations
 
 ---
 

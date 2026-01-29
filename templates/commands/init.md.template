@@ -294,8 +294,7 @@ Final next steps:
 ```
 Next steps:
 1. Review the generated documentation
-2. Run `specflow-ai update` to re-render commands/rules with detected values
-3. Run /plan-session to start your first session
+2. Run /plan-session to start your first session
 ```
 
 ---

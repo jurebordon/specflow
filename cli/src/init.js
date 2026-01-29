@@ -53,7 +53,7 @@ export async function init(options) {
 
   // ── Phase 1b: Set placeholder values for tech stack ────────────────
   // Tech detection is deferred to /init (AI-powered codebase analysis).
-  // CLI sets placeholders; /init detects and populates; `specflow-ai update` re-renders.
+  // CLI sets placeholders; /init detects, populates config, AND updates command files directly.
   config.TECH_STACK = config.TECH_STACK || 'Unknown';
   config.TEST_COMMAND = '# Detected by /init';
   config.BUILD_COMMAND = '# Detected by /init';
