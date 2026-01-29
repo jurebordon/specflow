@@ -125,6 +125,19 @@ Update these sections (leave the rest as-is):
 - **Invariants**: Copy from OVERVIEW.md invariants section
 - Verify **Git Workflow** section is accurate
 
+### 3f. CUSTOM.md (`docs_specflow/CUSTOM.md`)
+
+This file is for project-specific context that extends SpecFlow defaults. **Read the file first** — if it has skeleton structure, populate it. If empty, leave it as-is.
+
+Populate based on what you discovered:
+- **External References**: Links to related repos, external APIs, or resources
+- **Custom Commands**: Project-specific commands not covered by standard test/build/lint
+- **Project Conventions**: Patterns unique to this project (e.g., "all API responses use this envelope")
+- **Known Gotchas**: Common pitfalls or non-obvious behaviors you noticed
+- **AI Guidelines**: Specific instructions for AI behavior in this project
+
+**Note**: Don't invent content — only populate if you found relevant information during codebase exploration.
+
 ---
 
 ## Step 4: Detect Tech Stack & Commands
@@ -268,6 +281,7 @@ Documentation populated! Here's what was updated:
 - ROADMAP.md — Initial task breakdown
 - ADR.md — Tech stack decisions
 - CLAUDE.md — Key patterns and invariants
+- CUSTOM.md — Project-specific context (if populated)
 - .specflow-config.md — Tech stack and commands
 - start-session.md — Pre-flight test commands
 - end-session.md — Final test commands

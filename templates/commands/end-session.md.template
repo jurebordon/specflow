@@ -182,3 +182,4 @@ Session complete!
 - Keep session logs concise - key decisions only
 - Feature tags help track work across worktrees
 - Test before committing, always
+- Check `docs_specflow/CUSTOM.md` for project-specific commit conventions or PR templates

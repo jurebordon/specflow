@@ -386,6 +386,7 @@ Read templates from `.specflow/templates/` and generate:
 - `docs_specflow/OVERVIEW.md` - Use `.specflow/templates/docs/OVERVIEW.md.template`
 - `docs_specflow/ADR.md` - Use `.specflow/templates/docs/ADR.md.template`
 - `docs_specflow/LEARNED_PATTERNS.md` - Use `.specflow/templates/docs/LEARNED_PATTERNS.md.template`
+- `docs_specflow/CUSTOM.md` - Use `.specflow/templates/docs/CUSTOM.md.template` (project-specific extensions)
 
 ### Generate Session Commands:
 Copy and customize from `.specflow/templates/commands/`:
@@ -580,6 +581,7 @@ my-project/
 │   ├── OVERVIEW.md
 │   ├── ADR.md
 │   ├── LEARNED_PATTERNS.md    # Discovered patterns journal
+│   ├── CUSTOM.md              # Project-specific extensions
 │   └── frozen/                # If PRD/Spec provided
 │       ├── PRD.md
 │       └── TECH_SPEC.md

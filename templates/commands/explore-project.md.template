@@ -62,6 +62,7 @@ Read key files:
 - CONTRIBUTING.md
 - Any architecture/design docs
 - Any existing ADRs
+- `docs_specflow/CUSTOM.md` - Project-specific context (if exists)
 
 ---
 

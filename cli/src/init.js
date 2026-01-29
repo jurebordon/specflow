@@ -93,8 +93,8 @@ export async function init(options) {
   const manifest = buildStructuralManifest(templatesRoot, config);
 
   // ── Show summary ──────────────────────────────────────────────────
-  // Count total files: manifest + skeleton docs (4) + CLAUDE.md + config + settings
-  const skeletonDocCount = 4; // OVERVIEW, VISION, ROADMAP, ADR
+  // Count total files: manifest + skeleton docs (5) + CLAUDE.md + config + settings
+  const skeletonDocCount = 5; // OVERVIEW, VISION, ROADMAP, ADR, CUSTOM
   const extraFileCount = 3;   // .specflow-config.md, settings.json, CLAUDE.md
   const totalFiles = manifest.length + skeletonDocCount + extraFileCount;
 

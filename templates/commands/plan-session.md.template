@@ -34,6 +34,7 @@ Extract feature from branch name:
 - `CLAUDE.md` - Project overview
 - `docs_specflow/ROADMAP.md` - All tasks
 - `docs_specflow/SESSION_LOG.md` - Last 2-3 entries only
+- `docs_specflow/CUSTOM.md` - Project-specific context (if exists)
 
 **If feature detected**:
 - `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md` - Requirements

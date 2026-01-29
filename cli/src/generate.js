@@ -510,6 +510,59 @@ Project initialized with SpecFlow. Need to establish baseline architecture.
 <!-- New ADRs must be appended below this line. Do not modify existing entries. -->
 `,
     },
+    {
+      output: 'docs_specflow/CUSTOM.md',
+      description: 'Project-specific context',
+      content: `# Project-Specific Context
+
+> Custom instructions and context that extend SpecFlow's defaults. All commands read this file.
+> Add project-specific details here that the framework can't anticipate.
+
+---
+
+## External References
+
+<!-- Link external repositories or resources this project depends on -->
+
+- None yet
+
+---
+
+## Custom Commands
+
+<!-- Project-specific commands not covered by standard test/build/lint -->
+
+\`\`\`bash
+# Example: Custom deployment
+# ./deploy.sh staging
+\`\`\`
+
+---
+
+## Project Conventions
+
+<!-- Patterns specific to this project that AI should follow -->
+
+- None yet
+
+---
+
+## Known Gotchas
+
+<!-- Common pitfalls or non-obvious behaviors -->
+
+- None yet
+
+---
+
+## AI Guidelines
+
+<!-- How you want AI to behave in this project -->
+
+- Follow the conventions documented above
+- When uncertain, ask rather than guess
+`,
+    },
   ];
 
   for (const skeleton of skeletons) {
