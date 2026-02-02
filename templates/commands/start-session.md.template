@@ -26,7 +26,13 @@ Run baseline tests:
 {{TEST_COMMAND}}
 ```
 
-If tests fail, fix them before starting new work.
+If tests fail:
+1. Try to fix simple issues directly
+2. For complex build/test failures, use the **Build Error Resolver** agent:
+   ```
+   Use Task tool with subagent_type: "Build Error Resolver"
+   Prompt: "Diagnose and fix these test failures: [paste error output]"
+   ```
 
 ---
 

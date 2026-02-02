@@ -61,6 +61,12 @@ Show user:
 
 ## Step 4: Create Implementation Plan
 
+**For complex architectural tasks**, consider using the **Architecture Agent** first:
+```
+Use Task tool with subagent_type: "Architecture Agent"
+Prompt: "Review the approach for [task]. Consider trade-offs, existing patterns, and potential issues."
+```
+
 Present structured plan:
 
 ```markdown
@@ -107,3 +113,17 @@ Ask: "Approve this plan to start implementation?"
 - If task is too large, suggest breaking it down in ROADMAP
 - Feature detection is automatic - zero configuration
 - Tasks without `[feature: name]` tags won't be filtered
+
+## Available Agents
+
+Use these agents during implementation as needed:
+
+| Agent | When to Use |
+|-------|-------------|
+| **Architecture Agent** | Complex design decisions, system changes |
+| **Build Error Resolver** | Test/build failures you can't quickly fix |
+| **QA Agent** | Verify test coverage, suggest missing tests |
+| **Security Reviewer** | Auth, data handling, API security review |
+| **Refactor Cleaner** | Dead code removal, complexity reduction |
+| **Backend Agent** | Backend-specific patterns and best practices |
+| **Frontend Agent** | Frontend-specific patterns and best practices |
