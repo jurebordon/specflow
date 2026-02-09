@@ -185,6 +185,14 @@ git pull
 
 Your project files are unaffected — only the templates update. Re-run the INIT prompt to regenerate files from updated templates.
 
+## Support
+
+If you find SpecFlow useful, consider buying me a coffee!
+
+<a href="https://buymeacoffee.com/jurebordon2" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
+</a>
+
 ## License
 
 MIT
