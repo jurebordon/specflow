@@ -36,7 +36,41 @@ If tests fail:
 
 ---
 
-## Step 3: Implement
+## Step 3: Consider Specialist Agents
+
+Before diving into implementation, consider whether specialist agents could help with this task. The agents in `.claude/agents/` provide focused expertise — use the `Task` tool with the appropriate `subagent_type` to invoke them.
+
+### When to Use Agents
+
+| Task Type | Suggested Agents | Invocation Pattern |
+|-----------|-----------------|-------------------|
+| New API endpoint or backend logic | **Backend Agent** for implementation, then **QA Agent** for tests | Sequential |
+| New UI component or page | **Frontend Agent** for implementation, then **QA Agent** for tests | Sequential |
+| Full-stack feature | **Architecture Agent** to review design first, then **Backend** + **Frontend** in parallel | Parallel implementation |
+| Refactoring | **Refactor Cleaner** for code changes, **QA Agent** to verify no regressions | Sequential |
+| Build/test failures | **Build Error Resolver** to diagnose and fix | Immediate |
+| Security-sensitive changes (auth, data, secrets) | **Security Reviewer** after implementation | Post-implementation review |
+
+### How to Invoke
+
+Use the `Task` tool with `subagent_type` matching the agent name:
+```
+Task tool → subagent_type: "Backend Agent"
+Task tool → subagent_type: "QA Agent"
+Task tool → subagent_type: "Architecture Agent"
+```
+
+**Tips:**
+- Run independent agents in **parallel** (e.g., Backend + Frontend for separate concerns)
+- Run dependent agents **sequentially** (e.g., implement first, then test)
+- The **Architecture Agent** and **Security Reviewer** are read-only — they advise but don't modify code
+- Not every task needs specialist agents — simple changes are fine without them
+
+> **Note**: Agent use is suggestive, not required. For straightforward tasks, skip directly to Step 4.
+
+---
+
+## Step 4: Implement
 
 Follow the approved session plan step-by-step:
 
@@ -44,6 +78,7 @@ Follow the approved session plan step-by-step:
 2. **Implement incrementally** - small, testable chunks
 3. **Commit frequently** with clear messages
 4. **Run tests often** - catch issues early
+5. **Invoke specialist agents** when you hit their domain (see Step 3)
 
 ### Commit Convention
 ```bash
@@ -62,7 +97,7 @@ Examples:
 
 ---
 
-## Step 4: Track Progress
+## Step 5: Track Progress
 
 As you work:
 - Note any **decisions** made (for session log)

@@ -13,17 +13,17 @@ Verify everything works:
 
 Fix any failures before proceeding.
 
-**Optional quality checks** (for significant changes):
-- Use **QA Agent** to verify test coverage:
-  ```
-  Use Task tool with subagent_type: "QA Agent"
-  Prompt: "Review test coverage for [files changed]. Suggest any missing test cases."
-  ```
-- Use **Security Reviewer** for auth/data handling changes:
-  ```
-  Use Task tool with subagent_type: "Security Reviewer"
-  Prompt: "Review [files] for security issues (OWASP top 10, secrets, injection)."
-  ```
+**Optional quality reviews** (consider for significant changes):
+
+Run applicable agents in **parallel** using the `Task` tool — they don't depend on each other:
+
+| When to use | Agent | Prompt template |
+|-------------|-------|----------------|
+| Added substantial code | **QA Agent** | "Review test coverage for [files changed]. Suggest missing test cases." |
+| Changed auth, data handling, or secrets | **Security Reviewer** | "Review [files] for security issues (OWASP top 10, secrets, injection)." |
+| Large implementation or refactor | **Refactor Cleaner** | "Review [files] for dead code, unnecessary complexity, or naming issues." |
+
+These are advisory — they report findings for you to act on before committing.
 
 ---
 

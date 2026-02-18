@@ -57,6 +57,19 @@ If task or requirements are unclear:
   - Note it explicitly for ADR entry
   - Don't make sweeping changes without discussion
 
+### Agent Orchestration
+
+Consider invoking specialist agents when the task touches their domain:
+
+- **Backend/Frontend Agent**: For domain-specific implementation patterns
+- **QA Agent**: After implementing, to write tests or review coverage
+- **Architecture Agent**: Before significant design decisions (advisory, read-only)
+- **Security Reviewer**: After changes to auth, data handling, or secrets (advisory, read-only)
+- **Refactor Cleaner**: When cleaning up complexity or dead code
+- **Build Error Resolver**: When builds or tests fail unexpectedly
+
+Use the `Task` tool with the appropriate `subagent_type`. Run independent agents in parallel when possible. See `docs_specflow/AGENTS.md` for detailed orchestration patterns.
+
 ## Post-Session Checklist
 
 After completing work:

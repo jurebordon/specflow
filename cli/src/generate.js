@@ -80,6 +80,7 @@ export function buildStructuralManifest(templatesRoot, config) {
     { template: 'docs/WORKFLOW.md.template', output: 'docs_specflow/WORKFLOW.md', description: 'Tech workflow' },
     { template: 'docs/SESSION_LOG.md.template', output: 'docs_specflow/SESSION_LOG.md', description: 'Session journal' },
     { template: 'docs/LEARNED_PATTERNS.md.template', output: 'docs_specflow/LEARNED_PATTERNS.md', description: 'Discovered patterns' },
+    { template: 'docs/AGENTS.md.template', output: 'docs_specflow/AGENTS.md', description: 'Agent orchestration guide' },
   );
 
   // ── Technical layers: Hooks ─────────────────────────────────────────
@@ -92,6 +93,7 @@ export function buildStructuralManifest(templatesRoot, config) {
       { template: 'hooks/git-push-reminder.js.template', output: '.claude/hooks/git-push-reminder.js', description: 'Hook: git push reminder' },
       { template: 'hooks/session-end-persist.js.template', output: '.claude/hooks/session-end-persist.js', description: 'Hook: session state' },
       { template: 'hooks/continuous-learning.js.template', output: '.claude/hooks/continuous-learning.js', description: 'Hook: learning reminder' },
+      { template: 'hooks/agent-suggester.js.template', output: '.claude/hooks/agent-suggester.js', description: 'Hook: agent suggestions' },
     );
   }
 
@@ -152,6 +154,7 @@ export function buildFileManifest(templatesRoot, config) {
     { template: 'docs/OVERVIEW.md.template', output: 'docs_specflow/OVERVIEW.md', description: 'System architecture' },
     { template: 'docs/ADR.md.template', output: 'docs_specflow/ADR.md', description: 'Architecture decisions' },
     { template: 'docs/LEARNED_PATTERNS.md.template', output: 'docs_specflow/LEARNED_PATTERNS.md', description: 'Discovered patterns' },
+    { template: 'docs/AGENTS.md.template', output: 'docs_specflow/AGENTS.md', description: 'Agent orchestration guide' },
   );
 
   // ── Always generate: Commands ─────────────────────────────────────
@@ -183,6 +186,7 @@ export function buildFileManifest(templatesRoot, config) {
       { template: 'hooks/git-push-reminder.js.template', output: '.claude/hooks/git-push-reminder.js', description: 'Hook: git push reminder' },
       { template: 'hooks/session-end-persist.js.template', output: '.claude/hooks/session-end-persist.js', description: 'Hook: session state' },
       { template: 'hooks/continuous-learning.js.template', output: '.claude/hooks/continuous-learning.js', description: 'Hook: learning reminder' },
+      { template: 'hooks/agent-suggester.js.template', output: '.claude/hooks/agent-suggester.js', description: 'Hook: agent suggestions' },
     );
   }
 
@@ -646,7 +650,7 @@ export function generateSkeletonClaudeMd(projectDir, config, options = {}) {
 Automated behaviors at session lifecycle points:
 - **SessionStart**: Auto-loads ROADMAP, SESSION_LOG, and feature SPEC into context
 - **PreToolUse**: Blocks edits to frozen docs (VISION.md, SPEC.md requirements)
-- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage, reminds to capture learned patterns
+- **PostToolUse**: Auto-formats code after edits, suggests /compact at high context usage, reminds to capture learned patterns, suggests specialist agents based on changed files
 - **Stop**: Reminds to push unpushed commits
 - **SessionEnd**: Saves session state snapshot for continuity
 
@@ -690,6 +694,7 @@ Read these before making changes:
 | 4 | [ADR.md](docs_specflow/ADR.md) | Architecture decisions |
 | 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
 | 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
+| 7 | [AGENTS.md](docs_specflow/AGENTS.md) | Agent orchestration guide |
 
 > **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
 

@@ -47,6 +47,15 @@
             "command": "node .claude/hooks/continuous-learning.js"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/agent-suggester.js"
+          }
+        ]
       }
     ],
     "Stop": [
