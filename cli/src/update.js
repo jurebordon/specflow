@@ -89,6 +89,25 @@ export async function update() {
   // Re-generate settings.json
   generateSettings(projectDir, templatesRoot, config);
 
+  // ── Create new docs that don't exist yet (never overwrite) ────────
+  const newDocsManifest = fullManifest.filter(entry =>
+    entry.output.startsWith('docs_specflow/') &&
+    !existsSync(resolve(projectDir, entry.output))
+  );
+
+  if (newDocsManifest.length > 0) {
+    console.log('');
+    console.log(chalk.bold('New docs available:'));
+    const { created: docsCreated } = generateFiles(
+      projectDir,
+      templatesRoot,
+      newDocsManifest,
+      config,
+      { overwrite: false },
+    );
+    created.push(...docsCreated);
+  }
+
   console.log('');
   console.log(chalk.bold.green('Update complete!'));
   console.log(`  Updated ${created.length} files`);
