@@ -240,7 +240,7 @@ Answer these questions:
 
 If tech stack or git workflow changed:
 - Update configuration
-- Regenerate .claude/commands/
+- Regenerate .claude/skills/
 - Update .claude/agents/ if patterns changed
 
 ## 6. Document the Pivot

@@ -1,6 +1,6 @@
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
 import { askBasicQuestions, getDefaults } from './questions.js';
@@ -80,6 +80,14 @@ export async function init(options) {
   // ── Derive GIT_WORKFLOW booleans and template variables ────────────
   deriveGitVariables(config);
 
+  // ── Set SpecFlow version for skill frontmatter ──────────────────────
+  try {
+    const pkg = JSON.parse(readFileSync(resolve(cliRoot, 'package.json'), 'utf-8'));
+    config.SPECFLOW_VERSION = pkg.version;
+  } catch {
+    config.SPECFLOW_VERSION = 'unknown';
+  }
+
   // ── Build structural file manifest ─────────────────────────────────
   const templatesRoot = getTemplatesRoot(cliRoot);
 
@@ -142,7 +150,7 @@ export async function init(options) {
     });
   }
 
-  // 1. Render structural files (commands, hooks, rules, agents, renderable docs)
+  // 1. Render structural files (skills, hooks, rules, agents, renderable docs)
   const { created: structCreated, skipped: structSkipped } = generateFiles(
     projectDir,
     templatesRoot,

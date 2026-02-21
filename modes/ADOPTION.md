@@ -684,7 +684,7 @@ project/
 
 ### Creating a New Feature
 
-Use the `/new-feature` command (see [templates/commands/new-feature.md](../templates/commands/new-feature.md)):
+Use the `/new-feature` skill (see [templates/skills/new-feature/SKILL.md.template](../templates/skills/new-feature/SKILL.md.template)):
 
 ```
 /new-feature customer-dimension

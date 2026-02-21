@@ -1,3 +1,14 @@
+---
+name: explore-project
+description: >-
+  For Adoption mode: scan an existing codebase to understand structure, tech
+  stack, and patterns. Identifies directory structure, tech stack, existing
+  documentation, and code organization patterns. Generates OVERVIEW.md and
+  WORKFLOW.md.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # Explore Project
 
 > For Adoption mode: Scan the codebase to understand structure, tech stack, and existing patterns.

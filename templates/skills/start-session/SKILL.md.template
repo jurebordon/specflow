@@ -1,3 +1,13 @@
+---
+name: start-session
+description: >-
+  Begin implementation after plan approval. Confirms context, runs pre-flight
+  tests, suggests specialist agents, and sets up the implementation environment.
+  Use after /plan-session approval.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # Start Session
 
 > Plan approved. Verify environment and begin implementation.

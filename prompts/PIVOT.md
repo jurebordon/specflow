@@ -78,7 +78,7 @@ After approval:
 - OVERVIEW.md: Update architecture
 - VISION.md: Update tech stack section
 - .claude/agents/*: Update patterns
-- .claude/commands/*: Regenerate if workflow affected
+- .claude/skills/*: Regenerate if workflow affected
 
 ## 6. Create Migration Tasks
 Add to ROADMAP.md:
@@ -158,7 +158,7 @@ Review WORKFLOW.md:
 
 ### If Git Workflow Changed:
 - Update WORKFLOW.md
-- Regenerate .claude/commands/
+- Regenerate .claude/skills/
 - Update any scripts (merge-to-main.sh, etc.)
 
 ### If Integrations Changed:

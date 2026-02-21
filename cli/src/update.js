@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const cliRoot = resolve(__dirname, '..');
 
 /**
- * Update command: re-renders commands, hooks, rules, agents, and statusline
+ * Update command: re-renders skills, hooks, rules, agents, and statusline
  * without touching docs or config.
  */
 export async function update() {
@@ -19,7 +19,7 @@ export async function update() {
 
   console.log('');
   console.log(chalk.bold('SpecFlow Update'));
-  console.log(chalk.dim('Re-generate commands, hooks, rules, and agents from latest templates'));
+  console.log(chalk.dim('Re-generate skills, hooks, rules, and agents from latest templates'));
   console.log('');
 
   // ── Verify SpecFlow is initialized ────────────────────────────────
@@ -43,6 +43,14 @@ export async function update() {
   // Derive GIT_WORKFLOW booleans and template variables
   deriveGitVariables(config);
 
+  // Set SpecFlow version for skill frontmatter
+  try {
+    const pkg = JSON.parse(readFileSync(resolve(cliRoot, 'package.json'), 'utf-8'));
+    config.SPECFLOW_VERSION = pkg.version;
+  } catch {
+    config.SPECFLOW_VERSION = 'unknown';
+  }
+
   // ── Build manifest of updatable files ─────────────────────────────
   const templatesRoot = getTemplatesRoot(cliRoot);
 
@@ -53,19 +61,20 @@ export async function update() {
 
   const fullManifest = buildFileManifest(templatesRoot, config);
 
-  // Filter to only updatable files (commands, hooks, rules, agents, statusline, settings)
+  // Filter to only updatable files (skills, hooks, rules, agents, statusline)
   // Exclude docs and CLAUDE.md — those belong to the user
   const updatableManifest = fullManifest.filter(entry =>
-    entry.output.startsWith('.claude/') && !entry.output.endsWith('settings.json')
+    (entry.output.startsWith('.claude/') || entry.output.startsWith('.codex/')) &&
+    !entry.output.endsWith('settings.json')
   );
 
   console.log(chalk.bold(`Files to update: ${updatableManifest.length}`));
-  console.log(chalk.dim('  (commands, hooks, rules, agents, statusline)'));
+  console.log(chalk.dim('  (skills, hooks, rules, agents, statusline)'));
   console.log(chalk.dim('  Docs and config are NOT modified.'));
   console.log('');
 
   const proceed = await confirm({
-    message: 'Proceed? This will overwrite existing commands, hooks, rules, and agents.',
+    message: 'Proceed? This will overwrite existing skills, hooks, rules, and agents.',
     default: true,
   });
 

@@ -1,3 +1,13 @@
+---
+name: pivot-session
+description: >-
+  Reassess project direction and realign documentation. Reviews current state of
+  all SpecFlow docs, identifies drift between docs and reality, proposes and
+  applies updates to strategic, tactical, and operational documentation.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # Pivot Session
 
 This is a pivot session to reassess project direction and realign documentation.
@@ -80,7 +90,7 @@ If technical direction changed:
 
 ## 6. Update Operational Docs (if needed)
 
-### .claude/commands/
+### .claude/skills/
 Regenerate if:
 - Tech stack changed
 - Git workflow changed

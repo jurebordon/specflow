@@ -18,7 +18,7 @@ SpecFlow uses a three-layer documentation system designed for AI-assisted develo
 │  OPERATIONAL (every session)                                 │
 │  ├── SESSION_LOG.md - Session journal (newest first)        │
 │  ├── .claude/agents/* - Role-specific AI guides               │
-│  └── .claude/commands/* - Session commands                  │
+│  └── .claude/skills/*/SKILL.md - Session skills             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -144,9 +144,9 @@ Role-specific guidance for AI assistants:
 
 **Update when**: Patterns or conventions change for that role.
 
-### .claude/commands/*.md
+### .claude/skills/*/SKILL.md
 
-Generated session commands:
+Generated session skills:
 - `plan-session.md` - Plan next session
 - `start-session.md` - Begin implementation
 - `end-session.md` - Wrap up and merge
@@ -176,7 +176,7 @@ These serve as:
 | WORKFLOW.md | Human | Process changes | Edit in place |
 | SESSION_LOG.md | AI | Every session end | Prepend entry |
 | .claude/agents/* | Human/AI | Pattern changes | Edit in place |
-| .claude/commands/* | AI | Regenerate on config change | Overwrite |
+| .claude/skills/* | AI | Regenerate on config change | Overwrite |
 | feature_docs/*/SPEC.md | Nobody | Never | Read only |
 
 ## Documentation Drift

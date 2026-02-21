@@ -1,3 +1,13 @@
+---
+name: new-worktree
+description: >-
+  Set up a git worktree for parallel feature development. Creates a sibling
+  directory with a new branch for working on independent features simultaneously.
+  Only use when working on multiple independent features.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # New Worktree
 
 > **Advanced option** for parallel feature development. Use only when working on multiple independent features simultaneously.

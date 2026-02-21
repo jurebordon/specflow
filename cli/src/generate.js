@@ -48,30 +48,34 @@ export function getConfigRoot(cliRoot) {
 export function buildStructuralManifest(templatesRoot, config) {
   const files = [];
 
-  // ── Commands ───────────────────────────────────────────────────────
-  files.push(
-    { template: 'commands/plan-session.md.template', output: '.claude/commands/plan-session.md', description: 'Plan session command' },
-    { template: 'commands/start-session.md.template', output: '.claude/commands/start-session.md', description: 'Start session command' },
-    { template: 'commands/end-session.md.template', output: '.claude/commands/end-session.md', description: 'End session command' },
-    { template: 'commands/verify.md.template', output: '.claude/commands/verify.md', description: 'Verify command' },
-    { template: 'commands/new-feature.md.template', output: '.claude/commands/new-feature.md', description: 'New feature command' },
-    { template: 'commands/new-worktree.md.template', output: '.claude/commands/new-worktree.md', description: 'Worktree command' },
-    { template: 'commands/explore-project.md.template', output: '.claude/commands/explore-project.md', description: 'Explore project command' },
-  );
-
-  // Pivot session (conditional on template existence)
-  const pivotTemplate = resolve(templatesRoot, 'commands/pivot-session.md.template');
-  if (existsSync(pivotTemplate)) {
+  // ── Skills (Agent Skills standard) ──────────────────────────────────
+  // Output to both .claude/skills/ and .codex/skills/ for cross-platform support
+  const coreSkills = [
+    'plan-session', 'start-session', 'end-session', 'verify',
+    'new-feature', 'new-worktree', 'explore-project',
+  ];
+  for (const name of coreSkills) {
     files.push(
-      { template: 'commands/pivot-session.md.template', output: '.claude/commands/pivot-session.md', description: 'Pivot session command' },
+      { template: `skills/${name}/SKILL.md.template`, output: `.claude/skills/${name}/SKILL.md`, description: `Skill: ${name}` },
+      { template: `skills/${name}/SKILL.md.template`, output: `.codex/skills/${name}/SKILL.md`, description: `Skill: ${name} (codex)` },
     );
   }
 
-  // Init command (for AI-powered content population)
-  const initTemplate = resolve(templatesRoot, 'commands/init.md.template');
+  // Pivot session (conditional on template existence)
+  const pivotTemplate = resolve(templatesRoot, 'skills/pivot-session/SKILL.md.template');
+  if (existsSync(pivotTemplate)) {
+    files.push(
+      { template: 'skills/pivot-session/SKILL.md.template', output: '.claude/skills/pivot-session/SKILL.md', description: 'Skill: pivot-session' },
+      { template: 'skills/pivot-session/SKILL.md.template', output: '.codex/skills/pivot-session/SKILL.md', description: 'Skill: pivot-session (codex)' },
+    );
+  }
+
+  // Init skill (for AI-powered content population)
+  const initTemplate = resolve(templatesRoot, 'skills/init/SKILL.md.template');
   if (existsSync(initTemplate)) {
     files.push(
-      { template: 'commands/init.md.template', output: '.claude/commands/init.md', description: 'Init command (AI content)' },
+      { template: 'skills/init/SKILL.md.template', output: '.claude/skills/init/SKILL.md', description: 'Skill: init' },
+      { template: 'skills/init/SKILL.md.template', output: '.codex/skills/init/SKILL.md', description: 'Skill: init (codex)' },
     );
   }
 
@@ -157,22 +161,24 @@ export function buildFileManifest(templatesRoot, config) {
     { template: 'docs/AGENTS.md.template', output: 'docs_specflow/AGENTS.md', description: 'Agent orchestration guide' },
   );
 
-  // ── Always generate: Commands ─────────────────────────────────────
-  files.push(
-    { template: 'commands/plan-session.md.template', output: '.claude/commands/plan-session.md', description: 'Plan session command' },
-    { template: 'commands/start-session.md.template', output: '.claude/commands/start-session.md', description: 'Start session command' },
-    { template: 'commands/end-session.md.template', output: '.claude/commands/end-session.md', description: 'End session command' },
-    { template: 'commands/verify.md.template', output: '.claude/commands/verify.md', description: 'Verify command' },
-    { template: 'commands/new-feature.md.template', output: '.claude/commands/new-feature.md', description: 'New feature command' },
-    { template: 'commands/new-worktree.md.template', output: '.claude/commands/new-worktree.md', description: 'Worktree command' },
-    { template: 'commands/explore-project.md.template', output: '.claude/commands/explore-project.md', description: 'Explore project command' },
-  );
+  // ── Always generate: Skills (Agent Skills standard) ────────────────
+  const coreSkillNames = [
+    'plan-session', 'start-session', 'end-session', 'verify',
+    'new-feature', 'new-worktree', 'explore-project',
+  ];
+  for (const name of coreSkillNames) {
+    files.push(
+      { template: `skills/${name}/SKILL.md.template`, output: `.claude/skills/${name}/SKILL.md`, description: `Skill: ${name}` },
+      { template: `skills/${name}/SKILL.md.template`, output: `.codex/skills/${name}/SKILL.md`, description: `Skill: ${name} (codex)` },
+    );
+  }
 
   // ── Conditional: Pivot session ────────────────────────────────────
-  const pivotTemplate = resolve(templatesRoot, 'commands/pivot-session.md.template');
+  const pivotTemplate = resolve(templatesRoot, 'skills/pivot-session/SKILL.md.template');
   if (existsSync(pivotTemplate)) {
     files.push(
-      { template: 'commands/pivot-session.md.template', output: '.claude/commands/pivot-session.md', description: 'Pivot session command' },
+      { template: 'skills/pivot-session/SKILL.md.template', output: '.claude/skills/pivot-session/SKILL.md', description: 'Skill: pivot-session' },
+      { template: 'skills/pivot-session/SKILL.md.template', output: '.codex/skills/pivot-session/SKILL.md', description: 'Skill: pivot-session (codex)' },
     );
   }
 
@@ -708,7 +714,7 @@ Use these commands to structure your work:
 - \`/end-session\` - Wrap up and merge
 - \`/verify\` - Validate docs consistency and project health
 
-Commands are in \`.claude/commands/\`.
+Skills are in \`.claude/skills/\` ([Agent Skills](https://agentskills.io) standard, also output to \`.codex/skills/\`).
 
 ${techSection}## Agents
 

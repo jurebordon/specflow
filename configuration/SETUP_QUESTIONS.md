@@ -220,7 +220,7 @@ Select which layers to enable:
 |------|---------|------------|
 | CLAUDE.md | repo root | repo root* |
 | docs_specflow/*.md | docs_specflow/ | docs_specflow/ (ignored) |
-| .claude/commands/ | repo | repo |
+| .claude/skills/ | repo | repo |
 
 *\*Can be gitignored if explicitly requested*
 

@@ -1,3 +1,13 @@
+---
+name: end-session
+description: >-
+  Wrap up a development session. Runs final tests, updates ROADMAP (marks tasks
+  complete), logs session in SESSION_LOG, commits changes, and creates PR or
+  merges to main. Use when done coding.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # End Session
 
 > Wrap up implementation: test, document, commit, merge/PR.

@@ -1,3 +1,13 @@
+---
+name: verify
+description: >-
+  Validate SpecFlow documentation consistency and project health. Checks required
+  files exist, validates ROADMAP structure and feature tags, validates SESSION_LOG
+  format, checks configuration, and reports issues. Read-only, no modifications.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # Verify
 
 > Validate SpecFlow documentation consistency, project health, and configuration integrity.
@@ -20,10 +30,10 @@ Verify all required SpecFlow files exist:
 **Project Root**:
 - [ ] `CLAUDE.md` — AI assistant context
 
-**Commands** (in `.claude/commands/`):
-- [ ] `plan-session.md`
-- [ ] `start-session.md`
-- [ ] `end-session.md`
+**Skills** (in `.claude/skills/`):
+- [ ] `plan-session/SKILL.md`
+- [ ] `start-session/SKILL.md`
+- [ ] `end-session/SKILL.md`
 
 Report any missing files. Suggest creating them from `.specflow/templates/` if the framework is available.
 

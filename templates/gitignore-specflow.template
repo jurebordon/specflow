@@ -11,5 +11,5 @@ docs_specflow/
 CLAUDE.md
 {{/if}}
 
-# Note: .claude/commands/ are typically kept in git as they're useful
-# for anyone using Claude Code, regardless of SpecFlow usage
+# Note: .claude/skills/ are typically kept in git as they're useful
+# for anyone using Claude Code or Codex CLI, regardless of SpecFlow usage

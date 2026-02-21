@@ -1,3 +1,13 @@
+---
+name: new-feature
+description: >-
+  Create a new feature with SPEC document and ROADMAP tasks. Gathers feature
+  information, creates a frozen feature SPEC in feature_docs/, adds tagged tasks
+  to ROADMAP, and optionally creates a feature branch.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # New Feature
 
 > Create a new feature SPEC and add tasks to central ROADMAP.

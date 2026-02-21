@@ -1,3 +1,14 @@
+---
+name: plan-session
+description: >-
+  Plan the next development session. Detects current feature from git branch,
+  reads project context (ROADMAP, SESSION_LOG, CUSTOM), filters tasks by feature
+  tag, and creates a structured implementation plan. Use at the start of any
+  coding session.
+compatibility: Works with Claude Code, Codex CLI, and other Agent Skills-compatible tools
+metadata:
+  author: specflow
+---
 # Plan Session
 
 > Quick session planning: detect feature, read context, pick a task, create plan.

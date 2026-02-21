@@ -185,7 +185,7 @@ npx specflow-ai update
 ```
 
 **Option B — Manual:**
-Copy updated command templates from `.specflow/templates/commands/` to `.claude/commands/`, replacing the Handlebars variables with your project values.
+Copy updated skill templates from `.specflow/templates/skills/` to `.claude/skills/`, replacing the Handlebars variables with your project values.
 
 ### Step 9: Update .gitignore
 

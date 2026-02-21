@@ -26,7 +26,7 @@ SpecFlow solves this with:
 ```bash
 cd your-project
 
-# Interactive setup — scaffolds config, commands, hooks, rules, agents
+# Interactive setup — scaffolds config, skills, hooks, rules, agents
 npx specflow-ai init
 
 # AI detects tech stack, populates config, updates command files
@@ -36,9 +36,9 @@ npx specflow-ai init
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
+The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
 
-To update commands and agents to the latest templates (after SpecFlow releases):
+To update skills and agents to the latest templates (after SpecFlow releases):
 
 ```bash
 npx specflow-ai update
@@ -113,13 +113,13 @@ your-project/
 │       └── api-v2/
 │           └── SPEC.md
 └── .claude/
-    └── commands/              # Generated session commands
-        ├── explore-project.md # For adoption mode
-        ├── plan-session.md
-        ├── start-session.md
-        ├── end-session.md
-        ├── new-feature.md
-        └── new-worktree.md    # Advanced option
+    └── skills/                # Generated session skills (Agent Skills standard)
+        ├── explore-project/SKILL.md  # For adoption mode
+        ├── plan-session/SKILL.md
+        ├── start-session/SKILL.md
+        ├── end-session/SKILL.md
+        ├── new-feature/SKILL.md
+        └── new-worktree/SKILL.md     # Advanced option
 ```
 
 All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
@@ -174,7 +174,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 npx specflow-ai update
 ```
 
-This re-generates commands, hooks, rules, and agents from the latest templates. Your documentation and config are preserved.
+This re-generates skills, hooks, rules, and agents from the latest templates. Your documentation and config are preserved.
 
 ### Manual
 

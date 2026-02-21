@@ -27,7 +27,7 @@ No. SpecFlow works with any AI assistant:
 - GitHub Copilot
 - Any LLM that can follow prompts
 
-The `.claude/commands/` folder is named for convenience but the prompts work anywhere.
+The `.claude/skills/` folder is named for convenience but the prompts work anywhere.
 
 ### Can I use SpecFlow with an existing project?
 
@@ -62,7 +62,7 @@ You can always add them back later.
 Yes. The suggested structure is:
 ```
 docs_specflow/        # Documentation
-.claude/commands/     # Session commands
+.claude/skills/      # Session skills (Agent Skills standard)
 .claude/agents/       # Role guides
 ```
 
@@ -144,7 +144,7 @@ Customize the end-session command. The three workflows are:
 2. **PR Review** - Create PR, wait for approval
 3. **CI/CD Gated** - Create MR, no local merge
 
-If yours is different, edit `.claude/commands/end-session.md` to match your actual process.
+If yours is different, edit `.claude/skills/end-session/SKILL.md` to match your actual process.
 
 ### I accidentally merged locally when I shouldn't have
 
@@ -240,9 +240,9 @@ Or explicitly tell it what changed since the last session.
 
 ### Generated commands don't match my project
 
-Commands are templates. Edit them directly:
-- `.claude/commands/start-session.md`
-- `.claude/commands/end-session.md`
+Skills are templates. Edit them directly:
+- `.claude/skills/start-session/SKILL.md`
+- `.claude/skills/end-session/SKILL.md`
 
 Replace placeholder commands (`{{TEST_COMMAND}}`) with your actual commands.
 

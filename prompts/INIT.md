@@ -244,13 +244,13 @@ Update `docs_specflow/.specflow-config.md` with detected values:
 - **Typecheck Command**: [detected command]
 ```
 
-### Update Command Files Directly
+### Update Skill Files Directly
 
-**IMPORTANT**: Also update these command files with the detected test commands:
+**IMPORTANT**: Also update these skill files with the detected test commands:
 
-1. **`.claude/commands/start-session.md`** — Find the "Pre-flight Check" section and replace `# Detected by /init` with actual command(s)
+1. **`.claude/skills/start-session/SKILL.md`** — Find the "Pre-flight Check" section and replace `# Detected by /init` with actual command(s)
 
-2. **`.claude/commands/end-session.md`** — Find the "Final Tests" section and replace `# Detected by /init` with actual command(s)
+2. **`.claude/skills/end-session/SKILL.md`** — Find the "Final Tests" section and replace `# Detected by /init` with actual command(s)
 
 3. **`.claude/rules/testing.md`** — Update the Commands section with actual test/lint/typecheck commands
 
@@ -388,15 +388,15 @@ Read templates from `.specflow/templates/` and generate:
 - `docs_specflow/LEARNED_PATTERNS.md` - Use `.specflow/templates/docs/LEARNED_PATTERNS.md.template`
 - `docs_specflow/CUSTOM.md` - Use `.specflow/templates/docs/CUSTOM.md.template` (project-specific extensions)
 
-### Generate Session Commands:
-Copy and customize from `.specflow/templates/commands/`:
-- `.claude/commands/explore-project.md` - For adoption mode
-- `.claude/commands/plan-session.md`
-- `.claude/commands/start-session.md`
-- `.claude/commands/end-session.md`
-- `.claude/commands/verify.md` - Validate docs consistency and project health
-- `.claude/commands/new-feature.md`
-- `.claude/commands/new-worktree.md` - Advanced, for parallel development
+### Generate Session Skills:
+Copy and customize from `.specflow/templates/skills/`:
+- `.claude/skills/explore-project/SKILL.md` - For adoption mode
+- `.claude/skills/plan-session/SKILL.md`
+- `.claude/skills/start-session/SKILL.md`
+- `.claude/skills/end-session/SKILL.md`
+- `.claude/skills/verify/SKILL.md` - Validate docs consistency and project health
+- `.claude/skills/new-feature/SKILL.md`
+- `.claude/skills/new-worktree/SKILL.md` - Advanced, for parallel development
 
 ### Generate Technical Layers (if enabled):
 
@@ -672,7 +672,7 @@ What type of project is this?
 - CLAUDE.md
 - docs_specflow/ROADMAP.md, SESSION_LOG.md, WORKFLOW.md
 - docs_specflow/VISION.md, OVERVIEW.md, ADR.md, LEARNED_PATTERNS.md
-- .claude/commands/plan-session.md, start-session.md, end-session.md, pivot-session.md, new-feature.md, new-worktree.md
+- .claude/skills/plan-session/SKILL.md, start-session/SKILL.md, end-session/SKILL.md, pivot-session/SKILL.md, new-feature/SKILL.md, new-worktree/SKILL.md
 
 Proceed?
 

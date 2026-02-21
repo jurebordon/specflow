@@ -37,7 +37,7 @@ Use these commands to structure your work:
 - `/verify` - Validate docs consistency and project health
 - `/pivot-session` - Reassess direction
 
-Commands are in `.claude/commands/`.
+Skills are in `.claude/skills/` ([Agent Skills](https://agentskills.io) standard, also output to `.codex/skills/`).
 
 ## Technical Enforcement
 

@@ -30,15 +30,16 @@ ai-vibe-framework/
 │   │   └── questions.js   # Interactive prompts
 │   └── package.json
 ├── .claude/
-│   └── commands/          # Claude Code commands for this repo
-│       ├── plan-session.md
-│       ├── start-session.md
-│       └── end-session.md
+│   └── skills/            # Agent Skills (agentskills.io standard)
+│       ├── plan-session/SKILL.md
+│       ├── start-session/SKILL.md
+│       ├── end-session/SKILL.md
+│       └── ...
 ├── prompts/
 │   └── INIT.md            # Main initialization prompt
 ├── templates/
 │   ├── CLAUDE.md.template # Project context template
-│   ├── commands/          # Command templates
+│   ├── skills/            # Skill templates (Agent Skills standard)
 │   ├── docs/              # Documentation templates
 │   ├── hooks/             # Hook script templates
 │   ├── rules/             # Coding rule templates
@@ -176,7 +177,7 @@ See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 - `cli/src/update.js` - CLI `specflow-ai update` command (re-renders templates)
 - `cli/src/config.js` - Shared utilities (deriveGitVariables)
 - `prompts/INIT.md` - AI `/init` command (detects tech stack, populates config)
-- `templates/commands/plan-session.md.template` - Core workflow command
+- `templates/skills/plan-session/SKILL.md.template` - Core workflow skill
 - `docs_specflow/ROADMAP.md` - Current tasks (gitignored, not templates)
 - `docs_specflow/ADR.md` - Architecture decisions for SpecFlow itself
 - `configuration/TECH_STACKS.md` - Tech detection patterns for AI

@@ -267,7 +267,7 @@ A clear plan with:
 
 ## Commands Reference
 
-Session commands are generated during setup based on your project's configuration. They live in `.claude/commands/` and can be invoked as slash commands in Claude Code or pasted into other AI assistants.
+Session skills are generated during setup based on your project's configuration. They live in `.claude/skills/` and can be invoked as slash commands in Claude Code, Codex CLI, or other Agent Skills-compatible tools.
 
 | Command | Purpose |
 |---------|---------|

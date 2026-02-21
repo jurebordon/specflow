@@ -122,7 +122,7 @@ If metrics are needed, they must be:
 | `/end-session` | Wrapping up, merging |
 | `/pivot-session` | Reassessing direction |
 
-Commands are in `.claude/commands/`.
+Skills are in `.claude/skills/` ([Agent Skills](https://agentskills.io) standard, also output to `.codex/skills/`).
 
 ## Quick Reference
 
