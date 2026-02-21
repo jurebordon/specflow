@@ -1,6 +1,6 @@
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
 import { detectTechStack } from './detect.js';
@@ -97,6 +97,14 @@ export async function update() {
 
   // Re-generate settings.json
   generateSettings(projectDir, templatesRoot, config);
+
+  // ── Clean up legacy .claude/commands/ (pre-1.1.0) ───────────────
+  const legacyCommandsDir = resolve(projectDir, '.claude/commands');
+  if (existsSync(legacyCommandsDir)) {
+    console.log('');
+    console.log(chalk.dim('  Removing legacy .claude/commands/ (migrated to .claude/skills/)'));
+    rmSync(legacyCommandsDir, { recursive: true });
+  }
 
   // ── Create new docs that don't exist yet (never overwrite) ────────
   const newDocsManifest = fullManifest.filter(entry =>
