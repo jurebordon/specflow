@@ -864,7 +864,7 @@ export function generateSettings(projectDir, templatesRoot, config, options = {}
 
   // Add statusline config
   if (config.ENABLE_STATUSLINE) {
-    settings.statusLine = { command: 'node .claude/statusline.js' };
+    settings.statusLine = { type: 'command', command: 'node .claude/statusline.js' };
   }
 
   if (Object.keys(settings).length === 0) {
