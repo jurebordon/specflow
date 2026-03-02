@@ -23,6 +23,14 @@ If this conversation has significant prior history (multiple tool calls, long ou
 
 If the conversation is fresh (no prior messages or only a greeting), skip this step silently.
 
+### Plan Mode (Claude Code)
+
+If you have the `EnterPlanMode` tool available and plan mode is NOT already active:
+- Call `EnterPlanMode` to enter read-only planning mode.
+- If the user declines or the tool is unavailable, continue with inline planning below.
+
+If plan mode is already active (you see a system reminder about plan mode), skip this — note the plan file path from the system reminder.
+
 ---
 
 ## Step 1: Detect Feature Context
@@ -74,7 +82,7 @@ Show user:
 
 **For complex architectural tasks**, consider using an architecture-specialist agent if one is installed in `.claude/agents/`.
 
-Present structured plan:
+Use this structure for the plan:
 
 ```markdown
 ## Session Plan: {{TASK_TITLE}}
@@ -102,13 +110,19 @@ Present structured plan:
 [Any blockers or unclear requirements]
 ```
 
+**If in plan mode**: Write the plan to the plan file (path from system reminder). Explore the codebase using read-only tools to inform the plan before writing it.
+
+**If NOT in plan mode**: Present the plan as inline markdown in the conversation.
+
 ---
 
 ## Step 5: Get Approval
 
 **STOP - Do not implement yet.**
 
-Ask: "Approve this plan to start implementation?"
+**If in plan mode**: Call `ExitPlanMode` to present the plan for user approval. Do NOT also ask "Approve this plan?" — ExitPlanMode handles approval. If rejected, revise the plan file and call ExitPlanMode again.
+
+**If NOT in plan mode**: Ask "Approve this plan to start implementation?"
 - **Yes** → User runs `/start-session`
 - **No** → Revise plan or pick different task
 

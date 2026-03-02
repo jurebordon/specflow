@@ -24,6 +24,10 @@ git status
 - Feature from branch should match the plan
 - Working directory should be clean (or save WIP first)
 
+**Check for plan file** (Claude Code):
+- If a plan file from `/plan-session` exists in `~/.claude/plans/`, read the most recent one for the approved plan.
+- If not found, the plan was delivered inline — proceed from conversation context.
+
 **Read project-specific context** (if exists):
 - `docs_specflow/CUSTOM.md` - Custom commands, conventions, gotchas
 
