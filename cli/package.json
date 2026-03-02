@@ -1,6 +1,6 @@
 {
   "name": "specflow-ai",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "SpecFlow - spec-driven framework for AI-assisted development",
   "type": "module",
   "bin": {
