@@ -46,12 +46,8 @@ If checks fail, fix before proceeding with new work.
 Branch naming: [BRANCH_CONVENTION]
 Examples: feat/user-auth, fix/login-bug, refactor/api-cleanup
 
-## 3. Determine Role
-Based on the task, read the appropriate agent guide:
-- Backend work → .claude/agents/backend.md
-- Frontend work → .claude/agents/frontend.md
-- Testing → .claude/agents/qa.md
-- Architecture → .claude/agents/architecture.md
+## 3. Consider Specialist Agents
+If you have specialist agents installed (in `.claude/agents/`), consider invoking them for focused expertise based on the task type (backend, frontend, testing, architecture, etc.).
 
 ## 4. Begin Implementation
 - Mark task as in_progress (use TodoWrite if available)
@@ -241,7 +237,6 @@ Answer these questions:
 If tech stack or git workflow changed:
 - Update configuration
 - Regenerate .claude/skills/
-- Update .claude/agents/ if patterns changed
 
 ## 6. Document the Pivot
 
@@ -265,6 +260,6 @@ Provide:
 | Session Type | When | Key Actions |
 |-------------|------|-------------|
 | Plan | Before work | Review context, pick ONE task, create plan |
-| Start | Beginning work | Create branch, read agent guide, begin |
+| Start | Beginning work | Create branch, consider specialist agents, begin |
 | End | After work | Test, update docs, merge/PR |
 | Pivot | Direction unclear | Review all docs, realign, update |

@@ -147,12 +147,7 @@ project/
 │   │   ├── start-session.md
 │   │   ├── end-session.md
 │   │   └── verify.md
-│   └── agents/
-│       ├── base.md
-│       ├── backend.md
-│       ├── frontend.md (if applicable)
-│       ├── qa.md
-│       └── architecture.md
+│   └── agents/            # Optional (install community agents)
 ```
 
 ## Discovery Questions

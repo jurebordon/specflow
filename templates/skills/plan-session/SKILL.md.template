@@ -72,11 +72,7 @@ Show user:
 
 ## Step 4: Create Implementation Plan
 
-**For complex architectural tasks**, consider using the **Architecture Agent** first:
-```
-Use Task tool with subagent_type: "Architecture Agent"
-Prompt: "Review the approach for [task]. Consider trade-offs, existing patterns, and potential issues."
-```
+**For complex architectural tasks**, consider using an architecture-specialist agent if one is installed in `.claude/agents/`.
 
 Present structured plan:
 
@@ -125,16 +121,17 @@ Ask: "Approve this plan to start implementation?"
 - Feature detection is automatic - zero configuration
 - Tasks without `[feature: name]` tags won't be filtered
 
-## Available Agents
+## Specialist Agents
 
-Use these agents during implementation as needed:
+If you have agents installed in `.claude/agents/`, consider using them during implementation:
 
-| Agent | When to Use |
-|-------|-------------|
-| **Architecture Agent** | Complex design decisions, system changes |
-| **Build Error Resolver** | Test/build failures you can't quickly fix |
-| **QA Agent** | Verify test coverage, suggest missing tests |
-| **Security Reviewer** | Auth, data handling, API security review |
-| **Refactor Cleaner** | Dead code removal, complexity reduction |
-| **Backend Agent** | Backend-specific patterns and best practices |
-| **Frontend Agent** | Frontend-specific patterns and best practices |
+| Task Type | Look for an agent that... |
+|-----------|--------------------------|
+| Complex design decisions | Specializes in architecture review |
+| Build/test failures | Specializes in build diagnostics |
+| Test coverage gaps | Specializes in testing/QA |
+| Auth, data handling, secrets | Specializes in security auditing |
+| Dead code, complexity | Specializes in refactoring |
+| Backend/frontend patterns | Specializes in the relevant domain |
+
+> No agents installed? Install community agents: https://github.com/VoltAgent/awesome-claude-code-subagents

@@ -11,31 +11,31 @@ const os = require('os');
 const FIRST_THRESHOLD = 8;
 const REPEAT_INTERVAL = 10;
 
-// File patterns → agent suggestions
+// File patterns → specialist role suggestions
 const AGENT_RULES = [
   {
     patterns: [/\.(test|spec)\.(js|ts|jsx|tsx|py|rb)$/i, /__tests__\//i, /tests?\//i],
-    agent: 'QA Agent',
+    role: 'testing/QA specialist',
     reason: 'test files modified'
   },
   {
     patterns: [/routes?\//i, /controllers?\//i, /api\//i, /server\//i, /middleware\//i, /services?\//i, /models?\//i, /migrations?\//i],
-    agent: 'Backend Agent',
+    role: 'backend specialist',
     reason: 'backend files modified'
   },
   {
     patterns: [/components?\//i, /pages?\//i, /views?\//i, /hooks?\//i, /stores?\//i, /styles?\//i, /\.css$/i, /\.scss$/i, /\.vue$/i, /\.svelte$/i],
-    agent: 'Frontend Agent',
+    role: 'frontend specialist',
     reason: 'frontend files modified'
   },
   {
     patterns: [/auth/i, /login/i, /password/i, /token/i, /session/i, /permission/i, /secret/i, /crypt/i, /\.env/i, /credentials/i],
-    agent: 'Security Reviewer',
+    role: 'security specialist',
     reason: 'security-sensitive files modified'
   },
   {
     patterns: [/package\.json$/i, /tsconfig/i, /webpack/i, /vite\.config/i, /rollup/i, /\.babelrc/i, /Dockerfile/i, /docker-compose/i, /\.github\//i, /Makefile$/i],
-    agent: 'Build Error Resolver',
+    role: 'build/config specialist',
     reason: 'build/config files modified'
   }
 ];
@@ -61,17 +61,17 @@ function writeState(statePath, state) {
   }
 }
 
-function matchAgents(files) {
+function matchRoles(files) {
   const matched = new Map();
 
   for (const file of files) {
     for (const rule of AGENT_RULES) {
       for (const pattern of rule.patterns) {
         if (pattern.test(file)) {
-          if (!matched.has(rule.agent)) {
-            matched.set(rule.agent, { agent: rule.agent, reason: rule.reason, files: [] });
+          if (!matched.has(rule.role)) {
+            matched.set(rule.role, { role: rule.role, reason: rule.reason, files: [] });
           }
-          matched.get(rule.agent).files.push(file);
+          matched.get(rule.role).files.push(file);
           break;
         }
       }
@@ -111,23 +111,23 @@ async function main() {
   if (shouldSuggest) {
     state.suggestedAt = state.editCount;
 
-    const suggestions = matchAgents(state.files);
+    const suggestions = matchRoles(state.files);
 
     if (suggestions.length > 0) {
       const lines = [
         '',
         '--- SpecFlow Agent Suggestion ---',
-        'You\'ve edited ' + state.files.length + ' file(s) this session. Consider these specialist agents:',
+        'You\'ve edited ' + state.files.length + ' file(s) this session. Consider a specialist agent for:',
         ''
       ];
 
       for (const s of suggestions) {
-        lines.push('  * ' + s.agent + ' (' + s.reason + ')');
+        lines.push('  * ' + s.role + ' (' + s.reason + ')');
       }
 
       lines.push('');
-      lines.push('Use Task tool with the appropriate subagent_type for a focused review.');
-      lines.push('See docs_specflow/AGENTS.md for orchestration patterns.');
+      lines.push('Check .claude/agents/ for installed agents, or install community agents:');
+      lines.push('https://github.com/VoltAgent/awesome-claude-code-subagents');
       lines.push('---------------------------------');
       lines.push('');
 

@@ -16,7 +16,7 @@ The 2026-01-20 refactoring ([ADR-007](../docs_specflow/ADR.md)) simplified SpecF
 | **Doc organization** | Central or per-feature | Central with `[feature: name]` tags |
 | **Feature tracking** | Per-feature ROADMAP/SESSION_LOG in `docs/features/` | Single ROADMAP.md + SESSION_LOG.md with feature tags |
 | **Feature specs** | Per-feature full doc set | `feature_docs/<name>/SPEC.md` only (frozen north star) |
-| **Agent path** | `.ai/agents/` | `.claude/agents/` |
+| **Agent path** | `.ai/agents/` | `.claude/agents/` (optional, install community agents) |
 | **Tech commands** | Manual configuration | Auto-detected (TEST/BUILD/LINT/FORMAT/TYPECHECK) |
 | **Technical layers** | Not available | Hooks, rules, statusline (opt-in) |
 | **Installation** | Manual git clone only | CLI (`npx specflow-ai init`) or manual |
@@ -175,6 +175,8 @@ mv .ai/agents/*.md .claude/agents/
 rm -rf .ai/agents
 ```
 
+> **Note**: SpecFlow no longer ships agent templates. For specialist agents, install community agents from [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents).
+
 ### Step 8: Regenerate Commands
 
 Commands have been updated for the new structure. Regenerate them from templates:
@@ -283,8 +285,6 @@ If you manually edit templates, note these variable changes:
 | *(new)* | `{{ENABLE_HOOKS}}` | Technical layers toggle |
 | *(new)* | `{{ENABLE_RULES}}` | Technical layers toggle |
 | *(new)* | `{{ENABLE_STATUSLINE}}` | Technical layers toggle |
-| *(new)* | `{{AGENT_MODEL_*}}` | 8 agent model tier variables |
-
 See `prompts/INIT.md` for the complete variable reference table.
 
 ---

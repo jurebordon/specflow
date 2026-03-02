@@ -40,7 +40,7 @@ Not all documentation changes at the same rate. SpecFlow uses three layers:
 |-------|---------|---------|----------|
 | **Strategic** | Rarely | North star, major decisions | VISION.md, ADR.md |
 | **Tactical** | Per milestone | Current state, plans | OVERVIEW.md, ROADMAP.md |
-| **Operational** | Every session | Session tracking, AI guidance | SESSION_LOG.md, agent guides |
+| **Operational** | Every session | Session tracking, AI guidance | SESSION_LOG.md, skills |
 
 This prevents both stale docs (everything frozen) and doc churn (everything changes constantly).
 

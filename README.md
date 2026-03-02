@@ -26,7 +26,7 @@ SpecFlow solves this with:
 ```bash
 cd your-project
 
-# Interactive setup — scaffolds config, skills, hooks, rules, agents
+# Interactive setup — scaffolds config, skills, hooks, rules
 npx specflow-ai init
 
 # AI detects tech stack, populates config, updates command files
@@ -38,7 +38,7 @@ npx specflow-ai init
 
 The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
 
-To update skills and agents to the latest templates (after SpecFlow releases):
+To update skills to the latest templates (after SpecFlow releases):
 
 ```bash
 npx specflow-ai update
@@ -174,7 +174,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 npx specflow-ai update
 ```
 
-This re-generates skills, hooks, rules, and agents from the latest templates. Your documentation and config are preserved.
+This re-generates skills, hooks, and rules from the latest templates. Your documentation and config are preserved.
 
 ### Manual
 

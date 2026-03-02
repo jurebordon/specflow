@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const cliRoot = resolve(__dirname, '..');
 
 /**
- * Update command: re-renders skills, hooks, rules, agents, and statusline
+ * Update command: re-renders skills, hooks, rules, and statusline
  * without touching docs or config.
  */
 export async function update() {
@@ -19,7 +19,7 @@ export async function update() {
 
   console.log('');
   console.log(chalk.bold('SpecFlow Update'));
-  console.log(chalk.dim('Re-generate skills, hooks, rules, and agents from latest templates'));
+  console.log(chalk.dim('Re-generate skills, hooks, and rules from latest templates'));
   console.log('');
 
   // ── Verify SpecFlow is initialized ────────────────────────────────
@@ -69,12 +69,12 @@ export async function update() {
   );
 
   console.log(chalk.bold(`Files to update: ${updatableManifest.length}`));
-  console.log(chalk.dim('  (skills, hooks, rules, agents, statusline)'));
+  console.log(chalk.dim('  (skills, hooks, rules, statusline)'));
   console.log(chalk.dim('  Docs and config are NOT modified.'));
   console.log('');
 
   const proceed = await confirm({
-    message: 'Proceed? This will overwrite existing skills, hooks, rules, and agents.',
+    message: 'Proceed? This will overwrite existing skills, hooks, and rules.',
     default: true,
   });
 
@@ -193,17 +193,6 @@ function parseConfigFile(configPath) {
   }
 
   config.TECHNICAL_LAYERS = config.ENABLE_HOOKS || config.ENABLE_RULES || config.ENABLE_STATUSLINE;
-
-  // Default agent config (update doesn't change agent roles)
-  config.AGENT_ROLES = ['backend', 'frontend', 'qa', 'architecture', 'build-error-resolver', 'security-reviewer', 'refactor-cleaner'];
-  config.AGENT_MODEL_BASE = 'sonnet';
-  config.AGENT_MODEL_QA = 'sonnet';
-  config.AGENT_MODEL_ARCHITECTURE = 'opus';
-  config.AGENT_MODEL_BACKEND = 'sonnet';
-  config.AGENT_MODEL_FRONTEND = 'sonnet';
-  config.AGENT_MODEL_BUILD_ERROR = 'sonnet';
-  config.AGENT_MODEL_SECURITY = 'opus';
-  config.AGENT_MODEL_REFACTOR = 'sonnet';
 
   return config;
 }

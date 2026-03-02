@@ -111,7 +111,7 @@ Similar to greenfield, but:
 
 - CLAUDE.md includes constraints section
 - Commands respect process requirements
-- Agent guides reference constraint limitations
+- Skills reference constraint limitations
 - WORKFLOW.md reflects actual process
 
 ```

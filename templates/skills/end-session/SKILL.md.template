@@ -25,15 +25,15 @@ Fix any failures before proceeding.
 
 **Optional quality reviews** (consider for significant changes):
 
-Run applicable agents in **parallel** using the `Task` tool — they don't depend on each other:
+If you have specialist agents installed in `.claude/agents/`, run applicable reviews in **parallel** using the `Task` tool:
 
-| When to use | Agent | Prompt template |
-|-------------|-------|----------------|
-| Added substantial code | **QA Agent** | "Review test coverage for [files changed]. Suggest missing test cases." |
-| Changed auth, data handling, or secrets | **Security Reviewer** | "Review [files] for security issues (OWASP top 10, secrets, injection)." |
-| Large implementation or refactor | **Refactor Cleaner** | "Review [files] for dead code, unnecessary complexity, or naming issues." |
+| When to use | Look for an agent that... |
+|-------------|--------------------------|
+| Added substantial code | Specializes in testing/QA — ask it to review test coverage and suggest missing cases |
+| Changed auth, data handling, or secrets | Specializes in security auditing — ask it to review for OWASP top 10, secrets, injection |
+| Large implementation or refactor | Specializes in refactoring — ask it to review for dead code, unnecessary complexity |
 
-These are advisory — they report findings for you to act on before committing.
+These reviews are advisory — they report findings for you to act on before committing.
 
 ---
 

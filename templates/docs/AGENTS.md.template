@@ -1,37 +1,44 @@
 # Agent Orchestration Guide
 
-> When and how to invoke specialist agents during sessions.
-> Agents are in `.claude/agents/`. Use the `Task` tool with `subagent_type` to invoke them.
+> How to use specialist agents during sessions for focused expertise.
+> Agents live in `.claude/agents/`. Use the `Task` tool with `subagent_type` to invoke them.
 
 ---
 
-## Available Agents
+## Installing Agents
 
-| Agent | Subagent Type | Role | Access |
-|-------|--------------|------|--------|
-| Base | `Base Agent` | Shared principles, default for general tasks | read, edit, search, terminal |
-| Backend | `Backend Agent` | API endpoints, services, data access | read, edit, search, terminal |
-| Frontend | `Frontend Agent` | UI components, state, styling | read, edit, search, terminal |
-| QA | `QA Agent` | Test writing, coverage, test infra | read, edit, search, terminal |
-| Architecture | `Architecture Agent` | Design review, ADR, consistency | read, search (advisory) |
-| Security Reviewer | `Security Reviewer` | Vulnerability audit, OWASP review | read, search (advisory) |
-| Refactor Cleaner | `Refactor Cleaner` | Dead code, complexity, naming | read, edit, search, terminal |
-| Build Error Resolver | `Build Error Resolver` | Build failures, type errors, deps | read, edit, search, terminal |
+SpecFlow does not ship agents. Install community-maintained agents for specialist expertise:
 
-**Advisory agents** (Architecture, Security Reviewer) have read-only access. They report findings but don't modify code.
+**Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents)** — 100+ agents for backend, frontend, security, architecture, DevOps, and more.
+
+```bash
+git clone https://github.com/VoltAgent/awesome-claude-code-subagents.git
+cd awesome-claude-code-subagents && ./install-agents.sh
+```
+
+Agents install to `.claude/agents/` (project-specific) or `~/.claude/agents/` (global).
+
+---
+
+## How Agents Work
+
+1. Agent definitions are Markdown files in `.claude/agents/` with YAML frontmatter
+2. Claude Code auto-discovers them at session start
+3. Invoke via the `Task` tool with `subagent_type` matching the agent's `name` field
+4. Each agent runs in an isolated context with its own system prompt and tool access
 
 ---
 
 ## Orchestration Patterns
 
-### Pattern 1: Design → Implement → Test (Sequential)
+### Pattern 1: Design, Implement, Test (Sequential)
 
 Best for: **New features** that benefit from upfront design review.
 
 ```
-1. Architecture Agent  →  Review design, check patterns
-2. Backend/Frontend Agent  →  Implement the feature
-3. QA Agent  →  Write tests, verify coverage
+1. Architecture specialist  →  Review design, check patterns
+2. Backend/Frontend specialist  →  Implement the feature
+3. Testing specialist  →  Write tests, verify coverage
 ```
 
 ### Pattern 2: Parallel Implementation
@@ -39,30 +46,30 @@ Best for: **New features** that benefit from upfront design review.
 Best for: **Full-stack features** where backend and frontend are independent.
 
 ```
-1. Architecture Agent  →  Review design (optional)
-2. Backend Agent + Frontend Agent  →  Implement in parallel
-3. QA Agent  →  Test both sides
+1. Architecture specialist  →  Review design (optional)
+2. Backend + Frontend specialists  →  Implement in parallel
+3. Testing specialist  →  Test both sides
 ```
 
 Use parallel `Task` tool calls — both agents run simultaneously.
 
-### Pattern 3: Implement → Review (Post-hoc)
+### Pattern 3: Implement, then Review (Post-hoc)
 
 Best for: **Security-sensitive changes** or **significant refactors**.
 
 ```
-1. Implement the changes (directly or with Backend/Frontend Agent)
-2. Security Reviewer  →  Audit for vulnerabilities
-3. Refactor Cleaner  →  Review code quality (optional)
+1. Implement the changes (directly or with a domain specialist)
+2. Security specialist  →  Audit for vulnerabilities
+3. Refactoring specialist  →  Review code quality (optional)
 ```
 
-### Pattern 4: Fix → Verify (Reactive)
+### Pattern 4: Fix, then Verify (Reactive)
 
 Best for: **Build failures**, **test failures**, or **reported bugs**.
 
 ```
-1. Build Error Resolver  →  Diagnose and fix build/type errors
-2. QA Agent  →  Verify fix, check for regressions
+1. Build/error specialist  →  Diagnose and fix
+2. Testing specialist  →  Verify fix, check for regressions
 ```
 
 ### Pattern 5: Cleanup (Maintenance)
@@ -70,68 +77,30 @@ Best for: **Build failures**, **test failures**, or **reported bugs**.
 Best for: **Technical debt**, **dead code**, **complexity reduction**.
 
 ```
-1. Refactor Cleaner  →  Identify and clean up code
-2. QA Agent  →  Verify no regressions
+1. Refactoring specialist  →  Identify and clean up code
+2. Testing specialist  →  Verify no regressions
 ```
 
 ---
 
 ## Task-to-Agent Quick Reference
 
-| You're working on... | Consider using... |
-|----------------------|-------------------|
-| API endpoint | Backend Agent |
-| UI component | Frontend Agent |
-| Database migration | Backend Agent |
-| Auth/permissions | Backend Agent → Security Reviewer |
-| Form validation | Frontend Agent |
-| Performance issue | Architecture Agent (analysis) → appropriate implementation agent |
-| Flaky test | QA Agent |
-| Dead code cleanup | Refactor Cleaner |
-| Build won't compile | Build Error Resolver |
-| Dependency update | Build Error Resolver → Security Reviewer |
-| New module design | Architecture Agent |
-| Code review | Security Reviewer + Refactor Cleaner (parallel) |
-
----
-
-## Invocation Examples
-
-### Single agent
-```
-Use Task tool:
-  subagent_type: "Backend Agent"
-  prompt: "Implement a POST /api/users endpoint following the service/repository pattern. Validate input, handle errors, return consistent response format."
-```
-
-### Parallel agents
-```
-Use Task tool (call both in the same message):
-
-  subagent_type: "Backend Agent"
-  prompt: "Add the /api/orders endpoint with validation and error handling."
-
-  subagent_type: "Frontend Agent"
-  prompt: "Create the OrderForm component with client-side validation and loading states."
-```
-
-### Sequential with handoff
-```
-Step 1 - Use Task tool:
-  subagent_type: "Architecture Agent"
-  prompt: "Review this proposed data model for the notifications system. Check for consistency with existing patterns in OVERVIEW.md."
-
-Step 2 (after getting Architecture Agent's response) - Use Task tool:
-  subagent_type: "Backend Agent"
-  prompt: "Implement the notifications service based on the approved design. [Include Architecture Agent's recommendations]"
-```
+| You're working on... | Look for an agent that... |
+|----------------------|--------------------------|
+| API endpoint | Specializes in backend development |
+| UI component | Specializes in frontend development |
+| Database migration | Specializes in backend/data |
+| Auth/permissions | Backend specialist, then security specialist |
+| Build won't compile | Specializes in build diagnostics |
+| Dead code cleanup | Specializes in refactoring |
+| New module design | Specializes in architecture |
+| Code review | Security + refactoring specialists (parallel) |
 
 ---
 
 ## Guidelines
 
-- **Don't over-orchestrate**: Simple tasks don't need agents. A one-line fix doesn't need an Architecture Agent review.
+- **Don't over-orchestrate**: Simple tasks don't need agents. A one-line fix doesn't need an architecture review.
 - **Provide context**: Give agents enough information in the prompt — relevant file paths, the task from ROADMAP, constraints.
-- **Trust advisory agents**: When Architecture or Security agents flag issues, address them before proceeding.
-- **Agents share the codebase**: They can read any file, but only implementation agents (Backend, Frontend, QA, Refactor, Build Error) can modify code.
+- **Agents share the codebase**: They can read any file. Some are advisory (read-only), others can modify code.
 - **One task per session still applies**: Agents help you do the task better, not do more tasks.

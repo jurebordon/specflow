@@ -43,7 +43,6 @@ ai-vibe-framework/
 │   ├── docs/              # Documentation templates
 │   ├── hooks/             # Hook script templates
 │   ├── rules/             # Coding rule templates
-│   ├── agents/            # Agent templates
 │   ├── settings/          # Settings templates (hooks.json, statusline.js)
 │   ├── feature_docs/
 │   │   └── SPEC.md.template

@@ -102,11 +102,9 @@ A clear plan with:
    # Examples: feat/user-auth, fix/login-bug, refactor/api-cleanup
    ```
 
-2. **Determine role**
-   - Backend work → Read `.claude/agents/backend.md`
-   - Frontend work → Read `.claude/agents/frontend.md`
-   - Testing focus → Read `.claude/agents/qa.md`
-   - Architecture changes → Read `.claude/agents/architecture.md`
+2. **Consider specialist agents**
+   - If you have agents installed in `.claude/agents/`, invoke the appropriate specialist via the `Task` tool
+   - See `docs_specflow/AGENTS.md` for orchestration patterns
 
 3. **Implement**
    - Follow the plan

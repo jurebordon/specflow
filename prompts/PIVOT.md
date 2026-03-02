@@ -77,7 +77,6 @@ After approval:
 - ADR.md: Add new entry
 - OVERVIEW.md: Update architecture
 - VISION.md: Update tech stack section
-- .claude/agents/*: Update patterns
 - .claude/skills/*: Regenerate if workflow affected
 
 ## 6. Create Migration Tasks
@@ -168,7 +167,6 @@ Review WORKFLOW.md:
 
 ### If Team Structure Changed:
 - Update WORKFLOW.md
-- Update .claude/agents/ if roles changed
 
 ## 4. Communicate Change
 - Document in SESSION_LOG as pivot session
@@ -297,7 +295,7 @@ Create tasks in ROADMAP for any significant items.
 
 **Operational:**
 - Commands regenerated: [yes/no]
-- Agents updated: [which ones]
+- Skills regenerated: [yes/no]
 
 ### Decisions Made
 - [Key decisions and rationale]

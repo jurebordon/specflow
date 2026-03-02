@@ -81,7 +81,7 @@ After this, your project has fully customized SpecFlow configuration. No additio
 | `CLAUDE.md` | Yes | AI context file |
 | `docs_specflow/` | No* | SpecFlow documentation |
 | `.claude/skills/` | Yes | Session skills (Agent Skills standard) |
-| `.claude/agents/` | Yes | Specialized agents |
+| `.claude/agents/` | Optional | Community agents (install separately) |
 | `.claude/hooks/` | Yes | Automation hooks |
 | `.claude/rules/` | Yes | Coding standards |
 

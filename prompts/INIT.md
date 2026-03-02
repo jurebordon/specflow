@@ -5,7 +5,7 @@
 ## Option A: CLI + AI (Recommended)
 
 ```bash
-npx specflow-ai init          # Interactive setup: scaffolds config, commands, hooks, rules, agents
+npx specflow-ai init          # Interactive setup: scaffolds config, skills, hooks, rules
 # Then in Claude Code:
 /init                      # AI detects tech stack, populates config AND updates command files
 ```
@@ -267,22 +267,6 @@ uv run dbt_job.py <tenant> sandbox test  # DBT model tests
 
 **Do NOT leave `# Detected by /init` placeholders** — replace them with actual commands.
 
-### Report Agent Relevance
-
-Based on detected stack, report which agents are most relevant:
-
-| Stack | Highly Relevant Agents | Less Relevant Agents |
-|-------|------------------------|----------------------|
-| Full-stack (frontend + backend) | All 8 agents | — |
-| Backend only (Python, Go, Java) | base, qa, architecture, backend, build-error-resolver, security-reviewer | frontend |
-| Frontend only (React, Vue) | base, qa, architecture, frontend, refactor-cleaner | backend, security-reviewer |
-| Data/DBT | base, qa, architecture, backend | frontend, security-reviewer |
-| Infrastructure/DevOps | base, architecture, security-reviewer | frontend, backend, qa |
-
-Show: "Based on your [stack], these agents are most relevant: [list]. The others are generated but you may not need them."
-
-**Note**: All 8 agents are always generated (they're harmless if unused). This guidance helps users know which to invoke.
-
 ### Post-CLI Flow: Confirm Updates
 
 If this is a post-CLI run (config had placeholders):
@@ -428,23 +412,6 @@ Add statusLine config to `.claude/settings.json`:
 { "statusLine": { "command": "node .claude/statusline.js" } }
 ```
 
-### Generate Agents:
-Copy and customize from `.specflow/templates/agents/`:
-
-**Always generate** (core agents):
-- `.claude/agents/base.md` - Base agent with shared principles and session ritual
-- `.claude/agents/qa.md` - Test writing and quality assurance
-- `.claude/agents/architecture.md` - Architecture review and system design (read-only, advisory)
-- `.claude/agents/backend.md` - Backend implementation patterns
-- `.claude/agents/frontend.md` - Frontend implementation patterns
-
-**Generate based on user selection** (specialist agents — ask in Step 5.5 or default to all if technical layers enabled):
-- `.claude/agents/build-error-resolver.md` - Diagnose and fix build failures, type errors, dependency issues
-- `.claude/agents/security-reviewer.md` - Security auditing, OWASP top 10 review (read-only, advisory)
-- `.claude/agents/refactor-cleaner.md` - Dead code removal, complexity reduction, naming improvements
-
-Each agent template includes YAML frontmatter with a configurable `model` field using `{{AGENT_MODEL_*}}` variables. Defaults are defined in `.specflow/configuration/AGENT_TIERS.md`. Architecture and Security agents default to `opus` (reasoning-heavy advisory roles); all others default to `sonnet`.
-
 ### For Greenfield/Constrained with PRD/Spec:
 - `docs_specflow/frozen/PRD.md` - User's PRD
 - `docs_specflow/frozen/TECH_SPEC.md` - User's Tech Spec
@@ -510,14 +477,6 @@ When processing templates, replace these variables:
 | {{ENABLE_HOOKS}} | config |
 | {{ENABLE_RULES}} | config |
 | {{ENABLE_STATUSLINE}} | config |
-| {{AGENT_MODEL_BASE}} | config (default: sonnet) |
-| {{AGENT_MODEL_QA}} | config (default: sonnet) |
-| {{AGENT_MODEL_ARCHITECTURE}} | config (default: opus) |
-| {{AGENT_MODEL_BACKEND}} | config (default: sonnet) |
-| {{AGENT_MODEL_FRONTEND}} | config (default: sonnet) |
-| {{AGENT_MODEL_BUILD_ERROR}} | config (default: sonnet) |
-| {{AGENT_MODEL_SECURITY}} | config (default: opus) |
-| {{AGENT_MODEL_REFACTOR}} | config (default: sonnet) |
 | {{PYTHON}} | detected (boolean) |
 | {{TYPESCRIPT}} | detected (boolean) |
 | {{GO}} | detected (boolean) |
@@ -606,15 +565,6 @@ my-project/
 │   │   ├── security.md
 │   │   ├── testing.md
 │   │   └── documentation.md
-│   ├── agents/                   # Role-specific agents
-│   │   ├── base.md              # Shared principles
-│   │   ├── qa.md                # Test & quality
-│   │   ├── architecture.md      # Architecture review (advisory)
-│   │   ├── backend.md           # Backend patterns
-│   │   ├── frontend.md          # Frontend patterns
-│   │   ├── build-error-resolver.md  # Build failure diagnosis
-│   │   ├── security-reviewer.md     # Security auditing (advisory)
-│   │   └── refactor-cleaner.md      # Dead code & complexity
 │   ├── statusline.js             # If statusline enabled
 │   └── settings.json             # Hooks + statusline config
 ```

@@ -245,21 +245,11 @@ uv run dbt_job.py <tenant> sandbox test  # DBT model tests
 
 **Do NOT leave `# Detected by /init` placeholders** — replace them with actual commands.
 
-### 4e. Report Agent Relevance
+### 4e. Suggest Specialist Agents
 
-Based on detected stack, report which agents are most relevant:
+Mention that specialist agents can be installed for focused expertise:
 
-| Stack | Highly Relevant Agents | Less Relevant Agents |
-|-------|------------------------|----------------------|
-| Full-stack (frontend + backend) | All 8 agents | — |
-| Backend only (Python, Go, Java) | base, qa, architecture, backend, build-error-resolver, security-reviewer | frontend |
-| Frontend only (React, Vue) | base, qa, architecture, frontend, refactor-cleaner | backend, security-reviewer |
-| Data/DBT | base, qa, architecture, backend | frontend, security-reviewer |
-| Infrastructure/DevOps | base, architecture, security-reviewer | frontend, backend, qa |
-
-Show: "Based on your [stack], these agents are most relevant: [list]. The others are generated but you may not need them."
-
-**Note**: All 8 agents are always generated — this guidance just helps users know which to invoke.
+Show: "For specialist agents (backend, frontend, security, architecture, etc.), consider installing community agents from https://github.com/VoltAgent/awesome-claude-code-subagents"
 
 ---
 

@@ -63,7 +63,7 @@ Yes. The suggested structure is:
 ```
 docs_specflow/        # Documentation
 .claude/skills/      # Session skills (Agent Skills standard)
-.claude/agents/       # Role guides
+.claude/agents/       # Optional specialist agents (install from community)
 ```
 
 But you can:

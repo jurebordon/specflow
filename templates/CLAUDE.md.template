@@ -68,32 +68,20 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 
 ## Agents
 
-Role-specific agents in `.claude/agents/` provide specialized behavior:
+Install specialist agents in `.claude/agents/` for focused expertise during implementation.
+Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-| Agent | Role | Model Tier |
-|-------|------|------------|
-| `base.md` | Shared principles and session ritual | {{AGENT_MODEL_BASE}} |
-| `qa.md` | Test writing and quality assurance | {{AGENT_MODEL_QA}} |
-| `architecture.md` | Architecture review and system design (advisory, read-only) | {{AGENT_MODEL_ARCHITECTURE}} |
-| `backend.md` | Backend implementation patterns | {{AGENT_MODEL_BACKEND}} |
-| `frontend.md` | Frontend implementation patterns | {{AGENT_MODEL_FRONTEND}} |
-| `build-error-resolver.md` | Build failures, type errors, dependency issues | {{AGENT_MODEL_BUILD_ERROR}} |
-| `security-reviewer.md` | Security auditing, OWASP review (advisory, read-only) | {{AGENT_MODEL_SECURITY}} |
-| `refactor-cleaner.md` | Dead code removal, complexity reduction | {{AGENT_MODEL_REFACTOR}} |
-
-Advisory agents (architecture, security-reviewer) have read/search access only — they report findings but don't modify code.
+See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.
 
 ## Key Patterns
 
 {{#if BACKEND_STACK}}
 ### Backend ({{BACKEND_STACK}})
-- See `.claude/agents/backend.md` for patterns
 - Structure: {{BACKEND_STRUCTURE}}
 {{/if}}
 
 {{#if FRONTEND_STACK}}
 ### Frontend ({{FRONTEND_STACK}})
-- See `.claude/agents/frontend.md` for patterns
 - Structure: {{FRONTEND_STRUCTURE}}
 {{/if}}
 

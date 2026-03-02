@@ -61,22 +61,6 @@ export async function init(options) {
   config.FORMAT_COMMAND = '# Detected by /init';
   config.TYPECHECK_COMMAND = '# Detected by /init';
 
-  // ── Phase 1c: Set default agent config ────────────────────────────
-  // All 8 agents are always generated (harmless if unused).
-  // /init can later advise which agents are relevant based on codebase analysis.
-  config.AGENT_ROLES = [
-    'backend', 'frontend', 'qa', 'architecture',
-    'build-error-resolver', 'security-reviewer', 'refactor-cleaner',
-  ];
-  config.AGENT_MODEL_BASE = 'sonnet';
-  config.AGENT_MODEL_QA = 'sonnet';
-  config.AGENT_MODEL_ARCHITECTURE = 'opus';
-  config.AGENT_MODEL_BACKEND = 'sonnet';
-  config.AGENT_MODEL_FRONTEND = 'sonnet';
-  config.AGENT_MODEL_BUILD_ERROR = 'sonnet';
-  config.AGENT_MODEL_SECURITY = 'opus';
-  config.AGENT_MODEL_REFACTOR = 'sonnet';
-
   // ── Derive GIT_WORKFLOW booleans and template variables ────────────
   deriveGitVariables(config);
 
@@ -114,7 +98,6 @@ export async function init(options) {
   console.log(`  Git:           ${config.GIT_WORKFLOW} (${config.GIT_PLATFORM})`);
   console.log(`  Docs tracking: ${config.DOCS_GITIGNORED ? 'gitignored' : 'tracked'}`);
   console.log(`  Tech layers:   ${formatLayers(config)}`);
-  console.log(`  Agents:        ${formatAgents()}`);
   if (config.EXISTING_DOCS_PATH) {
     console.log(`  Existing docs: ${config.EXISTING_DOCS_PATH}`);
   }
@@ -206,6 +189,11 @@ export async function init(options) {
   console.log(chalk.dim('The /init command will scan your codebase and fill in OVERVIEW, VISION,'));
   console.log(chalk.dim('ROADMAP, ADR, and CLAUDE.md with project-specific content.'));
   console.log('');
+  console.log(chalk.bold('Optional: Install specialist agents'));
+  console.log('');
+  console.log(chalk.dim('  For focused code reviews and implementation, install community agents:'));
+  console.log(`  ${chalk.cyan('https://github.com/VoltAgent/awesome-claude-code-subagents')}`);
+  console.log('');
 }
 
 function formatLayers(config) {
@@ -215,8 +203,4 @@ function formatLayers(config) {
   if (config.ENABLE_RULES) parts.push('rules');
   if (config.ENABLE_STATUSLINE) parts.push('statusline');
   return parts.join(', ') || 'none';
-}
-
-function formatAgents() {
-  return '5 core + 3 specialist (all generated)';
 }

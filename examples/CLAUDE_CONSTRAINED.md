@@ -82,25 +82,14 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 
 ## Agents
 
-Role-specific agents in `.claude/agents/` provide specialized behavior:
+Install specialist agents in `.claude/agents/` for focused expertise during implementation.
+Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-| Agent | Role | Model Tier |
-|-------|------|------------|
-| `base.md` | Shared principles and session ritual | sonnet |
-| `qa.md` | Test writing and quality assurance | sonnet |
-| `architecture.md` | Architecture review and system design (advisory, read-only) | opus |
-| `backend.md` | Backend implementation patterns | sonnet |
-| `frontend.md` | Frontend implementation patterns | sonnet |
-| `build-error-resolver.md` | Build failures, type errors, dependency issues | sonnet |
-| `security-reviewer.md` | Security auditing, OWASP review (advisory, read-only) | opus |
-| `refactor-cleaner.md` | Dead code removal, complexity reduction | sonnet |
-
-Advisory agents (architecture, security-reviewer) have read/search access only — they report findings but don't modify code.
+See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.
 
 ## Key Patterns
 
 ### Frontend (React 18 + TypeScript)
-- See `.claude/agents/frontend.md` for patterns
 - Structure: `src/pages/` → `src/components/` → `src/hooks/` → `src/services/`
 - MSAL.js auth via `src/services/auth.ts` (never store tokens in localStorage)
 - Client API calls via `src/services/api.ts` with automatic token attachment

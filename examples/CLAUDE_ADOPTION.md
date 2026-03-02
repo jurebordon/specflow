@@ -41,22 +41,14 @@ Skills are in `.claude/skills/` ([Agent Skills](https://agentskills.io) standard
 
 ## Agents
 
-Role-specific agents in `.claude/agents/` provide specialized behavior:
+Install specialist agents in `.claude/agents/` for focused expertise during implementation.
+Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-| Agent | Role | Model Tier |
-|-------|------|------------|
-| `base.md` | Shared principles and session ritual | sonnet |
-| `qa.md` | Test writing and quality assurance | sonnet |
-| `architecture.md` | Architecture review and system design (advisory, read-only) | opus |
-| `backend.md` | Backend implementation patterns | sonnet |
-| `frontend.md` | Frontend implementation patterns | sonnet |
-
-Advisory agents (architecture) have read/search access only — they report findings but don't modify code.
+See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.
 
 ## Key Patterns
 
 ### Backend (DBT + Snowflake)
-- See `.claude/agents/backend.md` for patterns
 - Structure: `models/staging/` → `models/intermediate/` → `models/marts/`
 - Naming: `stg_[source]__[table]`, `int_[entity]__[transform]`, `dim_[entity]`, `fct_[event]`
 - Surrogate keys via `dbt_utils.generate_surrogate_key()`

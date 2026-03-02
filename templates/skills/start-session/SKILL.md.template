@@ -38,45 +38,29 @@ Run baseline tests:
 
 If tests fail:
 1. Try to fix simple issues directly
-2. For complex build/test failures, use the **Build Error Resolver** agent:
-   ```
-   Use Task tool with subagent_type: "Build Error Resolver"
-   Prompt: "Diagnose and fix these test failures: [paste error output]"
-   ```
+2. For complex build/test failures, consider using a build-error specialist agent if one is installed in `.claude/agents/`
 
 ---
 
 ## Step 3: Consider Specialist Agents
 
-Before diving into implementation, consider whether specialist agents could help with this task. The agents in `.claude/agents/` provide focused expertise — use the `Task` tool with the appropriate `subagent_type` to invoke them.
+If you have specialist agents installed (in `.claude/agents/`), consider invoking them via the `Task` tool with the appropriate `subagent_type` for focused expertise:
 
-### When to Use Agents
-
-| Task Type | Suggested Agents | Invocation Pattern |
-|-----------|-----------------|-------------------|
-| New API endpoint or backend logic | **Backend Agent** for implementation, then **QA Agent** for tests | Sequential |
-| New UI component or page | **Frontend Agent** for implementation, then **QA Agent** for tests | Sequential |
-| Full-stack feature | **Architecture Agent** to review design first, then **Backend** + **Frontend** in parallel | Parallel implementation |
-| Refactoring | **Refactor Cleaner** for code changes, **QA Agent** to verify no regressions | Sequential |
-| Build/test failures | **Build Error Resolver** to diagnose and fix | Immediate |
-| Security-sensitive changes (auth, data, secrets) | **Security Reviewer** after implementation | Post-implementation review |
-
-### How to Invoke
-
-Use the `Task` tool with `subagent_type` matching the agent name:
-```
-Task tool → subagent_type: "Backend Agent"
-Task tool → subagent_type: "QA Agent"
-Task tool → subagent_type: "Architecture Agent"
-```
+| Task Type | Look for an agent that... | Pattern |
+|-----------|--------------------------|---------|
+| New API endpoint or backend logic | Specializes in backend/API development | Sequential: implement, then test |
+| New UI component or page | Specializes in frontend/UI development | Sequential: implement, then test |
+| Full-stack feature | Can review architecture, then backend + frontend | Parallel implementation |
+| Refactoring | Specializes in code cleanup/complexity | Sequential: refactor, then test |
+| Build/test failures | Specializes in build diagnostics | Immediate |
+| Security-sensitive changes | Specializes in security auditing | Post-implementation review |
 
 **Tips:**
-- Run independent agents in **parallel** (e.g., Backend + Frontend for separate concerns)
+- Run independent agents in **parallel** (e.g., backend + frontend for separate concerns)
 - Run dependent agents **sequentially** (e.g., implement first, then test)
-- The **Architecture Agent** and **Security Reviewer** are read-only — they advise but don't modify code
 - Not every task needs specialist agents — simple changes are fine without them
 
-> **Note**: Agent use is suggestive, not required. For straightforward tasks, skip directly to Step 4.
+> **No agents installed?** Skills work fine without them. Install community agents: https://github.com/VoltAgent/awesome-claude-code-subagents
 
 ---
 

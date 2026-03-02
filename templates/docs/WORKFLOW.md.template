@@ -8,7 +8,7 @@
 |-------|-----------|------------------|
 | **Strategic** | VISION.md, ADR.md | Rarely (pivots, major decisions) |
 | **Tactical** | OVERVIEW.md, ROADMAP.md, WORKFLOW.md | Per milestone/feature |
-| **Operational** | SESSION_LOG.md, .claude/agents/* | Every session |
+| **Operational** | SESSION_LOG.md, .claude/skills/* | Every session |
 | **Frozen** | feature_docs/*/SPEC.md | Never (feature north star) |
 
 ## Session Lifecycle
