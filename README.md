@@ -30,13 +30,13 @@ cd your-project
 npx specflow-ai init
 
 # AI detects tech stack, populates config, updates command files
-/init
+/init-specflow
 
 # Start working
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
+The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
 
 To update skills to the latest templates (after SpecFlow releases):
 

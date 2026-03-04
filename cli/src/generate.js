@@ -70,12 +70,12 @@ export function buildStructuralManifest(templatesRoot, config) {
     );
   }
 
-  // Init skill (for AI-powered content population)
-  const initTemplate = resolve(templatesRoot, 'skills/init/SKILL.md.template');
+  // Init-specflow skill (for AI-powered content population)
+  const initTemplate = resolve(templatesRoot, 'skills/init-specflow/SKILL.md.template');
   if (existsSync(initTemplate)) {
     files.push(
-      { template: 'skills/init/SKILL.md.template', output: '.claude/skills/init/SKILL.md', description: 'Skill: init' },
-      { template: 'skills/init/SKILL.md.template', output: '.codex/skills/init/SKILL.md', description: 'Skill: init (codex)' },
+      { template: 'skills/init-specflow/SKILL.md.template', output: '.claude/skills/init-specflow/SKILL.md', description: 'Skill: init-specflow' },
+      { template: 'skills/init-specflow/SKILL.md.template', output: '.codex/skills/init-specflow/SKILL.md', description: 'Skill: init-specflow (codex)' },
     );
   }
 
@@ -256,7 +256,7 @@ export function generateFiles(projectDir, templatesRoot, manifest, context, opti
 /**
  * Generate skeleton documentation files that need AI content.
  * These are static markdown (not Handlebars-rendered) with TODO markers.
- * The /init command will populate them with AI-analyzed content.
+ * The /init-specflow command will populate them with AI-analyzed content.
  *
  * @param {string} projectDir - Target project directory
  * @param {Record<string, unknown>} config - Configuration values
@@ -274,15 +274,15 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
       content: `# System Overview
 
 > Living document describing what the system is *now*.
-> Run \`/init\` to populate this from codebase analysis.
+> Run \`/init-specflow\` to populate this from codebase analysis.
 
 ## 1. What This Product Does
 
-<!-- TODO: /init will populate from codebase scan or PRD -->
+<!-- TODO: /init-specflow will populate from codebase scan or PRD -->
 
 ## 2. Core User Journeys
 
-<!-- TODO: /init will populate -->
+<!-- TODO: /init-specflow will populate -->
 - **UJ1**: TODO - Define first user journey
 - **UJ2**: TODO - Define second user journey
 
@@ -293,7 +293,7 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
 - **Stack**: ${config.TECH_STACK || 'TODO'}
 - **Structure**:
   \`\`\`
-  TODO: /init will populate directory structure
+  TODO: /init-specflow will populate directory structure
   \`\`\`
 - **Main modules**: TODO
 
@@ -341,19 +341,19 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
       description: 'Product vision',
       content: `# Project Vision
 
-> Run \`/init\` to populate this from project context.
+> Run \`/init-specflow\` to populate this from project context.
 
 ## 1. Problem Statement
 
-<!-- TODO: /init will populate -->
+<!-- TODO: /init-specflow will populate -->
 
 ## 2. Solution Hypothesis
 
-<!-- TODO: /init will populate -->
+<!-- TODO: /init-specflow will populate -->
 
 ## 3. Target Users
 
-<!-- TODO: /init will populate -->
+<!-- TODO: /init-specflow will populate -->
 
 ## 4. Success Metrics
 
@@ -382,12 +382,12 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
       content: `# Roadmap
 
 **Last Updated**: ${config.DATE}
-**Current Phase**: <!-- TODO: /init will populate -->
+**Current Phase**: <!-- TODO: /init-specflow will populate -->
 
 ## Now (Current Work)
 
 <!-- Tag each task with [feature: name] -->
-<!-- TODO: /init will populate initial tasks -->
+<!-- TODO: /init-specflow will populate initial tasks -->
 
 ## Next (Queued)
 
@@ -436,7 +436,7 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
 
 > Append-only log of significant architecture and design decisions.
 > Never modify existing entries - only append new ones.
-> Run \`/init\` to populate ADR-0001 with your tech stack.
+> Run \`/init-specflow\` to populate ADR-0001 with your tech stack.
 
 ## ADR-0001: Initial Architecture and Tech Stack
 
@@ -449,7 +449,7 @@ Project initialized with SpecFlow. Need to establish baseline architecture.
 
 ### Decision
 
-- **Stack**: ${config.TECH_STACK || 'TODO: /init will populate'}
+- **Stack**: ${config.TECH_STACK || 'TODO: /init-specflow will populate'}
 
 ### Consequences
 
@@ -640,7 +640,7 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 
 ## Project Overview
 
-${config.PROJECT_DESCRIPTION || 'TODO: Run /init to populate from codebase analysis'}
+${config.PROJECT_DESCRIPTION || 'TODO: Run /init-specflow to populate from codebase analysis'}
 
 ## Quick Context
 
@@ -668,7 +668,7 @@ Read these before making changes:
 
 Use these commands to structure your work:
 
-- \`/init\` - Populate documentation with AI-analyzed content (run once after setup)
+- \`/init-specflow\` - Populate documentation with AI-analyzed content (run once after setup)
 - \`/plan-session\` - Prepare for implementation
 - \`/start-session\` - Begin coding
 - \`/end-session\` - Wrap up and merge
@@ -685,13 +685,13 @@ See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installa
 
 ## Key Patterns
 
-<!-- TODO: Run /init to populate from codebase analysis -->
+<!-- TODO: Run /init-specflow to populate from codebase analysis -->
 
 ## Invariants
 
 These rules must always hold:
 
-<!-- TODO: Run /init to populate from codebase analysis -->
+<!-- TODO: Run /init-specflow to populate from codebase analysis -->
 
 ## Git Workflow
 
@@ -706,7 +706,7 @@ ${gitWorkflowSection}
 
 ## Getting Started
 
-1. Run \`/init\` to populate documentation from codebase analysis
+1. Run \`/init-specflow\` to populate documentation from codebase analysis
 2. Run \`/plan-session\` to see current priorities
 3. Pick ONE task from ROADMAP.md
 4. Run \`/start-session\` to begin

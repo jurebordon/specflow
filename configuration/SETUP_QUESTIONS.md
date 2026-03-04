@@ -54,7 +54,7 @@ The setup process uses these questions to generate appropriate documentation and
 
 ## 3. Tech Stack
 
-> **Note**: The CLI no longer asks tech stack questions. It scaffolds files with placeholder values (e.g., `# Detected by /init`). The `/init` command then detects your tech stack automatically and populates the config.
+> **Note**: The CLI no longer asks tech stack questions. It scaffolds files with placeholder values (e.g., `# Detected by /init-specflow`). The `/init-specflow` command then detects your tech stack automatically and populates the config.
 
 ### For Full Manual Setup (prompts/INIT.md)
 

@@ -52,14 +52,14 @@ export async function init(options) {
   }
 
   // ── Phase 1b: Set placeholder values for tech stack ────────────────
-  // Tech detection is deferred to /init (AI-powered codebase analysis).
-  // CLI sets placeholders; /init detects, populates config, AND updates command files directly.
+  // Tech detection is deferred to /init-specflow (AI-powered codebase analysis).
+  // CLI sets placeholders; /init-specflow detects, populates config, AND updates command files directly.
   config.TECH_STACK = config.TECH_STACK || 'Unknown';
-  config.TEST_COMMAND = '# Detected by /init';
-  config.BUILD_COMMAND = '# Detected by /init';
-  config.LINT_COMMAND = '# Detected by /init';
-  config.FORMAT_COMMAND = '# Detected by /init';
-  config.TYPECHECK_COMMAND = '# Detected by /init';
+  config.TEST_COMMAND = '# Detected by /init-specflow';
+  config.BUILD_COMMAND = '# Detected by /init-specflow';
+  config.LINT_COMMAND = '# Detected by /init-specflow';
+  config.FORMAT_COMMAND = '# Detected by /init-specflow';
+  config.TYPECHECK_COMMAND = '# Detected by /init-specflow';
 
   // ── Derive GIT_WORKFLOW booleans and template variables ────────────
   deriveGitVariables(config);
@@ -183,10 +183,10 @@ export async function init(options) {
   console.log(chalk.bold('Next steps:'));
   console.log('');
   console.log(`  ${chalk.cyan('1.')} Open Claude Code in this project`);
-  console.log(`  ${chalk.cyan('2.')} Run ${chalk.bold('/init')} to populate docs with AI-analyzed content`);
+  console.log(`  ${chalk.cyan('2.')} Run ${chalk.bold('/init-specflow')} to populate docs with AI-analyzed content`);
   console.log(`  ${chalk.cyan('3.')} Then run ${chalk.bold('/plan-session')} to start your first session`);
   console.log('');
-  console.log(chalk.dim('The /init command will scan your codebase and fill in OVERVIEW, VISION,'));
+  console.log(chalk.dim('The /init-specflow command will scan your codebase and fill in OVERVIEW, VISION,'));
   console.log(chalk.dim('ROADMAP, ADR, and CLAUDE.md with project-specific content.'));
   console.log('');
   console.log(chalk.bold('Optional: Install specialist agents'));

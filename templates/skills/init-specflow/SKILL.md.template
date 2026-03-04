@@ -1,5 +1,5 @@
 ---
-name: init
+name: init-specflow
 description: >-
   Populate skeleton SpecFlow documentation with AI-analyzed content. Scans
   codebase, detects tech stack, populates OVERVIEW, VISION, ROADMAP, ADR, and
@@ -265,12 +265,12 @@ After populating all docs, run a quick consistency check:
 
 ## Step 6: Self-Archive
 
-This `/init` skill has served its purpose. Archive it:
+This `/init-specflow` skill has served its purpose. Archive it:
 
 ```bash
 # Move to docs for reference
-mv .claude/skills/init/SKILL.md docs_specflow/INIT_PROMPT.md
-rmdir .claude/skills/init/
+mv .claude/skills/init-specflow/SKILL.md docs_specflow/INIT_PROMPT.md
+rmdir .claude/skills/init-specflow/
 ```
 
 Report to the user:

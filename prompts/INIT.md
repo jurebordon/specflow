@@ -7,10 +7,10 @@
 ```bash
 npx specflow-ai init          # Interactive setup: scaffolds config, skills, hooks, rules
 # Then in Claude Code:
-/init                      # AI detects tech stack, populates config AND updates command files
+/init-specflow                      # AI detects tech stack, populates config AND updates command files
 ```
 
-The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init`). The `/init` command then analyzes your codebase, detects tech stack, updates config, populates documentation, AND updates command files with the actual test/build/lint commands. No additional steps needed.
+The CLI scaffolds structural files with placeholder values (e.g., `# Detected by /init-specflow`). The `/init-specflow` command then analyzes your codebase, detects tech stack, updates config, populates documentation, AND updates command files with the actual test/build/lint commands. No additional steps needed.
 
 ## Option B: Full Manual Prompt
 
@@ -49,7 +49,7 @@ Determine which initialization path to follow:
 
 **If YES (CLI already ran)** → **Post-CLI Flow**:
 - Read `.specflow-config.md` to get project settings
-- Check for placeholder values like `# Detected by /init` in TEST_COMMAND, BUILD_COMMAND, etc.
+- Check for placeholder values like `# Detected by /init-specflow` in TEST_COMMAND, BUILD_COMMAND, etc.
 - If placeholders found: Skip to **Step 5** (Tech Stack Detection) — the CLI already gathered basic config
 - After detection: Update config AND command files directly (start-session.md, end-session.md, testing.md)
 
@@ -248,9 +248,9 @@ Update `docs_specflow/.specflow-config.md` with detected values:
 
 **IMPORTANT**: Also update these skill files with the detected test commands:
 
-1. **`.claude/skills/start-session/SKILL.md`** — Find the "Pre-flight Check" section and replace `# Detected by /init` with actual command(s)
+1. **`.claude/skills/start-session/SKILL.md`** — Find the "Pre-flight Check" section and replace `# Detected by /init-specflow` with actual command(s)
 
-2. **`.claude/skills/end-session/SKILL.md`** — Find the "Final Tests" section and replace `# Detected by /init` with actual command(s)
+2. **`.claude/skills/end-session/SKILL.md`** — Find the "Final Tests" section and replace `# Detected by /init-specflow` with actual command(s)
 
 3. **`.claude/rules/testing.md`** — Update the Commands section with actual test/lint/typecheck commands
 
@@ -265,7 +265,7 @@ uv run dbt_job.py <tenant> sandbox test  # DBT model tests
 ```
 ```
 
-**Do NOT leave `# Detected by /init` placeholders** — replace them with actual commands.
+**Do NOT leave `# Detected by /init-specflow` placeholders** — replace them with actual commands.
 
 ### Post-CLI Flow: Confirm Updates
 

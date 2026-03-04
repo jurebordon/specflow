@@ -164,7 +164,7 @@ SpecFlow has no automated tests. Manual validation checklist:
 
 See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 
-1. **CLI Simplification** - CLI scaffolds with placeholders, `/init` detects tech stack and updates command files directly
+1. **CLI Simplification** - CLI scaffolds with placeholders, `/init-specflow` detects tech stack and updates command files directly
 2. **Documentation audit** - Ensure docs reflect the simplified two-step flow
 3. **CUSTOM.md extension** - User-extensible project context file for project-specific customizations
 
@@ -175,7 +175,7 @@ See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
 - `cli/src/init.js` - CLI `specflow-ai init` command (scaffolds with placeholders)
 - `cli/src/update.js` - CLI `specflow-ai update` command (re-renders templates)
 - `cli/src/config.js` - Shared utilities (deriveGitVariables)
-- `prompts/INIT.md` - AI `/init` command (detects tech stack, populates config)
+- `prompts/INIT.md` - AI `/init-specflow` command (detects tech stack, populates config)
 - `templates/skills/plan-session/SKILL.md.template` - Core workflow skill
 - `docs_specflow/ROADMAP.md` - Current tasks (gitignored, not templates)
 - `docs_specflow/ADR.md` - Architecture decisions for SpecFlow itself

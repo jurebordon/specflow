@@ -13,13 +13,13 @@ cd your-project
 npx specflow-ai init
 
 # 2. AI detects tech stack, populates config, updates command files
-/init
+/init-specflow
 
 # Start working
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
+The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
 
 ---
 
@@ -61,9 +61,9 @@ Interactive CLI that asks about your project:
 
 Generates ~40 files with placeholder values for tech-specific commands.
 
-### Step 2: `/init` (in Claude Code)
+### Step 2: `/init-specflow` (in Claude Code)
 
-Open your project in Claude Code and run the `/init` command. The AI will:
+Open your project in Claude Code and run the `/init-specflow` command. The AI will:
 - Scan your codebase to detect tech stack
 - Read existing documentation (if path configured) and extract commands verbatim
 - Update `.specflow-config.md` with detected values
@@ -103,7 +103,7 @@ npx specflow-ai init --mode adoption
 npx specflow-ai init --mode constrained
 ```
 
-> **Note**: The `--yes` flag skips all prompts and uses defaults. If your project has existing documentation you want `/init` to read, run the interactive mode (without `--yes`) which asks for the existing docs path.
+> **Note**: The `--yes` flag skips all prompts and uses defaults. If your project has existing documentation you want `/init-specflow` to read, run the interactive mode (without `--yes`) which asks for the existing docs path.
 
 ### Update Templates Only
 
