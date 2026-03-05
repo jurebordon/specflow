@@ -3,6 +3,7 @@
 // Blocks edits to frozen documentation files (VISION.md, SPEC.md requirements).
 
 const path = require('path');
+const fs = require('fs');
 
 async function main() {
   let input = '';
@@ -21,6 +22,15 @@ async function main() {
 
   // Block edits to VISION.md
   if (resolved.includes(docsPath) && resolved.endsWith(path.sep + 'VISION.md')) {
+    // Allow writes if the file is still a skeleton (contains TODO markers from /init-specflow)
+    if (fs.existsSync(resolved)) {
+      const content = fs.readFileSync(resolved, 'utf-8');
+      if (content.includes('TODO') || content.includes('/init-specflow will populate')) {
+        process.exit(0); // Skeleton file — initial population allowed
+      }
+    } else {
+      process.exit(0); // File doesn't exist yet — allow creation
+    }
     process.stderr.write(
       'BLOCKED: {{DOCS_PATH}}/VISION.md is frozen. ' +
       'This file requires explicit user approval before editing. ' +
