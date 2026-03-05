@@ -80,11 +80,12 @@ export function buildStructuralManifest(templatesRoot, config) {
   }
 
   // ── Renderable docs (use only config/detection variables) ──────────
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
   files.push(
-    { template: 'docs/WORKFLOW.md.template', output: 'docs_specflow/WORKFLOW.md', description: 'Tech workflow' },
-    { template: 'docs/SESSION_LOG.md.template', output: 'docs_specflow/SESSION_LOG.md', description: 'Session journal' },
-    { template: 'docs/LEARNED_PATTERNS.md.template', output: 'docs_specflow/LEARNED_PATTERNS.md', description: 'Discovered patterns' },
-    { template: 'docs/AGENTS.md.template', output: 'docs_specflow/AGENTS.md', description: 'Agent orchestration guide' },
+    { template: 'docs/WORKFLOW.md.template', output: `${docsPath}/WORKFLOW.md`, description: 'Tech workflow' },
+    { template: 'docs/SESSION_LOG.md.template', output: `${docsPath}/SESSION_LOG.md`, description: 'Session journal' },
+    { template: 'docs/LEARNED_PATTERNS.md.template', output: `${docsPath}/LEARNED_PATTERNS.md`, description: 'Discovered patterns' },
+    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent orchestration guide' },
   );
 
   // ── Technical layers: Hooks ─────────────────────────────────────────
@@ -134,16 +135,17 @@ export function buildFileManifest(templatesRoot, config) {
   const files = [];
 
   // ── Always generate: Documentation ────────────────────────────────
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
   files.push(
     { template: 'CLAUDE.md.template', output: 'CLAUDE.md', description: 'AI context file' },
-    { template: 'docs/ROADMAP.md.template', output: 'docs_specflow/ROADMAP.md', description: 'Task roadmap' },
-    { template: 'docs/SESSION_LOG.md.template', output: 'docs_specflow/SESSION_LOG.md', description: 'Session journal' },
-    { template: 'docs/WORKFLOW.md.template', output: 'docs_specflow/WORKFLOW.md', description: 'Tech workflow' },
-    { template: 'docs/VISION.md.template', output: 'docs_specflow/VISION.md', description: 'Product vision' },
-    { template: 'docs/OVERVIEW.md.template', output: 'docs_specflow/OVERVIEW.md', description: 'System architecture' },
-    { template: 'docs/ADR.md.template', output: 'docs_specflow/ADR.md', description: 'Architecture decisions' },
-    { template: 'docs/LEARNED_PATTERNS.md.template', output: 'docs_specflow/LEARNED_PATTERNS.md', description: 'Discovered patterns' },
-    { template: 'docs/AGENTS.md.template', output: 'docs_specflow/AGENTS.md', description: 'Agent orchestration guide' },
+    { template: 'docs/ROADMAP.md.template', output: `${docsPath}/ROADMAP.md`, description: 'Task roadmap' },
+    { template: 'docs/SESSION_LOG.md.template', output: `${docsPath}/SESSION_LOG.md`, description: 'Session journal' },
+    { template: 'docs/WORKFLOW.md.template', output: `${docsPath}/WORKFLOW.md`, description: 'Tech workflow' },
+    { template: 'docs/VISION.md.template', output: `${docsPath}/VISION.md`, description: 'Product vision' },
+    { template: 'docs/OVERVIEW.md.template', output: `${docsPath}/OVERVIEW.md`, description: 'System architecture' },
+    { template: 'docs/ADR.md.template', output: `${docsPath}/ADR.md`, description: 'Architecture decisions' },
+    { template: 'docs/LEARNED_PATTERNS.md.template', output: `${docsPath}/LEARNED_PATTERNS.md`, description: 'Discovered patterns' },
+    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent orchestration guide' },
   );
 
   // ── Always generate: Skills (Agent Skills standard) ────────────────
@@ -266,10 +268,11 @@ export function generateFiles(projectDir, templatesRoot, manifest, context, opti
 export function generateSkeletonDocs(projectDir, config, options = {}) {
   const created = [];
   const skipped = [];
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
 
   const skeletons = [
     {
-      output: 'docs_specflow/OVERVIEW.md',
+      output: `${docsPath}/OVERVIEW.md`,
       description: 'System architecture',
       content: `# System Overview
 
@@ -337,7 +340,7 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
 `,
     },
     {
-      output: 'docs_specflow/VISION.md',
+      output: `${docsPath}/VISION.md`,
       description: 'Product vision',
       content: `# Project Vision
 
@@ -377,7 +380,7 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
 `,
     },
     {
-      output: 'docs_specflow/ROADMAP.md',
+      output: `${docsPath}/ROADMAP.md`,
       description: 'Task roadmap',
       content: `# Roadmap
 
@@ -430,7 +433,7 @@ export function generateSkeletonDocs(projectDir, config, options = {}) {
 `,
     },
     {
-      output: 'docs_specflow/ADR.md',
+      output: `${docsPath}/ADR.md`,
       description: 'Architecture decisions',
       content: `# Architecture Decision Record
 
@@ -493,7 +496,7 @@ Project initialized with SpecFlow. Need to establish baseline architecture.
 `,
     },
     {
-      output: 'docs_specflow/CUSTOM.md',
+      output: `${docsPath}/CUSTOM.md`,
       description: 'Project-specific context',
       content: `# Project-Specific Context
 
@@ -634,6 +637,7 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 `;
   }
 
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
   const content = `# ${config.PROJECT_NAME}
 
 > This file provides context for AI assistants working on this project.
@@ -654,13 +658,13 @@ Read these before making changes:
 
 | Priority | Document | Purpose |
 |----------|----------|---------|
-| 1 | [ROADMAP.md](docs_specflow/ROADMAP.md) | Current tasks and priorities |
-| 2 | [SESSION_LOG.md](docs_specflow/SESSION_LOG.md) | Recent session history |
-| 3 | [OVERVIEW.md](docs_specflow/OVERVIEW.md) | System architecture |
-| 4 | [ADR.md](docs_specflow/ADR.md) | Architecture decisions |
-| 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
-| 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
-| 7 | [AGENTS.md](docs_specflow/AGENTS.md) | Agent orchestration guide |
+| 1 | [ROADMAP.md](${docsPath}/ROADMAP.md) | Current tasks and priorities |
+| 2 | [SESSION_LOG.md](${docsPath}/SESSION_LOG.md) | Recent session history |
+| 3 | [OVERVIEW.md](${docsPath}/OVERVIEW.md) | System architecture |
+| 4 | [ADR.md](${docsPath}/ADR.md) | Architecture decisions |
+| 5 | [VISION.md](${docsPath}/VISION.md) | Product direction |
+| 6 | [LEARNED_PATTERNS.md](${docsPath}/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
+| 7 | [AGENTS.md](${docsPath}/AGENTS.md) | Agent orchestration guide |
 
 > **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
 
@@ -681,7 +685,7 @@ ${techSection}## Agents
 Install specialist agents in \`.claude/agents/\` for focused expertise during implementation.
 Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.
+See [AGENTS.md](${docsPath}/AGENTS.md) for orchestration patterns and installation instructions.
 
 ## Key Patterns
 
@@ -731,15 +735,17 @@ ${gitWorkflowSection}
  * @param {object} options - { dryRun: boolean, overwrite: boolean }
  */
 export function generateConfig(projectDir, config, options = {}) {
-  const outputPath = resolve(projectDir, 'docs_specflow/.specflow-config.md');
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
+  const configRelPath = `${docsPath}/.specflow-config.md`;
+  const outputPath = resolve(projectDir, configRelPath);
 
   if (!options.overwrite && existsSync(outputPath)) {
-    console.log(chalk.yellow(`  skip  docs_specflow/.specflow-config.md (already exists)`));
+    console.log(chalk.yellow(`  skip  ${configRelPath} (already exists)`));
     return;
   }
 
   if (options.dryRun) {
-    console.log(chalk.blue(`  would create  docs_specflow/.specflow-config.md`));
+    console.log(chalk.blue(`  would create  ${configRelPath}`));
     return;
   }
 
@@ -781,7 +787,7 @@ export function generateConfig(projectDir, config, options = {}) {
 `;
 
   writeFileSync(outputPath, content, 'utf-8');
-  console.log(chalk.green(`  create  docs_specflow/.specflow-config.md`));
+  console.log(chalk.green(`  create  ${configRelPath}`));
 }
 
 /**
@@ -850,22 +856,23 @@ export function updateGitignore(projectDir, config, options = {}) {
     return;
   }
 
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
   const gitignorePath = resolve(projectDir, '.gitignore');
   let content = '';
 
   if (existsSync(gitignorePath)) {
     content = readFileSync(gitignorePath, 'utf-8');
-    if (content.includes('docs_specflow/')) {
+    if (content.includes(`${docsPath}/`)) {
       return; // Already ignored
     }
   }
 
   if (options.dryRun) {
-    console.log(chalk.blue(`  would update  .gitignore (add docs_specflow/)`));
+    console.log(chalk.blue(`  would update  .gitignore (add ${docsPath}/)`));
     return;
   }
 
-  const addition = '\n# SpecFlow documentation (personal)\ndocs_specflow/\n';
+  const addition = `\n# SpecFlow documentation (personal)\n${docsPath}/\n`;
   writeFileSync(gitignorePath, content + addition, 'utf-8');
-  console.log(chalk.green(`  update  .gitignore (added docs_specflow/)`));
+  console.log(chalk.green(`  update  .gitignore (added ${docsPath}/)`));
 }
