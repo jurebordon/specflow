@@ -16,16 +16,22 @@ metadata:
 
 ## Step 1: Read Configuration
 
-Read the SpecFlow config to understand this project:
+Find and read the SpecFlow config file:
 
-```
-docs_specflow/.specflow-config.md
+```bash
+# Locate the config (may be in docs_specflow/ or a custom path)
+find . -maxdepth 3 -name ".specflow-config.md" -not -path '*/\.*/*' 2>/dev/null | head -3
 ```
 
-Extract:
+If not found via find, check `CLAUDE.md` — it lists the docs path in the Documentation table.
+
+Read the config file and extract:
+- **Docs Path**: the directory containing SpecFlow docs (e.g. `docs_specflow/`, `docs/`, custom)
 - **Mode**: greenfield / constrained / adoption
 - **Tech Stack**: detected languages and tools
 - **Existing Docs**: path to existing project documentation (if any)
+
+> Use the discovered **Docs Path** for all file references in steps below (replacing `docs_specflow/` if different).
 
 ---
 
@@ -84,7 +90,7 @@ Extract:
 
 Using gathered context, update each skeleton doc. **Read each file first**, then replace TODO markers with real content.
 
-### 3a. OVERVIEW.md (`docs_specflow/OVERVIEW.md`)
+### 3a. OVERVIEW.md (`<docs-path>/OVERVIEW.md`)
 
 Fill in:
 - **Section 1 (What This Product Does)**: 2-3 sentence product description
@@ -97,7 +103,7 @@ Fill in:
 - **Section 4 (External Contracts)**: API specs, events, data schemas (if found)
 - **Section 5 (Invariants)**: 3-5 rules that must always hold
 
-### 3b. VISION.md (`docs_specflow/VISION.md`)
+### 3b. VISION.md (`<docs-path>/VISION.md`)
 
 Fill in:
 - **Problem Statement**: What problem does this project solve?
@@ -107,7 +113,7 @@ Fill in:
 - **Non-Goals**: What is explicitly out of scope?
 - **Tech Stack**: Confirm detected stack
 
-### 3c. ROADMAP.md (`docs_specflow/ROADMAP.md`)
+### 3c. ROADMAP.md (`<docs-path>/ROADMAP.md`)
 
 Fill in:
 - **Current Phase**: Name the current development phase
@@ -118,7 +124,7 @@ Fill in:
 - **Next**: 2-3 queued priorities tagged with `[feature: name]`
 - **Later**: 2-3 backlog ideas
 
-### 3d. ADR.md (`docs_specflow/ADR.md`)
+### 3d. ADR.md (`<docs-path>/ADR.md`)
 
 Update **ADR-0001**:
 - Fill in the **Decision** section with actual tech stack details:
@@ -135,7 +141,7 @@ Update these sections (leave the rest as-is):
 - **Invariants**: Copy from OVERVIEW.md invariants section
 - Verify **Git Workflow** section is accurate
 
-### 3f. CUSTOM.md (`docs_specflow/CUSTOM.md`)
+### 3f. CUSTOM.md (`<docs-path>/CUSTOM.md`)
 
 This file is for project-specific context that extends SpecFlow defaults. **Read the file first** — if it has skeleton structure, populate it. If empty, leave it as-is.
 
@@ -212,7 +218,7 @@ Populate based on what you discovered:
 
 ### 4c. Update Configuration
 
-Update `docs_specflow/.specflow-config.md` with detected/discovered values:
+Update `<docs-path>/.specflow-config.md` with detected/discovered values:
 
 - **Languages**: the detected tech stack (e.g. "Python, DBT", "TypeScript, React")
 - **Frameworks**: detected frameworks (e.g. "FastAPI", "React", "DBT")
@@ -268,8 +274,8 @@ After populating all docs, run a quick consistency check:
 This `/init-specflow` skill has served its purpose. Archive it:
 
 ```bash
-# Move to docs for reference
-mv .claude/skills/init-specflow/SKILL.md docs_specflow/INIT_PROMPT.md
+# Move to docs for reference (use the docs path from Step 1)
+mv .claude/skills/init-specflow/SKILL.md <docs-path>/INIT_PROMPT.md
 rmdir .claude/skills/init-specflow/
 ```
 
@@ -288,7 +294,7 @@ Documentation populated! Here's what was updated:
 - end-session/SKILL.md — Final test commands
 - testing.md — Test/lint/typecheck commands
 
-The /init skill has been archived to docs_specflow/INIT_PROMPT.md.
+The /init-specflow skill has been archived to <docs-path>/INIT_PROMPT.md.
 ```
 
 Final next steps:
