@@ -102,8 +102,8 @@ A clear plan with:
    # Examples: feat/user-auth, fix/login-bug, refactor/api-cleanup
    ```
 
-2. **Consider specialist agents**
-   - If you have agents installed in `.claude/agents/`, invoke the appropriate specialist via the `Task` tool
+2. **Consider specialist agents** (optional)
+   - If you have community agents installed (e.g., from [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents)), invoke the appropriate specialist
    - See `docs_specflow/AGENTS.md` for orchestration patterns
 
 3. **Implement**
@@ -273,5 +273,10 @@ Session skills are generated during setup based on your project's configuration.
 | `/start-session` | Begin implementation work |
 | `/end-session` | Wrap up and merge |
 | `/pivot-session` | Reassess and realign |
+| `/verify` | Validate docs consistency and project health |
+| `/new-feature` | Create new feature spec and branch |
+| `/explore-project` | Adoption mode codebase discovery |
+| `/new-worktree` | Set up parallel feature worktree |
+| `/init-specflow` | Detect tech stack, populate config |
 
 See [prompts/SESSIONS.md](../prompts/SESSIONS.md) for the full prompt templates.

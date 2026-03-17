@@ -126,8 +126,11 @@ project/
 │   ├── SESSION_LOG.md
 │   └── feature_docs/
 ├── .claude/
-│   ├── commands/          # Process-aware commands
-│   └── agents/            # Constraint-aware guides
+│   └── skills/            # Session skills (Agent Skills standard)
+│       ├── plan-session/SKILL.md
+│       ├── start-session/SKILL.md
+│       ├── end-session/SKILL.md
+│       └── ...            # verify, new-feature, etc.
 ```
 
 ## Handling Conflicts

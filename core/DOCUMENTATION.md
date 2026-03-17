@@ -136,10 +136,15 @@ Append-only journal (newest entries first):
 ### .claude/skills/*/SKILL.md
 
 Generated session skills:
-- `plan-session.md` - Plan next session
-- `start-session.md` - Begin implementation
-- `end-session.md` - Wrap up and merge
-- `pivot-session.md` - Retrospective and adjustment
+- `plan-session/SKILL.md` - Plan next session
+- `start-session/SKILL.md` - Begin implementation
+- `end-session/SKILL.md` - Wrap up and merge
+- `pivot-session/SKILL.md` - Retrospective and adjustment
+- `verify/SKILL.md` - Validate docs consistency
+- `new-feature/SKILL.md` - Create new feature spec
+- `explore-project/SKILL.md` - Adoption mode discovery
+- `new-worktree/SKILL.md` - Parallel feature worktree
+- `init-specflow/SKILL.md` - Detect tech stack, populate config
 
 **Update when**: Tech stack or git workflow changes (regenerate from templates).
 

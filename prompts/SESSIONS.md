@@ -47,7 +47,7 @@ Branch naming: [BRANCH_CONVENTION]
 Examples: feat/user-auth, fix/login-bug, refactor/api-cleanup
 
 ## 3. Consider Specialist Agents
-If you have specialist agents installed (in `.claude/agents/`), consider invoking them for focused expertise based on the task type (backend, frontend, testing, architecture, etc.).
+If you have community agents installed (e.g., from [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents)), consider invoking them for focused expertise based on the task type (backend, frontend, testing, architecture, etc.).
 
 ## 4. Begin Implementation
 - Mark task as in_progress (use TodoWrite if available)

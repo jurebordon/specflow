@@ -87,11 +87,11 @@ If using the manual prompt flow (no CLI), these questions help gather tech conte
 
 **Question**: How do you manage code changes?
 
-| Option | Description | Commands Generated |
-|--------|-------------|-------------------|
-| **Solo** | Direct merge to main, single developer | merge-to-main.sh |
-| **PR Review** | Feature branches, PR required for merge | create-pr (no auto-merge) |
-| **CI/CD Gated** | MR/PR with automated merge via pipeline | create-mr (no local merge) |
+| Option | Description | Behavior |
+|--------|-------------|----------|
+| **Solo** | Direct merge to main, single developer | `/end-session` merges locally |
+| **PR Review** | Feature branches, PR required for merge | `/end-session` creates PR (no auto-merge) |
+| **CI/CD Gated** | MR/PR with automated merge via pipeline | `/end-session` creates MR (no local merge) |
 
 ### Follow-up Questions
 
@@ -244,6 +244,11 @@ The CLI suggests installing VoltAgent agents during `specflow-ai init`.
 | **start-session** | Begin coding work | Always |
 | **end-session** | Wrap up and merge | Always |
 | **pivot-session** | Reassess direction | For longer projects |
+| **verify** | Validate docs and project health | Recommended |
+| **new-feature** | Create feature spec and branch | For multi-feature projects |
+| **explore-project** | Discover existing codebase | For adoption mode |
+| **new-worktree** | Parallel feature worktree | For parallel development |
+| **init-specflow** | Detect tech stack, populate config | Always (run once after CLI init) |
 
 Commands are generated based on your git workflow and integrations.
 

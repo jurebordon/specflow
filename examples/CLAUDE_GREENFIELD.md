@@ -62,7 +62,7 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 
 ## Agents
 
-Install specialist agents in `.claude/agents/` for focused expertise during implementation.
+Install community agents for focused expertise during implementation.
 Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
 See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.

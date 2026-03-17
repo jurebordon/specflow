@@ -62,8 +62,7 @@ You can always add them back later.
 Yes. The suggested structure is:
 ```
 docs_specflow/        # Documentation
-.claude/skills/      # Session skills (Agent Skills standard)
-.claude/agents/       # Optional specialist agents (install from community)
+.claude/skills/       # Session skills (Agent Skills standard)
 ```
 
 But you can:
@@ -244,7 +243,7 @@ Skills are templates. Edit them directly:
 - `.claude/skills/start-session/SKILL.md`
 - `.claude/skills/end-session/SKILL.md`
 
-Replace placeholder commands (`{{TEST_COMMAND}}`) with your actual commands.
+After running `/init-specflow`, skills are populated with your detected commands. Edit them directly if needed.
 
 ### I'm getting merge conflicts in documentation
 
@@ -300,7 +299,7 @@ For a 50-line script you'll write once, just write it.
 
 ### Found a bug or have a suggestion?
 
-Open an issue at: [GitHub repo URL]
+Open an issue at: https://github.com/jurebordon/specflow
 
 ### Can I contribute examples for my stack?
 

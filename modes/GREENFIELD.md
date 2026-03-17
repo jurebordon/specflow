@@ -142,12 +142,12 @@ project/
 │   ├── SESSION_LOG.md
 │   └── feature_docs/
 ├── .claude/
-│   ├── commands/
-│   │   ├── plan-session.md
-│   │   ├── start-session.md
-│   │   ├── end-session.md
-│   │   └── verify.md
-│   └── agents/            # Optional (install community agents)
+│   └── skills/            # Session skills (Agent Skills standard)
+│       ├── plan-session/SKILL.md
+│       ├── start-session/SKILL.md
+│       ├── end-session/SKILL.md
+│       ├── verify/SKILL.md
+│       └── ...            # new-feature, explore-project, etc.
 ```
 
 ## Discovery Questions

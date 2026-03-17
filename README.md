@@ -94,10 +94,6 @@ After initialization, your project will have:
 
 ```
 your-project/
-├── .specflow/                 # Framework (gitignored)
-│   ├── templates/
-│   ├── prompts/
-│   └── configuration/
 ├── CLAUDE.md                  # Root context for AI assistants
 ├── docs_specflow/             # SpecFlow documentation (tracked or gitignored, your choice)
 │   ├── .specflow-config.md    # Project settings
@@ -107,19 +103,29 @@ your-project/
 │   ├── ADR.md                 # Architecture decisions (strategic)
 │   ├── OVERVIEW.md            # Current system state (tactical)
 │   ├── WORKFLOW.md            # Tech-specific commands (tactical)
+│   ├── LEARNED_PATTERNS.md    # Discovered patterns
+│   ├── AGENTS.md              # Agent orchestration guide
+│   ├── CUSTOM.md              # Project-specific extensions
 │   └── feature_docs/          # Per-feature specs
-│       ├── user-auth/
-│       │   └── SPEC.md        # Feature requirements (frozen)
-│       └── api-v2/
-│           └── SPEC.md
-└── .claude/
-    └── skills/                # Generated session skills (Agent Skills standard)
-        ├── explore-project/SKILL.md  # For adoption mode
-        ├── plan-session/SKILL.md
-        ├── start-session/SKILL.md
-        ├── end-session/SKILL.md
-        ├── new-feature/SKILL.md
-        └── new-worktree/SKILL.md     # Advanced option
+│       └── feature-name/
+│           └── SPEC.md        # Feature requirements (frozen)
+├── .claude/
+│   ├── skills/                # Session skills (Agent Skills standard)
+│   │   ├── plan-session/SKILL.md
+│   │   ├── start-session/SKILL.md
+│   │   ├── end-session/SKILL.md
+│   │   ├── pivot-session/SKILL.md
+│   │   ├── verify/SKILL.md
+│   │   ├── new-feature/SKILL.md
+│   │   ├── explore-project/SKILL.md
+│   │   ├── new-worktree/SKILL.md
+│   │   └── init-specflow/SKILL.md
+│   ├── hooks/                 # Automation hooks (optional)
+│   ├── rules/                 # Coding standards (optional)
+│   ├── settings.json          # Hook & statusline config
+│   └── statusline.js          # Real-time status (optional)
+└── .codex/
+    └── skills/                # Codex-compatible skills (mirrored)
 ```
 
 All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
@@ -161,7 +167,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 ## Key Principles
 
 1. **Specs before code** - Define what before how
-2. **Documentation as source of truth** - If code and docs disagree, update docs
+2. **Documentation as source of truth** - If code and docs disagree, update docs to match code
 3. **Session-based work** - Focused, trackable units of progress
 4. **No manual metrics** - Automated or nothing
 5. **Adaptive, not rigid** - Framework fits the project, not vice versa

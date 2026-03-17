@@ -9,7 +9,7 @@ SpecFlow provides two installation methods: **CLI** (recommended) or **manual cl
 ```bash
 cd your-project
 
-# 1. Interactive setup — scaffolds config, commands, hooks, rules, agents
+# 1. Interactive setup — scaffolds config, skills, hooks, rules
 npx specflow-ai init
 
 # 2. AI detects tech stack, populates config, updates command files
@@ -19,7 +19,7 @@ npx specflow-ai init
 /plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates command files directly. No additional steps needed.
+The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
 
 ---
 
@@ -37,14 +37,20 @@ your-project/
 │   ├── WORKFLOW.md
 │   ├── SESSION_LOG.md
 │   ├── LEARNED_PATTERNS.md
+│   ├── AGENTS.md
 │   └── CUSTOM.md                # Project-specific extensions
-└── .claude/
-    ├── commands/                # Session workflow commands
-    ├── agents/                  # 8 specialized agents
-    ├── hooks/                   # Automation hooks
-    ├── rules/                   # Coding standards
-    ├── settings.json
-    └── statusline.js
+├── .claude/
+│   ├── skills/                  # Session skills (Agent Skills standard)
+│   │   ├── plan-session/SKILL.md
+│   │   ├── start-session/SKILL.md
+│   │   ├── end-session/SKILL.md
+│   │   └── ...                  # verify, new-feature, explore-project, etc.
+│   ├── hooks/                   # Automation hooks (if enabled)
+│   ├── rules/                   # Coding standards (if enabled)
+│   ├── settings.json            # Hook & statusline config
+│   └── statusline.js            # Real-time status (if enabled)
+└── .codex/
+    └── skills/                  # Codex-compatible skills (mirrored)
 ```
 
 ---
@@ -56,7 +62,7 @@ your-project/
 Interactive CLI that asks about your project:
 - Project type (greenfield, adoption, constrained)
 - Git workflow (solo, PR-based)
-- Documentation preferences
+- Documentation preferences (path, tracking)
 - Technical layers (hooks, rules, statusline)
 
 Generates ~40 files with placeholder values for tech-specific commands.
@@ -67,8 +73,8 @@ Open your project in Claude Code and run the `/init-specflow` command. The AI wi
 - Scan your codebase to detect tech stack
 - Read existing documentation (if path configured) and extract commands verbatim
 - Update `.specflow-config.md` with detected values
-- Update command files directly (start-session.md, end-session.md, testing.md)
-- Report which agents are relevant for your stack
+- Update skill files directly (e.g., `.claude/skills/start-session/SKILL.md`)
+- Report detected tech stack and populated configuration
 
 After this, your project has fully customized SpecFlow configuration. No additional steps needed.
 
@@ -81,9 +87,9 @@ After this, your project has fully customized SpecFlow configuration. No additio
 | `CLAUDE.md` | Yes | AI context file |
 | `docs_specflow/` | No* | SpecFlow documentation |
 | `.claude/skills/` | Yes | Session skills (Agent Skills standard) |
-| `.claude/agents/` | Optional | Community agents (install separately) |
-| `.claude/hooks/` | Yes | Automation hooks |
-| `.claude/rules/` | Yes | Coding standards |
+| `.codex/skills/` | Yes | Codex-compatible skills (mirrored) |
+| `.claude/hooks/` | Optional | Automation hooks |
+| `.claude/rules/` | Optional | Coding standards |
 
 *By default, `docs_specflow/` is gitignored. You can choose to track it during setup.
 
@@ -113,7 +119,7 @@ After changing `.specflow-config.md`, re-render templates:
 npx specflow-ai update
 ```
 
-This updates commands, hooks, rules, and agents without touching your documentation.
+This updates skills, hooks, and rules without touching your documentation.
 
 ---
 
