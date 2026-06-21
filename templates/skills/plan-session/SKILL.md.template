@@ -51,6 +51,7 @@ Extract feature from branch name:
 
 **Required**:
 - `CLAUDE.md` - Project overview
+- `docs_specflow/ORCHESTRATION.md` - Session lifecycle and delegation rules (if exists)
 - `docs_specflow/ROADMAP.md` - All tasks
 - `docs_specflow/SESSION_LOG.md` - Last 2-3 entries only
 - `docs_specflow/CUSTOM.md` - Project-specific context (if exists)
@@ -81,6 +82,7 @@ Show user:
 ## Step 4: Create Implementation Plan
 
 **For complex architectural tasks**, consider using an architecture-specialist agent if one is installed in `.claude/agents/`.
+Follow `docs_specflow/ORCHESTRATION.md` when deciding whether to delegate: only delegate bounded work with clear ownership and keep the primary session responsible for integration.
 
 Use this structure for the plan:
 

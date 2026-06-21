@@ -26,6 +26,7 @@ Verify all required SpecFlow files exist:
 - [ ] `docs_specflow/OVERVIEW.md` — System architecture
 - [ ] `docs_specflow/ADR.md` — Architecture decisions
 - [ ] `docs_specflow/WORKFLOW.md` — Development workflow
+- [ ] `docs_specflow/ORCHESTRATION.md` — Session lifecycle and delegation contract
 
 **Project Root**:
 - [ ] `CLAUDE.md` — AI assistant context

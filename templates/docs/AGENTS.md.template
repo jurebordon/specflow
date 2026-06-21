@@ -1,7 +1,7 @@
-# Agent Orchestration Guide
+# Agent Catalog
 
-> How to use specialist agents during sessions for focused expertise.
-> Agents live in `.claude/agents/`. Use the `Task` tool with `subagent_type` to invoke them.
+> How to install and select specialist agents.
+> See `ORCHESTRATION.md` for lifecycle rules, delegation constraints, checkpoints, and failure handling.
 
 ---
 
@@ -27,9 +27,13 @@ Agents install to `.claude/agents/` (project-specific) or `~/.claude/agents/` (g
 3. Invoke via the `Task` tool with `subagent_type` matching the agent's `name` field
 4. Each agent runs in an isolated context with its own system prompt and tool access
 
+Other Agent Skills-compatible tools may call these "subagents", "workers", or "specialists". Use the same selection rules: bounded task, clear context, explicit ownership, and primary-agent integration.
+
 ---
 
-## Orchestration Patterns
+## Delegation Patterns
+
+These are common ways to use agents inside the session lifecycle defined in `ORCHESTRATION.md`.
 
 ### Pattern 1: Design, Implement, Test (Sequential)
 
@@ -101,6 +105,8 @@ Best for: **Technical debt**, **dead code**, **complexity reduction**.
 ## Guidelines
 
 - **Don't over-orchestrate**: Simple tasks don't need agents. A one-line fix doesn't need an architecture review.
-- **Provide context**: Give agents enough information in the prompt — relevant file paths, the task from ROADMAP, constraints.
-- **Agents share the codebase**: They can read any file. Some are advisory (read-only), others can modify code.
+- **Provide context**: Include the roadmap task, feature name, relevant files, and constraints from `CUSTOM.md`, `WORKFLOW.md`, and feature specs.
+- **Assign ownership**: If an agent may edit files, state exactly which files or modules it owns.
+- **Preserve others' changes**: Agents share the codebase. They must not revert human or other-agent work.
 - **One task per session still applies**: Agents help you do the task better, not do more tasks.
+- **Primary agent integrates**: The primary session reviews agent output, resolves conflicts, runs verification, and writes the session log.

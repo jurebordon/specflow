@@ -29,6 +29,7 @@ git status
 - If not found, the plan was delivered inline — proceed from conversation context.
 
 **Read project-specific context** (if exists):
+- `docs_specflow/ORCHESTRATION.md` - Session lifecycle, delegation, checkpoints
 - `docs_specflow/CUSTOM.md` - Custom commands, conventions, gotchas
 
 ---
@@ -62,6 +63,8 @@ If you have specialist agents installed (in `.claude/agents/`), consider invokin
 **Tips:**
 - Run independent agents in **parallel** (e.g., backend + frontend for separate concerns)
 - Run dependent agents **sequentially** (e.g., implement first, then test)
+- Assign explicit file/module ownership to any agent that may edit
+- Keep the primary session responsible for integration and final verification
 - Not every task needs specialist agents — simple changes are fine without them
 
 > **No agents installed?** Skills work fine without them. Install community agents: https://github.com/VoltAgent/awesome-claude-code-subagents

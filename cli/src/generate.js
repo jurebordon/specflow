@@ -85,7 +85,8 @@ export function buildStructuralManifest(templatesRoot, config) {
     { template: 'docs/WORKFLOW.md.template', output: `${docsPath}/WORKFLOW.md`, description: 'Tech workflow' },
     { template: 'docs/SESSION_LOG.md.template', output: `${docsPath}/SESSION_LOG.md`, description: 'Session journal' },
     { template: 'docs/LEARNED_PATTERNS.md.template', output: `${docsPath}/LEARNED_PATTERNS.md`, description: 'Discovered patterns' },
-    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent orchestration guide' },
+    { template: 'docs/ORCHESTRATION.md.template', output: `${docsPath}/ORCHESTRATION.md`, description: 'Session orchestration contract' },
+    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent catalog' },
   );
 
   // ── Technical layers: Hooks ─────────────────────────────────────────
@@ -145,7 +146,8 @@ export function buildFileManifest(templatesRoot, config) {
     { template: 'docs/OVERVIEW.md.template', output: `${docsPath}/OVERVIEW.md`, description: 'System architecture' },
     { template: 'docs/ADR.md.template', output: `${docsPath}/ADR.md`, description: 'Architecture decisions' },
     { template: 'docs/LEARNED_PATTERNS.md.template', output: `${docsPath}/LEARNED_PATTERNS.md`, description: 'Discovered patterns' },
-    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent orchestration guide' },
+    { template: 'docs/ORCHESTRATION.md.template', output: `${docsPath}/ORCHESTRATION.md`, description: 'Session orchestration contract' },
+    { template: 'docs/AGENTS.md.template', output: `${docsPath}/AGENTS.md`, description: 'Agent catalog' },
   );
 
   // ── Always generate: Skills (Agent Skills standard) ────────────────
@@ -664,7 +666,8 @@ Read these before making changes:
 | 4 | [ADR.md](${docsPath}/ADR.md) | Architecture decisions |
 | 5 | [VISION.md](${docsPath}/VISION.md) | Product direction |
 | 6 | [LEARNED_PATTERNS.md](${docsPath}/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
-| 7 | [AGENTS.md](${docsPath}/AGENTS.md) | Agent orchestration guide |
+| 7 | [ORCHESTRATION.md](${docsPath}/ORCHESTRATION.md) | Session lifecycle and delegation contract |
+| 8 | [AGENTS.md](${docsPath}/AGENTS.md) | Agent catalog and delegation patterns |
 
 > **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
 
@@ -685,7 +688,8 @@ ${techSection}## Agents
 Install specialist agents in \`.claude/agents/\` for focused expertise during implementation.
 Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-See [AGENTS.md](${docsPath}/AGENTS.md) for orchestration patterns and installation instructions.
+See [ORCHESTRATION.md](${docsPath}/ORCHESTRATION.md) for the session lifecycle, delegation rules, checkpoints, and failure handling.
+See [AGENTS.md](${docsPath}/AGENTS.md) for agent selection patterns and installation instructions.
 
 ## Key Patterns
 

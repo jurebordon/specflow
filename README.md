@@ -104,7 +104,8 @@ your-project/
 │   ├── OVERVIEW.md            # Current system state (tactical)
 │   ├── WORKFLOW.md            # Tech-specific commands (tactical)
 │   ├── LEARNED_PATTERNS.md    # Discovered patterns
-│   ├── AGENTS.md              # Agent orchestration guide
+│   ├── ORCHESTRATION.md       # Session lifecycle and delegation contract
+│   ├── AGENTS.md              # Agent catalog and delegation patterns
 │   ├── CUSTOM.md              # Project-specific extensions
 │   └── feature_docs/          # Per-feature specs
 │       └── feature-name/
@@ -141,6 +142,7 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 - [Core Principles](core/PRINCIPLES.md) - Philosophy and core concepts
 - [Documentation Structure](core/DOCUMENTATION.md) - The three-layer system
 - [Session Workflow](core/SESSIONS.md) - Plan, implement, wrap up, pivot
+- [Agent Orchestration](templates/docs/ORCHESTRATION.md.template) - Session lifecycle, delegation rules, checkpoints
 
 ### Project Modes
 - [Greenfield Mode](modes/GREENFIELD.md) - New projects (with full example)
