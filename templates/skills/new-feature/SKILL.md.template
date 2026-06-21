@@ -44,7 +44,7 @@ If user provides a spec document, PRD, or ticket, use that information.
 
 ## Step 2: Create Feature SPEC
 
-Create `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md`:
+Create `{{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md`:
 
 ```markdown
 # Feature: {{FEATURE_NAME}}
@@ -121,7 +121,7 @@ Create `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md`:
 
 ## Step 3: Add Tasks to Central ROADMAP
 
-Update `docs_specflow/ROADMAP.md`:
+Update `{{DOCS_PATH}}/ROADMAP.md`:
 
 Break feature into tasks and add to appropriate section (Now/Next/Later):
 
@@ -163,10 +163,10 @@ Provide summary to user:
 Feature created: {{FEATURE_NAME}}
 
 **Created**:
-- docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md
+- {{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md
 
 **Updated**:
-- docs_specflow/ROADMAP.md (added tasks with [feature: {{FEATURE_NAME}}] tags)
+- {{DOCS_PATH}}/ROADMAP.md (added tasks with [feature: {{FEATURE_NAME}}] tags)
 
 {{#if TICKET_ID}}
 **Linked to**: {{TICKET_ID}}

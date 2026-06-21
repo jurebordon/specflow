@@ -71,8 +71,8 @@ cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
 ```
 
 If feature doesn't exist yet, run `/new-feature {{FEATURE_NAME}}` to create:
-- `docs_specflow/feature_docs/{{FEATURE_NAME}}/SPEC.md`
-- Tasks in `docs_specflow/ROADMAP.md` with `[feature: {{FEATURE_NAME}}]` tags
+- `{{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md`
+- Tasks in `{{DOCS_PATH}}/ROADMAP.md` with `[feature: {{FEATURE_NAME}}]` tags
 
 ---
 
@@ -118,7 +118,7 @@ No special configuration needed - it just works.
 
 - Worktree directory is sibling to main repo (not inside it)
 - Each worktree has its own working directory but shares git history
-- Feature docs (`docs_specflow/`) are shared across all worktrees
+- Feature docs (`{{DOCS_PATH}}/`) are shared across all worktrees
 - Tasks use `[feature: name]` tags in central ROADMAP.md
 - Sessions use `[feature-name] YYYY-MM-DD` format in central SESSION_LOG.md
 - Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}`

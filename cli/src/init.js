@@ -14,7 +14,7 @@ import {
   generateSkeletonClaudeMd,
   updateGitignore,
 } from './generate.js';
-import { deriveGitVariables } from './config.js';
+import { deriveGitVariables, normalizeDocsPath } from './config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const cliRoot = resolve(__dirname, '..');
@@ -60,6 +60,7 @@ export async function init(options) {
   config.LINT_COMMAND = '# Detected by /init-specflow';
   config.FORMAT_COMMAND = '# Detected by /init-specflow';
   config.TYPECHECK_COMMAND = '# Detected by /init-specflow';
+  config.DOCS_PATH = normalizeDocsPath(config.DOCS_PATH);
 
   // ── Derive GIT_WORKFLOW booleans and template variables ────────────
   deriveGitVariables(config);

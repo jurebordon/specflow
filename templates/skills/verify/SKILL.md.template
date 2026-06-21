@@ -18,15 +18,15 @@ metadata:
 
 Verify all required SpecFlow files exist:
 
-**Documentation** (in `docs_specflow/`):
-- [ ] `docs_specflow/.specflow-config.md` — Project configuration
-- [ ] `docs_specflow/ROADMAP.md` — Task tracking
-- [ ] `docs_specflow/SESSION_LOG.md` — Session history
-- [ ] `docs_specflow/VISION.md` — Product direction
-- [ ] `docs_specflow/OVERVIEW.md` — System architecture
-- [ ] `docs_specflow/ADR.md` — Architecture decisions
-- [ ] `docs_specflow/WORKFLOW.md` — Development workflow
-- [ ] `docs_specflow/ORCHESTRATION.md` — Session lifecycle and delegation contract
+**Documentation** (in `{{DOCS_PATH}}/`):
+- [ ] `{{DOCS_PATH}}/.specflow-config.md` — Project configuration
+- [ ] `{{DOCS_PATH}}/ROADMAP.md` — Task tracking
+- [ ] `{{DOCS_PATH}}/SESSION_LOG.md` — Session history
+- [ ] `{{DOCS_PATH}}/VISION.md` — Product direction
+- [ ] `{{DOCS_PATH}}/OVERVIEW.md` — System architecture
+- [ ] `{{DOCS_PATH}}/ADR.md` — Architecture decisions
+- [ ] `{{DOCS_PATH}}/WORKFLOW.md` — Development workflow
+- [ ] `{{DOCS_PATH}}/ORCHESTRATION.md` — Session lifecycle and delegation contract
 
 **Project Root**:
 - [ ] `CLAUDE.md` — AI assistant context
@@ -42,7 +42,7 @@ Report any missing files. Suggest creating them from `.specflow/templates/` if t
 
 ## Step 2: Validate ROADMAP Structure
 
-Read `docs_specflow/ROADMAP.md` and check:
+Read `{{DOCS_PATH}}/ROADMAP.md` and check:
 
 ### Feature Tags
 - [ ] Every task has a `[feature: name]` tag
@@ -70,7 +70,7 @@ Read `docs_specflow/ROADMAP.md` and check:
 
 ## Step 3: Validate SESSION_LOG Format
 
-Read `docs_specflow/SESSION_LOG.md` and check:
+Read `{{DOCS_PATH}}/SESSION_LOG.md` and check:
 
 ### Entry Format
 - [ ] Entries follow `## [feature-name] YYYY-MM-DD` heading format
@@ -91,7 +91,7 @@ Read `docs_specflow/SESSION_LOG.md` and check:
 
 ## Step 4: Validate Feature Docs
 
-Check `docs_specflow/feature_docs/` if it exists:
+Check `{{DOCS_PATH}}/feature_docs/` if it exists:
 
 - [ ] Each feature directory has a `SPEC.md`
 - [ ] Feature directory names match `[feature: name]` tags in ROADMAP
@@ -105,7 +105,7 @@ Check `docs_specflow/feature_docs/` if it exists:
 
 ## Step 5: Validate Configuration
 
-Read `docs_specflow/.specflow-config.md` and check:
+Read `{{DOCS_PATH}}/.specflow-config.md` and check:
 
 ### Required Fields
 - [ ] Project Name is set (not placeholder)

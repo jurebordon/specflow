@@ -29,8 +29,8 @@ git status
 - If not found, the plan was delivered inline — proceed from conversation context.
 
 **Read project-specific context** (if exists):
-- `docs_specflow/ORCHESTRATION.md` - Session lifecycle, delegation, checkpoints
-- `docs_specflow/CUSTOM.md` - Custom commands, conventions, gotchas
+- `{{DOCS_PATH}}/ORCHESTRATION.md` - Session lifecycle, delegation, checkpoints
+- `{{DOCS_PATH}}/CUSTOM.md` - Custom commands, conventions, gotchas
 
 ---
 

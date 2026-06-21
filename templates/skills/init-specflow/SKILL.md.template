@@ -19,19 +19,19 @@ metadata:
 Find and read the SpecFlow config file:
 
 ```bash
-# Locate the config (may be in docs_specflow/ or a custom path)
+# Locate the config (may be in {{DOCS_PATH}}/ or a custom path)
 find . -maxdepth 3 -name ".specflow-config.md" -not -path '*/\.*/*' 2>/dev/null | head -3
 ```
 
 If not found via find, check `CLAUDE.md` — it lists the docs path in the Documentation table.
 
 Read the config file and extract:
-- **Docs Path**: the directory containing SpecFlow docs (e.g. `docs_specflow/`, `docs/`, custom)
+- **Docs Path**: the directory containing SpecFlow docs (e.g. `{{DOCS_PATH}}/`, `docs/`, custom)
 - **Mode**: greenfield / constrained / adoption
 - **Tech Stack**: detected languages and tools
 - **Existing Docs**: path to existing project documentation (if any)
 
-> Use the discovered **Docs Path** for all file references in steps below (replacing `docs_specflow/` if different).
+> Use the discovered **Docs Path** for all file references in steps below (replacing `{{DOCS_PATH}}/` if different).
 
 ---
 
