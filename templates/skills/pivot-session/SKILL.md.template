@@ -16,26 +16,26 @@ This is a pivot session to reassess project direction and realign documentation.
 
 Read and assess these documents:
 
-**docs_specflow/ROADMAP.md**
+**{{DOCS_PATH}}/ROADMAP.md**
 - Are tasks in "Now" actually current?
 - Is "Next" prioritized correctly?
 - Any stale items in "Later"?
 - Are blockers still relevant?
 
-**docs_specflow/SESSION_LOG.md** (last 5-10 entries)
+**{{DOCS_PATH}}/SESSION_LOG.md** (last 5-10 entries)
 - Any patterns in recent work?
 - Recurring blockers?
 - Scope creep?
 
-**docs_specflow/VISION.md**
+**{{DOCS_PATH}}/VISION.md**
 - Is the stated direction still valid?
 - Have priorities shifted?
 
-**docs_specflow/OVERVIEW.md**
+**{{DOCS_PATH}}/OVERVIEW.md**
 - Does this match the actual system?
 - Any drift from reality?
 
-**docs_specflow/ADR.md**
+**{{DOCS_PATH}}/ADR.md**
 - Any decisions being ignored?
 - Any decisions that should be revisited?
 
@@ -104,7 +104,7 @@ Update if:
 
 ## 7. Document the Pivot
 
-Add to docs_specflow/SESSION_LOG.md:
+Add to {{DOCS_PATH}}/SESSION_LOG.md:
 ```markdown
 ## Session: [DATE] (Pivot)
 

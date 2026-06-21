@@ -1,11 +1,11 @@
-import { resolve, dirname } from 'node:path';
+import { join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs';
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
 import { detectTechStack } from './detect.js';
 import { getTemplatesRoot, buildFileManifest, generateFiles, generateSettings } from './generate.js';
-import { deriveGitVariables } from './config.js';
+import { deriveGitVariables, normalizeDocsPath } from './config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const cliRoot = resolve(__dirname, '..');
@@ -23,7 +23,7 @@ export async function update() {
   console.log('');
 
   // ── Verify SpecFlow is initialized ────────────────────────────────
-  const configPath = resolve(projectDir, 'docs_specflow/.specflow-config.md');
+  const configPath = findConfigPath(projectDir);
   if (!existsSync(configPath)) {
     console.log(chalk.red('Error: This project has not been initialized with SpecFlow.'));
     console.log(chalk.red('Run `specflow-ai init` first.'));
@@ -32,6 +32,7 @@ export async function update() {
 
   // ── Parse existing config to get settings ─────────────────────────
   const config = parseConfigFile(configPath);
+  config.DOCS_PATH = normalizeDocsPath(config.DOCS_PATH || dirname(relative(projectDir, configPath)));
 
   // Detect tech stack for boolean flags
   const detection = detectTechStack(projectDir);
@@ -107,8 +108,9 @@ export async function update() {
   }
 
   // ── Create new docs that don't exist yet (never overwrite) ────────
+  const docsPath = config.DOCS_PATH || 'docs_specflow';
   const newDocsManifest = fullManifest.filter(entry =>
-    entry.output.startsWith('docs_specflow/') &&
+    entry.output.startsWith(`${docsPath}/`) &&
     !existsSync(resolve(projectDir, entry.output))
   );
 
@@ -129,6 +131,55 @@ export async function update() {
   console.log(chalk.bold.green('Update complete!'));
   console.log(`  Updated ${created.length} files`);
   console.log('');
+}
+
+/**
+ * Find SpecFlow config in the current project.
+ * Supports both the default docs_specflow/ path and custom docs paths
+ * recorded by older or manually migrated installs.
+ *
+ * @param {string} projectDir - Project root
+ * @returns {string} Absolute config path, or default path if not found
+ */
+function findConfigPath(projectDir) {
+  const defaultPath = resolve(projectDir, 'docs_specflow/.specflow-config.md');
+  if (existsSync(defaultPath)) return defaultPath;
+
+  for (const dir of findCandidateDocsDirs(projectDir)) {
+    const configPath = join(dir, '.specflow-config.md');
+    if (existsSync(configPath)) return configPath;
+  }
+
+  return defaultPath;
+}
+
+/**
+ * Return shallow candidate docs directories without walking heavy project trees.
+ *
+ * @param {string} projectDir - Project root
+ * @returns {string[]} Absolute directory paths
+ */
+function findCandidateDocsDirs(projectDir) {
+  const candidates = [];
+
+  for (const name of ['docs', 'docs_specflow', '.specflow']) {
+    const path = resolve(projectDir, name);
+    if (existsSync(path) && statSync(path).isDirectory()) {
+      candidates.push(path);
+    }
+  }
+
+  for (const entry of readdirSync(projectDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+
+    const path = resolve(projectDir, entry.name);
+    if (!candidates.includes(path)) {
+      candidates.push(path);
+    }
+  }
+
+  return candidates;
 }
 
 /**

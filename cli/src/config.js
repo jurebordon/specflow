@@ -46,3 +46,17 @@ export function deriveGitVariables(config) {
     }
   }
 }
+
+/**
+ * Normalize docs path from CLI answers or parsed config.
+ *
+ * @param {unknown} docsPath - Raw docs path
+ * @returns {string} Normalized relative docs path
+ */
+export function normalizeDocsPath(docsPath) {
+  if (typeof docsPath !== 'string' || docsPath.trim() === '') {
+    return 'docs_specflow';
+  }
+
+  return docsPath.trim().replace(/\\/g, '/').replace(/\/+$/, '') || 'docs_specflow';
+}

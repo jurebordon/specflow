@@ -73,7 +73,7 @@ Read key files:
 - CONTRIBUTING.md
 - Any architecture/design docs
 - Any existing ADRs
-- `docs_specflow/CUSTOM.md` - Project-specific context (if exists)
+- `{{DOCS_PATH}}/CUSTOM.md` - Project-specific context (if exists)
 
 ---
 
@@ -107,7 +107,7 @@ cat Gemfile | head -20
 
 ## Step 6: Generate OVERVIEW.md
 
-Create `docs_specflow/OVERVIEW.md` with findings:
+Create `{{DOCS_PATH}}/OVERVIEW.md` with findings:
 
 ```markdown
 # Project Overview
@@ -144,7 +144,7 @@ Create `docs_specflow/OVERVIEW.md` with findings:
 
 ## Step 7: Generate WORKFLOW.md
 
-Create `docs_specflow/WORKFLOW.md` based on discovered patterns:
+Create `{{DOCS_PATH}}/WORKFLOW.md` based on discovered patterns:
 
 ```markdown
 # Development Workflow
@@ -185,8 +185,8 @@ Exploration complete! Here's what I found:
 **Existing Docs**: [list]
 
 **Generated**:
-- docs_specflow/OVERVIEW.md - System architecture and patterns
-- docs_specflow/WORKFLOW.md - Development commands and workflow
+- {{DOCS_PATH}}/OVERVIEW.md - System architecture and patterns
+- {{DOCS_PATH}}/WORKFLOW.md - Development commands and workflow
 
 **Next Steps**:
 1. Review the generated OVERVIEW.md and WORKFLOW.md
