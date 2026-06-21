@@ -63,10 +63,10 @@ Example:
 Prepend entry to `{{DOCS_PATH}}/SESSION_LOG.md`:
 
 ```markdown
-## [{{FEATURE_NAME}}] {{CURRENT_DATE}}
+## [\{{FEATURE_NAME}}] {{CURRENT_DATE}}
 
 **Task**: [Task description from ROADMAP]
-**Branch**: {{CURRENT_BRANCH}}
+**Branch**: \{{CURRENT_BRANCH}}
 
 ### Summary
 - [What was accomplished]
@@ -128,9 +128,9 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```bash
 git checkout {{DEFAULT_BRANCH}}
 git pull origin {{DEFAULT_BRANCH}}
-git merge {{CURRENT_BRANCH}}
+git merge \{{CURRENT_BRANCH}}
 git push origin {{DEFAULT_BRANCH}}
-git branch -d {{CURRENT_BRANCH}}
+git branch -d \{{CURRENT_BRANCH}}
 ```
 {{/if}}
 
@@ -139,7 +139,7 @@ git branch -d {{CURRENT_BRANCH}}
 
 Push branch:
 ```bash
-git push -u origin {{CURRENT_BRANCH}}
+git push -u origin \{{CURRENT_BRANCH}}
 ```
 
 Create pull request:
@@ -165,7 +165,7 @@ Wait for review before merging.
 
 Push branch:
 ```bash
-git push -u origin {{CURRENT_BRANCH}}
+git push -u origin \{{CURRENT_BRANCH}}
 ```
 
 Create merge request:

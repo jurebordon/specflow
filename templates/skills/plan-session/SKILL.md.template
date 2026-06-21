@@ -57,7 +57,7 @@ Extract feature from branch name:
 - `{{DOCS_PATH}}/CUSTOM.md` - Project-specific context (if exists)
 
 **If feature detected**:
-- `{{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md` - Requirements
+- `{{DOCS_PATH}}/feature_docs/\{{FEATURE_NAME}}/SPEC.md` - Requirements
 
 **Optional** (only if unclear):
 - `{{DOCS_PATH}}/OVERVIEW.md` - Architecture
@@ -67,13 +67,13 @@ Extract feature from branch name:
 
 ## Step 3: Filter & Pick Task
 
-Find tasks in ROADMAP.md tagged `[feature: {{FEATURE_NAME}}]`:
+Find tasks in ROADMAP.md tagged `[feature: \{{FEATURE_NAME}}]`:
 - Pick first unchecked task from "Now" section
 - If "Now" is empty, pick first from "Next" section
 
 Show user:
 ```markdown
-**Detected Feature**: {{FEATURE_NAME}}
+**Detected Feature**: \{{FEATURE_NAME}}
 **Next Task**: [task description from ROADMAP]
 ```
 
@@ -87,10 +87,10 @@ Follow `{{DOCS_PATH}}/ORCHESTRATION.md` when deciding whether to delegate: only 
 Use this structure for the plan:
 
 ```markdown
-## Session Plan: {{TASK_TITLE}}
+## Session Plan: \{{TASK_TITLE}}
 
-**Feature**: {{FEATURE_NAME}}
-**Branch**: {{CURRENT_BRANCH}}
+**Feature**: \{{FEATURE_NAME}}
+**Branch**: \{{CURRENT_BRANCH}}
 
 ### Steps
 1. [Specific action 1]

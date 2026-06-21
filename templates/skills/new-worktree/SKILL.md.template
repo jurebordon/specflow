@@ -54,25 +54,25 @@ git pull origin {{DEFAULT_BRANCH}}
 
 ```bash
 # Create worktree with new branch
-git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+git worktree add ../{{PROJECT_NAME}}-\{{FEATURE_NAME}} -b {{BRANCH_CONVENTION}}/\{{FEATURE_NAME}}
 
 # Or from existing branch
-git worktree add ../{{PROJECT_NAME}}-{{FEATURE_NAME}} {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+git worktree add ../{{PROJECT_NAME}}-\{{FEATURE_NAME}} {{BRANCH_CONVENTION}}/\{{FEATURE_NAME}}
 ```
 
-Worktree location: `../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
+Worktree location: `../{{PROJECT_NAME}}-\{{FEATURE_NAME}}`
 
 ---
 
 ## Step 4: Set Up Feature (if needed)
 
 ```bash
-cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+cd ../{{PROJECT_NAME}}-\{{FEATURE_NAME}}
 ```
 
-If feature doesn't exist yet, run `/new-feature {{FEATURE_NAME}}` to create:
-- `{{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md`
-- Tasks in `{{DOCS_PATH}}/ROADMAP.md` with `[feature: {{FEATURE_NAME}}]` tags
+If feature doesn't exist yet, run `/new-feature \{{FEATURE_NAME}}` to create:
+- `{{DOCS_PATH}}/feature_docs/\{{FEATURE_NAME}}/SPEC.md`
+- Tasks in `{{DOCS_PATH}}/ROADMAP.md` with `[feature: \{{FEATURE_NAME}}]` tags
 
 ---
 
@@ -81,13 +81,13 @@ If feature doesn't exist yet, run `/new-feature {{FEATURE_NAME}}` to create:
 Provide summary:
 
 ```
-Worktree created: {{FEATURE_NAME}}
+Worktree created: \{{FEATURE_NAME}}
 
-**Location**: ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
-**Branch**: {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+**Location**: ../{{PROJECT_NAME}}-\{{FEATURE_NAME}}
+**Branch**: {{BRANCH_CONVENTION}}/\{{FEATURE_NAME}}
 
 **To work on this feature**:
-  cd ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+  cd ../{{PROJECT_NAME}}-\{{FEATURE_NAME}}
   /plan-session  # AI will detect feature from branch name
 
 **To switch back to main**:
@@ -97,7 +97,7 @@ Worktree created: {{FEATURE_NAME}}
   git worktree list
 
 **When done**:
-  git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}
+  git worktree remove ../{{PROJECT_NAME}}-\{{FEATURE_NAME}}
 ```
 
 ---
@@ -121,4 +121,4 @@ No special configuration needed - it just works.
 - Feature docs (`{{DOCS_PATH}}/`) are shared across all worktrees
 - Tasks use `[feature: name]` tags in central ROADMAP.md
 - Sessions use `[feature-name] YYYY-MM-DD` format in central SESSION_LOG.md
-- Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-{{FEATURE_NAME}}`
+- Clean up after merge: `git worktree remove ../{{PROJECT_NAME}}-\{{FEATURE_NAME}}`

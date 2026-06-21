@@ -44,10 +44,10 @@ If user provides a spec document, PRD, or ticket, use that information.
 
 ## Step 2: Create Feature SPEC
 
-Create `{{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md`:
+Create `{{DOCS_PATH}}/feature_docs/\{{FEATURE_NAME}}/SPEC.md`:
 
 ```markdown
-# Feature: {{FEATURE_NAME}}
+# Feature: \{{FEATURE_NAME}}
 
 > Frozen north star for this feature.
 
@@ -127,14 +127,14 @@ Break feature into tasks and add to appropriate section (Now/Next/Later):
 
 ```markdown
 ## Now
-- [ ] [First task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
+- [ ] [First task for \{{FEATURE_NAME}}] [feature: \{{FEATURE_NAME}}]
 
 ## Next
-1. [Second task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
-2. [Third task for {{FEATURE_NAME}}] [feature: {{FEATURE_NAME}}]
+1. [Second task for \{{FEATURE_NAME}}] [feature: \{{FEATURE_NAME}}]
+2. [Third task for \{{FEATURE_NAME}}] [feature: \{{FEATURE_NAME}}]
 ```
 
-**Important**: Every task MUST have `[feature: {{FEATURE_NAME}}]` tag.
+**Important**: Every task MUST have `[feature: \{{FEATURE_NAME}}]` tag.
 
 ---
 
@@ -143,13 +143,13 @@ Break feature into tasks and add to appropriate section (Now/Next/Later):
 {{#if GIT_WORKFLOW_SOLO}}
 Optional: Create feature branch
 ```bash
-git checkout -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+git checkout -b {{BRANCH_CONVENTION}}/\{{FEATURE_NAME}}
 ```
 {{else}}
 Create feature branch:
 ```bash
 git checkout {{DEFAULT_BRANCH}} && git pull
-git checkout -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
+git checkout -b {{BRANCH_CONVENTION}}/\{{FEATURE_NAME}}
 ```
 {{/if}}
 
@@ -160,13 +160,13 @@ git checkout -b {{BRANCH_CONVENTION}}/{{FEATURE_NAME}}
 Provide summary to user:
 
 ```
-Feature created: {{FEATURE_NAME}}
+Feature created: \{{FEATURE_NAME}}
 
 **Created**:
-- {{DOCS_PATH}}/feature_docs/{{FEATURE_NAME}}/SPEC.md
+- {{DOCS_PATH}}/feature_docs/\{{FEATURE_NAME}}/SPEC.md
 
 **Updated**:
-- {{DOCS_PATH}}/ROADMAP.md (added tasks with [feature: {{FEATURE_NAME}}] tags)
+- {{DOCS_PATH}}/ROADMAP.md (added tasks with [feature: \{{FEATURE_NAME}}] tags)
 
 {{#if TICKET_ID}}
 **Linked to**: {{TICKET_ID}}
@@ -175,12 +175,12 @@ Feature created: {{FEATURE_NAME}}
 **Next Steps**:
 1. Review SPEC.md and confirm requirements
 2. Run `/plan-session` to start working on first task
-   - AI will automatically filter ROADMAP for [feature: {{FEATURE_NAME}}] tasks
+   - AI will automatically filter ROADMAP for [feature: \{{FEATURE_NAME}}] tasks
 3. Or manually update ROADMAP.md with more detailed tasks
 
 **Working on this feature**:
-- All your sessions will be tagged with [feature: {{FEATURE_NAME}}] in SESSION_LOG.md
-- All tasks should have [feature: {{FEATURE_NAME}}] tag in ROADMAP.md
+- All your sessions will be tagged with [feature: \{{FEATURE_NAME}}] in SESSION_LOG.md
+- All tasks should have [feature: \{{FEATURE_NAME}}] tag in ROADMAP.md
 - Update SPEC.md as decisions are made during implementation
 ```
 
