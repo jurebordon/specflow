@@ -78,8 +78,8 @@
       "added_keys": [
         { "key": "SpecFlow > Config Schema", "mode": "auto", "value": 1 },
         { "key": "SpecFlow > SpecFlow Version", "mode": "auto", "source": "installed package version" },
-        { "key": "Documentation > Tasks File", "mode": "auto", "source": "derive as <Docs Path>/ROADMAP.md if it exists, else ask" },
-        { "key": "Documentation > Session Log", "mode": "auto", "source": "derive as <Docs Path>/SESSION_LOG.md if it exists, else ask" },
+        { "key": "Documentation > Tasks File", "mode": "auto", "source": "derive as <Docs Path>/ROADMAP.md when that file exists", "fallback_decision": "doc_file_names" },
+        { "key": "Documentation > Session Log", "mode": "auto", "source": "derive as <Docs Path>/SESSION_LOG.md when that file exists", "fallback_decision": "doc_file_names" },
         { "key": "Git Workflow > Commit Convention", "mode": "decision", "decision": "commit_convention" },
         { "key": "Commands > Test", "mode": "decision", "decision": "command_lists" },
         { "key": "Commands > Lint", "mode": "decision", "decision": "command_lists" },
@@ -90,6 +90,22 @@
         { "key": "Review Gate > Mode", "mode": "decision", "decision": "review_gate" },
         { "key": "Review Gate > Probed", "mode": "decision", "decision": "review_gate" },
         { "key": "Review Gate > Notes", "mode": "decision", "decision": "review_gate" }
+      ],
+
+      "merged_keys": [
+        {
+          "from_section": "Tech Commands (Mixed Stack)",
+          "note": "Schema 0's mixed-stack shape, documented in prompts/INIT.md. Plural keys whose values are indented, labelled sub-bullets rather than a value on the same line:  - **Test Commands**:  /  followed by  '  - Python: pytest'  and  '  - DBT: dbt test'.",
+          "mapping": [
+            { "from": "Test Commands", "to": "Commands > Test" },
+            { "from": "Build Commands", "to": "Commands > Build" },
+            { "from": "Lint Commands", "to": "Commands > Lint" }
+          ],
+          "mode": "auto",
+          "transform": "labelled_sublist_to_list",
+          "transform_note": "Drop the 'Python:' / 'DBT:' label and keep the command. Merge with anything found in the singular Tech Stack > * Command keys, de-duplicating.",
+          "why_it_matters": "This is the one schema-0 shape that already recorded multiple commands per category. It is also the easiest to lose: a naive line parser reads '- **Test Commands**:' as a scalar with an empty value and silently drops every indented sub-bullet. Dropping it would delete exactly the multi-command information schema 1 exists to preserve."
+        }
       ],
 
       "split_keys": [
@@ -123,6 +139,13 @@
           "deferrable": true,
           "on_defer": "Write 'none' and note that gated skills will announce they are running ungated.",
           "rerunnable": true
+        },
+        {
+          "id": "doc_file_names",
+          "prompt": "The default ROADMAP.md / SESSION_LOG.md were not found under the docs path. Which files hold the task list and the session journal?",
+          "deferrable": false,
+          "note": "Not deferrable: Tasks File and Session Log are required in schema 1, and every session skill reads them. Deferring would write a config pointing at files that do not exist, which fails silently at the point of use rather than here.",
+          "applies_when": "the derived default does not exist on disk"
         },
         {
           "id": "commit_convention",

@@ -19,6 +19,20 @@ const SKIP_EXTENSIONS = new Set([
 ]);
 
 /**
+ * Quote a path for the shell.
+ *
+ * execSync runs through a shell, and the formatter command is a shell string
+ * ("cd frontend && npx prettier --write"), so the file path must be quoted
+ * before it is appended. Double quotes are not enough: the shell still expands
+ * `$(...)`, backticks and `$VAR` inside them, and file paths are attacker-
+ * influenced in a way the command string is not. Single quotes suppress all
+ * expansion; an embedded quote is closed, escaped and reopened.
+ */
+function shellQuote(value) {
+  return "'" + String(value).replace(/'/g, "'\\''") + "'";
+}
+
+/**
  * Split a command into its working directory and the command to run there.
  * `cd backend && black .` -> { dir: 'backend', command: 'black .' }
  * `prettier --write`      -> { dir: '',        command: 'prettier --write' }
@@ -79,7 +93,7 @@ async function main() {
   const relative = path.relative(formatter.scopeAbs, resolved);
 
   try {
-    execSync(formatter.command + ' ' + JSON.stringify(relative), {
+    execSync(formatter.command + ' ' + shellQuote(relative), {
       cwd: formatter.scopeAbs,
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 10000

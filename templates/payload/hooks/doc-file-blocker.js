@@ -29,8 +29,9 @@ async function main() {
   const inDocs = resolved === docsAbs || resolved.startsWith(docsAbs + path.sep);
   if (!inDocs) process.exit(0);
 
-  // VISION.md — frozen once populated.
-  if (resolved.endsWith(path.sep + 'VISION.md')) {
+  // VISION.md — frozen once populated. Match the docs-root file exactly; a
+  // nested <docs>/archive/VISION.md is a different document and not frozen.
+  if (resolved === path.join(docsAbs, 'VISION.md')) {
     if (!fs.existsSync(resolved)) process.exit(0); // Creation is allowed.
 
     const content = fs.readFileSync(resolved, 'utf-8');

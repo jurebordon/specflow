@@ -16,28 +16,53 @@ const path = require('path');
 const ANCHOR = path.join('.specflow', 'config.md');
 
 /**
- * Walk up from startDir looking for the config anchor. Falls back to a
- * directory containing .git so callers can still resolve the repo root when
- * the project is not initialised.
+ * Walk up from startDir looking for the config anchor, stopping at the first
+ * repository boundary.
+ *
+ * The walk must not cross a `.git`: a nested repository or submodule that has
+ * no config of its own is uninitialised, and inheriting the parent repo's
+ * config would point its hooks at another project's docs. Stopping there
+ * yields `configPath: null`, which every caller treats as "not a SpecFlow
+ * project" and no-ops on.
  *
  * @returns {Object|null} `{ root, configPath }`, or null when neither is found.
  */
 function findRoot(startDir) {
   try {
     let dir = path.resolve(startDir || process.cwd());
-    let gitRoot = null;
 
     for (;;) {
       const candidate = path.join(dir, ANCHOR);
       if (fs.existsSync(candidate)) return { root: dir, configPath: candidate };
-      if (!gitRoot && fs.existsSync(path.join(dir, '.git'))) gitRoot = dir;
+
+      // Repository boundary — do not inherit a parent repo's config.
+      if (fs.existsSync(path.join(dir, '.git'))) return { root: dir, configPath: null };
 
       const parent = path.dirname(dir);
-      if (parent === dir) break;
+      if (parent === dir) return null;
       dir = parent;
     }
+  } catch (_) {
+    return null;
+  }
+}
 
-    return gitRoot ? { root: gitRoot, configPath: null } : null;
+/**
+ * Resolve a config-supplied path against the repo root, refusing anything that
+ * escapes it.
+ *
+ * Config values are meant to be trusted, but a stray `../` — from a hand edit
+ * or a bad migration — would otherwise let a hook read, write or block files
+ * in an unrelated directory. Returns null rather than throwing.
+ */
+function safeResolve(root, value) {
+  if (!value || typeof value !== 'string') return null;
+  if (/^</.test(value.trim())) return null; // unfilled <angle bracket> placeholder
+
+  try {
+    const resolved = path.resolve(root, value.trim().replace(/\/+$/, ''));
+    if (resolved !== root && !resolved.startsWith(root + path.sep)) return null;
+    return resolved;
   } catch (_) {
     return null;
   }
@@ -115,17 +140,14 @@ function load(startDir) {
  */
 function docsPath(cfg) {
   if (!cfg) return null;
-  const raw = cfg.scalars['Docs Path'] || cfg.scalars['Path'];
-  if (!raw || /^</.test(raw)) return null;
-  return path.join(cfg.root, raw.replace(/\/+$/, ''));
+  return safeResolve(cfg.root, cfg.scalars['Docs Path'] || cfg.scalars['Path']);
 }
 
 /** Docs directory relative to the repo root, for use in messages. */
 function docsPathRelative(cfg) {
-  if (!cfg) return null;
-  const raw = cfg.scalars['Docs Path'] || cfg.scalars['Path'];
-  if (!raw || /^</.test(raw)) return null;
-  return raw.replace(/\/+$/, '');
+  const abs = docsPath(cfg);
+  if (!abs) return null;
+  return path.relative(cfg.root, abs) || '.';
 }
 
 /**
@@ -140,8 +162,8 @@ function commandList(cfg, kind) {
 /** Absolute path to a config-declared file key, or a fallback under docs. */
 function docFile(cfg, key, fallbackName) {
   if (!cfg) return null;
-  const raw = cfg.scalars[key];
-  if (raw && !/^</.test(raw)) return path.join(cfg.root, raw);
+  const declared = safeResolve(cfg.root, cfg.scalars[key]);
+  if (declared) return declared;
   const docs = docsPath(cfg);
   return docs && fallbackName ? path.join(docs, fallbackName) : null;
 }
@@ -149,6 +171,7 @@ function docFile(cfg, key, fallbackName) {
 module.exports = {
   ANCHOR,
   findRoot,
+  safeResolve,
   load,
   docsPath,
   docsPathRelative,

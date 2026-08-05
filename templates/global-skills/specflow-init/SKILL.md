@@ -23,6 +23,30 @@ skill, that logic belongs here.
 
 ---
 
+## Files this skill ships with
+
+The installer places these **inside this skill's own directory**, so they are
+present wherever the skill is. Resolve them relative to this `SKILL.md`, not to
+the project and not to a SpecFlow source checkout:
+
+```
+<this skill's directory>/
+├── SKILL.md                    ← you are here
+├── CONFIG_SCHEMA.md            ← the schema this skill writes
+├── migrations/manifest.json    ← what changed between schema versions
+└── payload/
+    ├── hooks/                  ← including specflow-config.js
+    ├── rules/
+    └── settings/
+```
+
+**If any of them is missing, stop and report it.** A truncated install cannot
+migrate correctly: without the manifest there is no way to prove a config is
+current, and guessing produces a stale config that later skills misread with no
+error surfaced.
+
+---
+
 ## Step 0: Determine the situation
 
 ```bash
@@ -55,8 +79,8 @@ writing.
 
 ### Migration mode
 
-Read `configuration/migrations/manifest.json` (shipped alongside this skill) and
-follow the `0 → 1` entry. It states exactly which keys are carried, renamed,
+Read `migrations/manifest.json` from this skill's directory and follow the
+`0 → 1` entry. It states exactly which keys are carried, renamed,
 split and added, and which changes are `auto` versus `decision`.
 
 Consult the manifest rather than judging for yourself. Deciding "nothing needs
@@ -163,7 +187,7 @@ Record `Mode`, `Probed` (today's date) and any `Notes`.
 
 ## Step 4: Write the config
 
-Write `.specflow/config.md` from the schema in `configuration/CONFIG_SCHEMA.md`.
+Write `.specflow/config.md` from the schema in this skill's `CONFIG_SCHEMA.md`.
 Fill every required key. Paths carry no trailing slash.
 
 **In amend mode, write only if something actually changed.** The config is
@@ -178,7 +202,8 @@ Never lower `Config Schema`.
 
 ## Step 5: Install the payload
 
-Copy from this skill's `payload/` directory into the project. These files ship
+Copy from this skill's `payload/` directory (see *Files this skill ships with*)
+into the project. These files ship
 verbatim and read `.specflow/config.md` at runtime, so there is nothing to
 render and nothing that can go stale:
 
