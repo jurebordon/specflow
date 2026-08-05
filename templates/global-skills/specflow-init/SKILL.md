@@ -79,9 +79,32 @@ writing.
 
 ### Migration mode
 
-Read `migrations/manifest.json` from this skill's directory and follow the
-`0 → 1` entry. It states exactly which keys are carried, renamed,
-split and added, and which changes are `auto` versus `decision`.
+Run the migration script rather than transforming the config by hand:
+
+```bash
+node <this skill's directory>/payload/migrate-config.js \
+  <legacy config path> --repo <repo root>            # proposed schema-1 config
+node <this skill's directory>/payload/migrate-config.js \
+  <legacy config path> --repo <repo root> --json     # decisions still outstanding
+```
+
+It implements every change the manifest marks `auto` — key renames, the
+scalar-to-list command transform, the mixed-stack plural shape, the ticketing
+split, trailing-slash normalisation — and reports what it could not resolve. It
+writes nothing; you review its output and write the file.
+
+Do the mechanical half in code. A key silently dropped during migration fails
+much later, at the point some skill uses it, with no error pointing back here.
+
+The script also **refuses to carry prose forward as a command**. Schema 0's
+single-value fields invited sentences, and one real project recorded its build
+command as "n/a (backend has no build step; frontend build command TBD…)".
+Anything like that is dropped and raised as a decision rather than written into
+a config that every skill will try to execute.
+
+Then read `migrations/manifest.json` from this skill's directory for the `0 → 1`
+entry. It states exactly which keys are carried, renamed, split and added, and
+which changes are `auto` versus `decision`.
 
 Consult the manifest rather than judging for yourself. Deciding "nothing needs
 updating" without it is a guess, and a wrong "all good" leaves a stale config
