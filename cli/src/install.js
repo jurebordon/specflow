@@ -11,7 +11,10 @@
  * settings) from this skill's own directory.
  */
 
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import {
+  accessSync, constants, cpSync, existsSync, mkdirSync, readdirSync,
+  readFileSync, renameSync, statSync, writeFileSync, rmSync
+} from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -87,6 +90,31 @@ function isOurs(skillDir, receiptNames) {
   return receiptNames.includes(basename(skillDir));
 }
 
+/**
+ * Can every file under this path actually be read?
+ *
+ * This has to be checked up front rather than handled on failure. cpSync on an
+ * unreadable directory does not throw a catchable JS error — it surfaces a C++
+ * std::filesystem_error that aborts the process (SIGABRT), so no try/catch and
+ * no cleanup handler ever runs. Refusing during validation converts an
+ * unrecoverable crash into an ordinary, reversible error.
+ */
+function isReadable(target) {
+  try {
+    const stats = statSync(target);
+    if (!stats.isDirectory()) {
+      accessSync(target, constants.R_OK);
+      return true;
+    }
+    for (const entry of readdirSync(target, { withFileTypes: true })) {
+      if (!isReadable(join(target, entry.name))) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function readReceipt(skillsRoot) {
   try {
     return JSON.parse(readFileSync(join(skillsRoot, RECEIPT), 'utf-8'));
@@ -156,37 +184,75 @@ export async function install(options = {}) {
     plan.push({ name, dest: join(skillsRoot, name), items });
   }
 
-  const missing = plan.flatMap((s) => s.items.filter((i) => !existsSync(i.from)).map((i) => i.from));
-  if (missing.length > 0) {
-    console.error(chalk.red('Incomplete SpecFlow sources — nothing was written:'));
-    for (const m of missing) console.error(`  ${m}`);
+  const unusable = plan.flatMap((s) =>
+    s.items.filter((i) => !existsSync(i.from) || !isReadable(i.from)).map((i) => i.from)
+  );
+  if (unusable.length > 0) {
+    console.error(chalk.red('Missing or unreadable SpecFlow sources — nothing was written:'));
+    for (const m of unusable) console.error(`  ${m}`);
     process.exitCode = 1;
     return;
   }
 
-  if (!dryRun) mkdirSync(skillsRoot, { recursive: true });
-
-  const written = [];
-  for (const { name, dest, items } of plan) {
+  for (const { name, items } of plan) {
     console.log(chalk[dryRun ? 'blue' : 'green'](`  ${dryRun ? 'would install' : 'install'}  ${name}/`));
     for (const item of items.slice(1)) {
       console.log(chalk[dryRun ? 'blue' : 'green'](`    ${dryRun ? 'would add' : 'add'}  ${item.label}`));
     }
+  }
 
-    if (!dryRun) {
-      // Replace SpecFlow's own files wholesale; a stale skill file is worse
-      // than a missing one.
-      if (existsSync(dest)) rmSync(dest, { recursive: true });
-      mkdirSync(dest, { recursive: true });
+  const written = plan.map((s) => s.name);
+
+  if (dryRun) {
+    console.log();
+    console.log(chalk.blue('Dry run — nothing written.'));
+    return;
+  }
+
+  mkdirSync(skillsRoot, { recursive: true });
+
+  // Stage every skill in full, then swap them into place.
+  //
+  // Copying directly over the destination means a copy that fails partway --
+  // disk full, a permissions change, an interrupt -- destroys a working
+  // install and leaves a skill that is still discoverable but missing the
+  // payload or manifest it needs. Staging first keeps the existing install
+  // untouched until every byte is on disk; the swap is then a sequence of
+  // renames, which are cheap and atomic per directory.
+  //
+  // Staging lives inside skillsRoot so the rename never crosses a filesystem.
+  const staging = join(skillsRoot, '.specflow-staging');
+
+  try {
+    if (existsSync(staging)) rmSync(staging, { recursive: true });
+    mkdirSync(staging, { recursive: true });
+
+    for (const { name, items } of plan) {
+      const stageDir = join(staging, name);
+      mkdirSync(stageDir, { recursive: true });
       for (const item of items) {
-        cpSync(item.from, join(dest, item.to), { recursive: true });
+        cpSync(item.from, join(stageDir, item.to), { recursive: true });
       }
     }
 
-    written.push(name);
+    for (const { name, dest } of plan) {
+      if (existsSync(dest)) rmSync(dest, { recursive: true });
+      renameSync(join(staging, name), dest);
+    }
+  } catch (err) {
+    console.error(chalk.red(`\nInstall failed: ${err.message}`));
+    console.error('Your previous install was left in place.');
+    process.exitCode = 1;
+    return;
+  } finally {
+    try {
+      if (existsSync(staging)) rmSync(staging, { recursive: true });
+    } catch {
+      // Leftover staging is harmless; it is replaced on the next run.
+    }
   }
 
-  if (!dryRun) {
+  {
     // The receipt records what this machine has, so a later install knows
     // which directories are its own to replace.
     writeFileSync(
@@ -201,11 +267,6 @@ export async function install(options = {}) {
   }
 
   console.log();
-  if (dryRun) {
-    console.log(chalk.blue('Dry run — nothing written.'));
-    return;
-  }
-
   console.log(chalk.bold('Installed.'));
   console.log(`\nSkills are available in every project on this machine.`);
   console.log(`Next: run ${chalk.cyan('specflow-init')} inside a project to set it up.`);
