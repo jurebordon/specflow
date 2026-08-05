@@ -1,0 +1,84 @@
+# SpecFlow Project Configuration
+
+<!--
+  Written by specflow-init. Fixed anchor — do not move this file.
+  Schema reference: configuration/CONFIG_SCHEMA.md
+
+  Fill-ins are marked <like this>. Angle brackets, not Handlebars: nothing
+  here is substituted at build time. specflow-init writes real values.
+  Delete any optional section that does not apply rather than leaving it blank.
+-->
+
+## SpecFlow
+- **Config Schema**: 1
+- **SpecFlow Version**: <x.y.z>
+
+## Project
+- **Name**: <project name>
+- **Mode**: <greenfield | adoption | constrained>
+- **Description**: <one line>
+
+## Tech Stack
+- **Languages**: <comma-separated>
+- **Frameworks**: <comma-separated, optional>
+
+## Documentation
+- **Docs Path**: <docs>
+- **Tasks File**: <docs/ROADMAP.md>
+- **Session Log**: <docs/SESSION_LOG.md>
+- **Tracking**: <gitignored | tracked>
+
+## Commands
+
+<!-- Lists, always. Each entry runs from the repository root. -->
+
+### Test
+- `<cd backend && pytest tests/ -q>`
+
+### Lint
+- `<cd frontend && npm run lint>`
+
+### Build
+- `<cd frontend && npm run build>`
+
+### Typecheck
+- `<cd frontend && tsc -b>`
+
+### Format
+- `<cd backend && black .>`
+
+## Known Test Failures
+
+<!--
+  Baseline separating "already broken" from "I broke it".
+  Message is REQUIRED. A skill may only attribute an observed failure to this
+  baseline after comparing the observed message against the recorded one.
+  Matching on test path alone is forbidden — that is how a real regression
+  once reached a branch disguised as a known-flaky test.
+
+  Empty is valid and preferable to a guessed baseline. Delete this section's
+  entries and leave "- None recorded." if the suite is green.
+-->
+
+- None recorded.
+
+## Git Workflow
+- **Type**: <solo | team>
+- **Platform**: <GitHub | GitLab | none>
+- **Default Branch**: <detected from remote HEAD — do not assume main>
+- **Branch Convention**: <feat/description>
+- **Commit Convention**: <conventional>
+
+## Integrations
+- **Ticketing**: <none | jira | linear | github>
+- **Ticket Format**: <PROJ-123, omit if no ticketing>
+
+## Review Gate
+- **Mode**: <codex | subagent | none>
+- **Probed**: <YYYY-MM-DD>
+- **Notes**: <what was found, optional>
+
+## Technical Layers
+- **Hooks**: <enabled | disabled>
+- **Rules**: <enabled | disabled>
+- **Statusline**: <enabled | disabled>

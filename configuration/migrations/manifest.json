@@ -1,0 +1,167 @@
+{
+  "manifest_version": 1,
+  "current_schema": 1,
+  "anchor": ".specflow/config.md",
+  "_comment": "Machine-readable migration manifest. A skill consults this to decide whether a project config needs updating; it must not judge for itself. See ../CONFIG_SCHEMA.md.",
+
+  "schemas": {
+    "0": {
+      "label": "legacy",
+      "description": "Pre-anchor layout. Config lives inside the docs directory; skills are rendered per project into .claude/skills/ with build-time placeholder substitution.",
+      "detect": {
+        "any_of": [
+          "docs/.specflow-config.md",
+          "docs_specflow/.specflow-config.md"
+        ],
+        "note": "Schema 0 records no version key. A config with no 'Config Schema' entry IS schema 0 — absence is the signal, not an error."
+      }
+    },
+    "1": {
+      "label": "global-skills",
+      "description": "Skills install once per machine to ~/.claude/skills/ and ship verbatim. Project facts live at the fixed anchor .specflow/config.md.",
+      "detect": {
+        "file": ".specflow/config.md",
+        "key": "Config Schema"
+      }
+    }
+  },
+
+  "migrations": [
+    {
+      "from": 0,
+      "to": 1,
+      "title": "Move config to fixed anchor; list-valued commands; review gate; failure baseline",
+      "auto_applicable": false,
+      "reason_not_auto": "Command lists, the known-failure baseline and the review gate cannot be derived from a schema 0 config. Each needs confirmation. The file move and key renames below are auto; the rest are deferrable decisions.",
+
+      "moved_files": [
+        {
+          "from_any_of": ["docs/.specflow-config.md", "docs_specflow/.specflow-config.md"],
+          "to": ".specflow/config.md",
+          "mode": "auto",
+          "delete_source": true,
+          "note": "Source is git-tracked in consumer projects, so the move is reversible."
+        }
+      ],
+
+      "renamed_keys": [
+        { "from": "Documentation > Path", "to": "Documentation > Docs Path", "mode": "auto", "transform": "strip_trailing_slash" },
+        { "from": "Tech Stack > Test Command", "to": "Commands > Test", "mode": "auto", "transform": "scalar_to_list" },
+        { "from": "Tech Stack > Build Command", "to": "Commands > Build", "mode": "auto", "transform": "scalar_to_list" },
+        { "from": "Tech Stack > Lint Command", "to": "Commands > Lint", "mode": "auto", "transform": "scalar_to_list" },
+        { "from_any_of": ["Technical Layers > Format Command", "Tech Stack > Format Command"], "to": "Commands > Format", "mode": "auto", "transform": "scalar_to_list" },
+        { "from_any_of": ["Technical Layers > Typecheck Command", "Tech Stack > Typecheck Command"], "to": "Commands > Typecheck", "mode": "auto", "transform": "scalar_to_list" }
+      ],
+      "_renamed_keys_note": [
+        "Schema 0 has no single canonical shape. cli/src/generate.js emits Format/Typecheck Command under '## Technical Layers', but configs written by the /init-specflow prompt place them under '## Tech Stack'. Both occur in real projects, hence from_any_of.",
+        "Readers must match on the key name and tolerate either section heading."
+      ],
+
+      "carried_keys": [
+        "Project > Name",
+        "Project > Mode",
+        "Project > Description",
+        "Tech Stack > Languages",
+        "Tech Stack > Frameworks",
+        "Documentation > Existing Docs",
+        "Documentation > Tracking",
+        "Git Workflow > Type",
+        "Git Workflow > Platform",
+        "Git Workflow > Default Branch",
+        "Git Workflow > Branch Convention",
+        "Integrations > Ticketing",
+        "Technical Layers > Hooks",
+        "Technical Layers > Rules",
+        "Technical Layers > Statusline"
+      ],
+
+      "added_keys": [
+        { "key": "SpecFlow > Config Schema", "mode": "auto", "value": 1 },
+        { "key": "SpecFlow > SpecFlow Version", "mode": "auto", "source": "installed package version" },
+        { "key": "Documentation > Tasks File", "mode": "auto", "source": "derive as <Docs Path>/ROADMAP.md if it exists, else ask" },
+        { "key": "Documentation > Session Log", "mode": "auto", "source": "derive as <Docs Path>/SESSION_LOG.md if it exists, else ask" },
+        { "key": "Git Workflow > Commit Convention", "mode": "decision", "decision": "commit_convention" },
+        { "key": "Commands > Test", "mode": "decision", "decision": "command_lists" },
+        { "key": "Commands > Lint", "mode": "decision", "decision": "command_lists" },
+        { "key": "Commands > Build", "mode": "decision", "decision": "command_lists" },
+        { "key": "Commands > Typecheck", "mode": "decision", "decision": "command_lists" },
+        { "key": "Commands > Format", "mode": "decision", "decision": "command_lists" },
+        { "key": "Known Test Failures", "mode": "decision", "decision": "failure_baseline" },
+        { "key": "Review Gate > Mode", "mode": "decision", "decision": "review_gate" },
+        { "key": "Review Gate > Probed", "mode": "decision", "decision": "review_gate" },
+        { "key": "Review Gate > Notes", "mode": "decision", "decision": "review_gate" }
+      ],
+
+      "split_keys": [
+        {
+          "from": "Integrations > Ticketing",
+          "note": "Schema 0 encodes the format inline as 'jira (format: PROJ-123)'.",
+          "to": ["Integrations > Ticketing", "Integrations > Ticket Format"],
+          "mode": "auto"
+        }
+      ],
+
+      "removed_keys": [],
+
+      "decisions": [
+        {
+          "id": "command_lists",
+          "prompt": "Schema 0 recorded one command per category. List every command that must run to verify this project — a single value silently skips suites.",
+          "deferrable": true,
+          "on_defer": "Carry the schema 0 scalar forward as a one-item list and annotate the config 'UNCONFIRMED: single command carried from schema 0'.",
+          "detect_from": ["package.json", "pyproject.toml", "pytest.ini", "go.mod", "Cargo.toml", "Makefile"]
+        },
+        {
+          "id": "failure_baseline",
+          "prompt": "Record currently-failing tests as a baseline, with each failure's actual message.",
+          "deferrable": true,
+          "on_defer": "Write an empty baseline. Empty is valid and safer than a guessed one."
+        },
+        {
+          "id": "review_gate",
+          "prompt": "Probe for Codex and record the available review gate.",
+          "deferrable": true,
+          "on_defer": "Write 'none' and note that gated skills will announce they are running ungated.",
+          "rerunnable": true
+        },
+        {
+          "id": "commit_convention",
+          "prompt": "What commit message convention does this project use?",
+          "deferrable": true,
+          "on_defer": "Default to 'conventional' and mark UNCONFIRMED."
+        }
+      ],
+
+      "cleanup": [
+        {
+          "id": "remove_project_skills",
+          "target": ".claude/skills/",
+          "mode": "decision",
+          "deferrable": true,
+          "prompt": "Delete the per-project skill copies now superseded by the global install. List exactly what will be removed before removing it.",
+          "note": "These are git-tracked in consumer projects, so the deletion is reversible. Accepted consequence: a teammate cloning the repo gets no skills until they install SpecFlow themselves.",
+          "preserve": "Any skill directory not shipped by SpecFlow is project-authored — never delete it."
+        }
+      ],
+
+      "doc_changes": [
+        {
+          "id": "docs_populated_not_scaffolded",
+          "description": "From schema 1, docs are agent-generated and populated rather than rendered from templates. specflow-init creates missing docs only; it never rewrites populated ROADMAP, SESSION_LOG or ADR content.",
+          "mode": "auto",
+          "affects": ["ROADMAP.md", "SESSION_LOG.md", "OVERVIEW.md", "ADR.md", "VISION.md"]
+        }
+      ]
+    }
+  ],
+
+  "rules": {
+    "comparison": {
+      "skill_newer_than_project": "Defer to specflow-init to migrate, then record the new version.",
+      "equal": "Proceed silently. Write nothing.",
+      "skill_older_than_project": "The machine's SpecFlow is stale. Warn and proceed read-only. Never lower Config Schema — that relabels a newer config as older and destroys the mismatch signal permanently."
+    },
+    "write_policy": "Write the config only when a migration actually changed something. A no-op check writes nothing. The config is git-tracked, so an unconditional version bump produces a commit-worthy diff on every machine after every release.",
+    "session_policy": "A mismatch found mid-session must not become a setup interview. Auto-apply changes marked 'auto'; offer 'decision' changes as deferrable. The task in hand always completes."
+  }
+}
