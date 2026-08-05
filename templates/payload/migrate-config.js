@@ -109,6 +109,20 @@ function looksLikeCommand(value) {
   if (/\b(TBD|when scaffolded|no build step|not applicable)\b/i.test(v)) return false;
   // A sentence: ends in a period and has more words than a command usually does.
   if (/\.\s*$/.test(v) && v.split(/\s+/).length > 6) return false;
+
+  // Short prose is the hard case: "see README", "ask team", "use CI" all look
+  // like a two-token command. Nothing about their shape distinguishes them
+  // from `npm test`, so discriminate on the leading verb instead -- no build
+  // tool is invoked by any of these words.
+  const first = v.split(/\s+/)[0].toLowerCase();
+  const PROSE_LEADS = new Set([
+    'see', 'ask', 'use', 'check', 'refer', 'contact', 'consult', 'read',
+    'follow', 'depends', 'varies', 'manual', 'manually', 'unknown',
+    'unclear', 'either', 'whatever', 'per', 'via', 'in', 'the', 'a', 'we',
+    'you', 'it', 'this', 'that', 'currently', 'usually', 'normally'
+  ]);
+  if (PROSE_LEADS.has(first) && /\s/.test(v)) return false;
+
   return true;
 }
 

@@ -13,7 +13,7 @@
 
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 
@@ -43,9 +43,13 @@ function resolveSources() {
   const bundled = resolve(cliRoot, 'templates');
   const repoRoot = resolve(cliRoot, '..');
 
+  // Repo root first. cli/templates/ is a build artefact written by
+  // prepublishOnly and is not tracked, so in a source checkout it is usually
+  // stale -- preferring it would install yesterday's skills while the working
+  // tree shows today's.
   const candidates = [
-    { templates: resolve(bundled, 'templates'), configuration: resolve(bundled, 'configuration') },
-    { templates: resolve(repoRoot, 'templates'), configuration: resolve(repoRoot, 'configuration') }
+    { templates: resolve(repoRoot, 'templates'), configuration: resolve(repoRoot, 'configuration') },
+    { templates: resolve(bundled, 'templates'), configuration: resolve(bundled, 'configuration') }
   ];
 
   for (const c of candidates) {
@@ -77,7 +81,10 @@ function isOurs(skillDir, receiptNames) {
   const skillMd = join(skillDir, 'SKILL.md');
   if (!existsSync(skillMd)) return true; // nothing meaningful there
   if (skillAuthor(skillMd) === 'specflow') return true;
-  return receiptNames.includes(skillDir.split('/').pop());
+  // basename, not split('/') — path.join uses backslashes on Windows, which
+  // would compare a full path against a bare skill name and never match,
+  // wrongly flagging our own receipt-owned skill as foreign.
+  return receiptNames.includes(basename(skillDir));
 }
 
 function readReceipt(skillsRoot) {
@@ -127,46 +134,52 @@ export async function install(options = {}) {
     return;
   }
 
+  // Build the full plan and verify every source exists BEFORE deleting
+  // anything. specflow-init is only usable with its schema, manifest and
+  // payload alongside it, so a run that removes the old copy and then finds a
+  // missing source would leave a skill that is still discoverable but cannot
+  // do its job -- the worst of both states.
+  const plan = [];
+  for (const name of GLOBAL_SKILLS) {
+    const items = [
+      { from: join(sources.templates, 'global-skills', name, 'SKILL.md'), to: 'SKILL.md', label: 'SKILL.md' }
+    ];
+
+    if (name === 'specflow-init') {
+      items.push(
+        { from: join(sources.configuration, 'CONFIG_SCHEMA.md'), to: 'CONFIG_SCHEMA.md', label: 'CONFIG_SCHEMA.md' },
+        { from: join(sources.configuration, 'migrations'), to: 'migrations', label: 'migrations/' },
+        { from: join(sources.templates, 'payload'), to: 'payload', label: 'payload/' }
+      );
+    }
+
+    plan.push({ name, dest: join(skillsRoot, name), items });
+  }
+
+  const missing = plan.flatMap((s) => s.items.filter((i) => !existsSync(i.from)).map((i) => i.from));
+  if (missing.length > 0) {
+    console.error(chalk.red('Incomplete SpecFlow sources — nothing was written:'));
+    for (const m of missing) console.error(`  ${m}`);
+    process.exitCode = 1;
+    return;
+  }
+
   if (!dryRun) mkdirSync(skillsRoot, { recursive: true });
 
   const written = [];
-  for (const name of GLOBAL_SKILLS) {
-    const src = join(sources.templates, 'global-skills', name, 'SKILL.md');
-    if (!existsSync(src)) {
-      console.error(chalk.red(`  missing source: ${src}`));
-      process.exitCode = 1;
-      return;
-    }
-
-    const dest = join(skillsRoot, name);
+  for (const { name, dest, items } of plan) {
     console.log(chalk[dryRun ? 'blue' : 'green'](`  ${dryRun ? 'would install' : 'install'}  ${name}/`));
+    for (const item of items.slice(1)) {
+      console.log(chalk[dryRun ? 'blue' : 'green'](`    ${dryRun ? 'would add' : 'add'}  ${item.label}`));
+    }
 
     if (!dryRun) {
       // Replace SpecFlow's own files wholesale; a stale skill file is worse
       // than a missing one.
       if (existsSync(dest)) rmSync(dest, { recursive: true });
       mkdirSync(dest, { recursive: true });
-      cpSync(src, join(dest, 'SKILL.md'));
-    }
-
-    // specflow-init carries the schema, the migration manifest and the payload
-    // it installs into projects. It resolves them relative to its own
-    // directory, so they must live inside it.
-    if (name === 'specflow-init') {
-      const extras = [
-        { from: join(sources.configuration, 'CONFIG_SCHEMA.md'), to: join(dest, 'CONFIG_SCHEMA.md'), label: 'CONFIG_SCHEMA.md' },
-        { from: join(sources.configuration, 'migrations'), to: join(dest, 'migrations'), label: 'migrations/' },
-        { from: join(sources.templates, 'payload'), to: join(dest, 'payload'), label: 'payload/' }
-      ];
-
-      for (const extra of extras) {
-        if (!existsSync(extra.from)) {
-          console.error(chalk.red(`  missing source: ${extra.from}`));
-          process.exitCode = 1;
-          return;
-        }
-        console.log(chalk[dryRun ? 'blue' : 'green'](`    ${dryRun ? 'would add' : 'add'}  ${extra.label}`));
-        if (!dryRun) cpSync(extra.from, extra.to, { recursive: true });
+      for (const item of items) {
+        cpSync(item.from, join(dest, item.to), { recursive: true });
       }
     }
 

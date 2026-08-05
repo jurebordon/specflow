@@ -9,7 +9,7 @@
 **SpecFlow** is a lightweight, spec-driven framework for AI-assisted software development. It provides a structured approach to documentation and session-based workflows that helps developers maintain context across AI-assisted coding sessions.
 
 **Mode**: Adoption (improving an existing framework)
-**Tech Stack**: Markdown templates with Handlebars variables
+**Tech Stack**: Markdown skills + a small Node CLI. No templating engine.
 **Repository**: https://github.com/jurebordon/specflow
 
 ---
@@ -66,34 +66,69 @@ it will not be present in a fresh clone.
 - Use `[feature: infrastructure]` for project-wide work
 - Automatic feature detection from branch names
 
-### 2. Template System
-- Handlebars syntax: `{{VARIABLE}}`, `{{#if CONDITION}}`, `{{#each ARRAY}}`
-- Variables defined in `.specflow-config.md` or detected automatically
-- Tech-adaptive commands (TEST_COMMAND, BUILD_COMMAND, LINT_COMMAND)
+### 2. No Build-Time Substitution
 
-### 3. Three-Layer Documentation
+Handlebars templating is **gone** from everything that ships. Skills and payload
+files are copied byte-for-byte and resolve project facts at runtime from
+`.specflow/config.md`.
+
+The only remaining `{{...}}` in `templates/global-skills/` are prompt-level
+markers the agent fills per invocation — `{{FEATURE_NAME}}`, `{{TICKET_ID}}`,
+`{{TASK_TITLE}}` — and runtime values it reads fresh each time,
+`{{CURRENT_BRANCH}}` and `{{CURRENT_DATE}}`. Anything else is a bug.
+
+`templates/payload/` must contain no `{{` at all.
+
+### 3. Two Version Numbers
+
+- `specflow_version` moves with every release. Informational only.
+- `config_schema` moves only when the config's **shape** changes, and is what
+  gates migration. Gating on the package version would trigger a migration
+  check on releases that changed nothing structural.
+
+### 4. Three-Layer Documentation
 - **Strategic**: VISION.md, ADR.md (rarely changes)
 - **Tactical**: OVERVIEW.md, ROADMAP.md, WORKFLOW.md (evolves with project)
 - **Operational**: SESSION_LOG.md (append-only journal)
 
-### 4. Session-Based Workflow
+### 5. Session-Based Workflow
+
+The five machine-installed skills:
+
 ```
-/plan-session   → Read context, filter tasks, create plan
-/start-session  → Verify environment, begin implementation
-/end-session    → Test, document, commit, merge/PR
-/verify         → Validate docs consistency and project health
+specflow-init          → Set up or migrate a project; the only writer of config
+plan-session           → Read context, filter tasks, create plan
+start-session          → Verify environment, record baseline, implement
+end-session            → Verify, document, commit, merge/PR
+plan-autonomous-batch  → Clear a whole feature tag hands-off, through review gates
 ```
+
+`explore-project`, `new-feature`, `new-worktree`, `pivot-session` and `verify`
+are **not** part of the 2.0 set. They were per-project skills in 1.x and have
+not yet been converted to the config-driven model.
 
 ---
 
 ## Development Guidelines
 
-### When Working on Templates
-1. **Read existing templates** to understand patterns
-2. **Test with sample variables** to ensure correct rendering
-3. **Keep instructions concise** - AI agents should move fast
-4. **Use consistent formatting** - Markdown with clear headings
-5. **Document variables** in comments or examples
+### When Working on Skills
+1. **Read the existing skills** — they share a deliberate structure
+2. **Never reintroduce a project value.** If a skill needs a fact, add it to
+   `configuration/CONFIG_SCHEMA.md` and have the skill read it
+3. **Update `core/CONFIG_CONTRACT.md` first**, then propagate the block to every
+   skill that carries it — it is duplicated on purpose, so it drifts easily
+4. **Reference other skills by named anchor**, never by step number; step
+   numbers rot the moment either skill is edited
+5. **Keep instructions concise** — agents should move fast
+
+### When Changing the Config Shape
+1. Update `configuration/CONFIG_SCHEMA.md`
+2. Add a migration entry to `configuration/migrations/manifest.json`, marking
+   each change `auto` or `decision`
+3. Bump `config_schema` in the schema doc, the manifest, `cli/src/install.js`
+   and every skill's frontmatter
+4. Teach `templates/payload/migrate-config.js` the transform
+5. Verify against copies of real legacy configs — never the originals
 
 ### When Working on Prompts
 1. **Be directive** - Tell AI what to do, not just what to consider
