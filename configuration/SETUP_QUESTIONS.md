@@ -206,8 +206,8 @@ Select which layers to enable:
 
 | Option | Description | Use Case |
 |--------|-------------|----------|
-| **Tracked (default)** | `docs_specflow/` committed to repo | Team projects, shared context |
-| **Gitignored** | `docs_specflow/` added to .gitignore | Personal workflow, team doesn't use AI |
+| **Tracked (default)** | `docs/` committed to repo | Team projects, shared context |
+| **Gitignored** | `docs/` added to .gitignore | Personal workflow, team doesn't use AI |
 
 ### Follow-up Questions
 
@@ -219,7 +219,7 @@ Select which layers to enable:
 | File | Tracked | Gitignored |
 |------|---------|------------|
 | CLAUDE.md | repo root | repo root* |
-| docs_specflow/*.md | docs_specflow/ | docs_specflow/ (ignored) |
+| docs/*.md | docs/ | docs/ (ignored) |
 | .claude/skills/ | repo | repo |
 
 *\*Can be gitignored if explicitly requested*

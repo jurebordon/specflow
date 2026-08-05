@@ -1,5 +1,13 @@
 # SpecFlow Initialization Prompt
 
+> **Superseded in SpecFlow 2.0.** Project setup is now the `specflow-init`
+> skill, which is installed to `~/.claude/skills/` by `specflow install`.
+>
+> This file is kept for one reason: it documents the schema 0 config shapes,
+> including the `## Tech Commands (Mixed Stack)` form. The 0 → 1 migration
+> reads those shapes, and `configuration/migrations/manifest.json` cites this
+> file as their reference. Do not delete it without updating the manifest.
+
 > Two ways to initialize SpecFlow in any project.
 
 ## Option A: CLI + AI (Recommended)

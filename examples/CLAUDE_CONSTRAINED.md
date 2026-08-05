@@ -38,12 +38,12 @@ Read these before making changes:
 
 | Priority | Document | Purpose |
 |----------|----------|---------|
-| 1 | [ROADMAP.md](docs_specflow/ROADMAP.md) | Current tasks and priorities |
-| 2 | [SESSION_LOG.md](docs_specflow/SESSION_LOG.md) | Recent session history |
-| 3 | [OVERVIEW.md](docs_specflow/OVERVIEW.md) | Component architecture |
-| 4 | [ADR.md](docs_specflow/ADR.md) | Technical decisions |
-| 5 | [VISION.md](docs_specflow/VISION.md) | Product direction |
-| 6 | [LEARNED_PATTERNS.md](docs_specflow/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
+| 1 | [ROADMAP.md](docs/ROADMAP.md) | Current tasks and priorities |
+| 2 | [SESSION_LOG.md](docs/SESSION_LOG.md) | Recent session history |
+| 3 | [OVERVIEW.md](docs/OVERVIEW.md) | Component architecture |
+| 4 | [ADR.md](docs/ADR.md) | Technical decisions |
+| 5 | [VISION.md](docs/VISION.md) | Product direction |
+| 6 | [LEARNED_PATTERNS.md](docs/LEARNED_PATTERNS.md) | Discovered patterns and conventions |
 
 > **LEARNED_PATTERNS.md**: Append codebase patterns, anti-patterns, and conventions you discover during sessions. The continuous-learning hook will periodically remind you to capture insights. Check this file at session start to avoid re-discovering known patterns.
 
@@ -85,7 +85,7 @@ Real-time display: context usage %, current feature, TODO progress, git status.
 Install community agents for focused expertise during implementation.
 Recommended: [VoltAgent community agents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 100+ battle-tested agents for backend, frontend, security, architecture, and more.
 
-See [AGENTS.md](docs_specflow/AGENTS.md) for orchestration patterns and installation instructions.
+See [AGENTS.md](docs/AGENTS.md) for orchestration patterns and installation instructions.
 
 ## Key Patterns
 

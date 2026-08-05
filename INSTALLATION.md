@@ -1,25 +1,90 @@
 # Installing SpecFlow
 
-SpecFlow provides two installation methods: **CLI** (recommended) or **manual clone**.
+SpecFlow installs in two steps: **once per machine**, then **once per project**.
+
+Already on SpecFlow 1.x? See [MIGRATION.md](MIGRATION.md).
 
 ---
 
-## Quick Install (Recommended)
+## Quick Install
 
 ```bash
+# 1. Once per machine
+npm install -g specflow-ai
+specflow install
+
+# 2. Once per project
 cd your-project
-
-# 1. Interactive setup — scaffolds config, skills, hooks, rules
-npx specflow-ai init
-
-# 2. AI detects tech stack, populates config, updates command files
-/init-specflow
+specflow-init
 
 # Start working
-/plan-session
+plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
+---
+
+## Step 1: `specflow install`
+
+Places five skills into `~/.claude/skills/`:
+
+```
+~/.claude/skills/
+├── specflow-init/
+│   ├── SKILL.md
+│   ├── CONFIG_SCHEMA.md          # the schema it writes
+│   ├── migrations/               # what changed between schema versions
+│   └── payload/                  # hooks, rules, settings, doc skeletons
+│       └── ...                   # copied into projects at init
+├── plan-session/
+├── start-session/
+├── end-session/
+└── plan-autonomous-batch/
+```
+
+Claude Code loads `~/.claude/skills/` for every project, so these are available
+everywhere immediately. They ship **verbatim** — no project values are
+substituted into them, which is why one upgrade reaches every project at once.
+
+`specflow install` refuses to overwrite a same-named skill it did not install,
+so a `plan-session` you wrote yourself is safe. Use `--force` to override, or
+`--dry-run` to preview.
+
+A receipt at `~/.claude/skills/.specflow-install.json` records the version,
+schema and which directories belong to SpecFlow.
+
+### Options
+
+```bash
+specflow install --dry-run    # show what would be written
+specflow install --force      # replace same-named skills SpecFlow did not install
+specflow --version
+```
+
+---
+
+## Step 2: `specflow-init`
+
+Run this **skill** — not a CLI command — inside each project. An agent does the
+work, which is the point: it can read your codebase and write real documentation
+instead of leaving empty templates behind.
+
+It will:
+
+1. **Interview** you for what cannot be detected — where docs live, whether they
+   are gitignored, project mode, branching strategy, commit convention,
+   ticketing.
+2. **Detect and confirm** the rest — languages, frameworks, test/lint/build/
+   typecheck/format commands, default branch, platform. It always shows what it
+   found and asks; nothing is recorded silently.
+3. **Record a failure baseline** — which tests already fail, and what each
+   failure says.
+4. **Probe for a review gate** — Codex, a fallback subagent, or none.
+5. **Write `.specflow/config.md`** — the one file every skill reads.
+6. **Install the payload** — hooks, rules, settings, per your choices.
+7. **Scaffold and populate the docs** — with real content, not TODO markers.
+
+Re-running it later is additive. It adds what is missing and never rewrites a
+ROADMAP, SESSION_LOG or ADR that has real content.
 
 ---
 
@@ -27,9 +92,10 @@ The CLI scaffolds structural files with placeholder values. Then `/init-specflow
 
 ```
 your-project/
+├── .specflow/
+│   └── config.md                # every project fact (git-tracked)
 ├── CLAUDE.md                    # AI context file
-├── docs_specflow/               # SpecFlow documentation (gitignored by default)
-│   ├── .specflow-config.md      # Project settings
+├── docs/                        # path is your choice
 │   ├── OVERVIEW.md
 │   ├── VISION.md
 │   ├── ROADMAP.md
@@ -37,148 +103,87 @@ your-project/
 │   ├── WORKFLOW.md
 │   ├── SESSION_LOG.md
 │   ├── LEARNED_PATTERNS.md
+│   ├── ORCHESTRATION.md
 │   ├── AGENTS.md
-│   └── CUSTOM.md                # Project-specific extensions
-├── .claude/
-│   ├── skills/                  # Session skills (Agent Skills standard)
-│   │   ├── plan-session/SKILL.md
-│   │   ├── start-session/SKILL.md
-│   │   ├── end-session/SKILL.md
-│   │   └── ...                  # verify, new-feature, explore-project, etc.
-│   ├── hooks/                   # Automation hooks (if enabled)
-│   ├── rules/                   # Coding standards (if enabled)
-│   ├── settings.json            # Hook & statusline config
-│   └── statusline.js            # Real-time status (if enabled)
-└── .codex/
-    └── skills/                  # Codex-compatible skills (mirrored)
+│   └── CUSTOM.md
+└── .claude/
+    ├── hooks/                   # if enabled
+    ├── rules/                   # if enabled
+    ├── settings.json            # merged with yours, not replaced
+    └── statusline.js            # if enabled
 ```
 
----
+No `.claude/skills/` — skills live on your machine.
 
-## The Two-Step Flow
-
-### Step 1: `npx specflow-ai init`
-
-Interactive CLI that asks about your project:
-- Project type (greenfield, adoption, constrained)
-- Git workflow (solo, PR-based)
-- Documentation preferences (path, tracking)
-- Technical layers (hooks, rules, statusline)
-
-Generates ~40 files with placeholder values for tech-specific commands.
-
-### Step 2: `/init-specflow` (in Claude Code)
-
-Open your project in Claude Code and run the `/init-specflow` command. The AI will:
-- Scan your codebase to detect tech stack
-- Read existing documentation (if path configured) and extract commands verbatim
-- Update `.specflow-config.md` with detected values
-- Update skill files directly (e.g., `.claude/skills/start-session/SKILL.md`)
-- Report detected tech stack and populated configuration
-
-After this, your project has fully customized SpecFlow configuration. No additional steps needed.
+Hooks and rules are per-project because they are per-project things, but they
+ship verbatim and read `.specflow/config.md` at runtime. They cannot drift out
+of step with your config, and an upgrade cannot clobber your edits to them.
 
 ---
 
 ## What Gets Tracked vs Ignored
 
-| Path | Tracked | Purpose |
-|------|---------|---------|
-| `CLAUDE.md` | Yes | AI context file |
-| `docs_specflow/` | No* | SpecFlow documentation |
-| `.claude/skills/` | Yes | Session skills (Agent Skills standard) |
-| `.codex/skills/` | Yes | Codex-compatible skills (mirrored) |
-| `.claude/hooks/` | Optional | Automation hooks |
-| `.claude/rules/` | Optional | Coding standards |
-
-*By default, `docs_specflow/` is gitignored. You can choose to track it during setup.
+| Path | Recommendation |
+|---|---|
+| `.specflow/config.md` | **Track it.** Every skill reads it; a teammate without it has an uninitialised project. |
+| `docs/` | Your choice — `specflow-init` asks and records the answer. |
+| `.claude/hooks`, `.claude/rules` | Track, so the team shares the same guardrails. |
+| `.claude/settings.json` | Track, but expect local additions. |
 
 ---
 
-## CLI Options
-
-### Non-Interactive Mode
+## Updating
 
 ```bash
-# Accept all defaults - not recommended if you have existing docs
-npx specflow-ai init --yes
-
-# Specify project mode
-npx specflow-ai init --mode greenfield
-npx specflow-ai init --mode adoption
-npx specflow-ai init --mode constrained
+npm install -g specflow-ai@latest
+specflow update
 ```
 
-> **Note**: The `--yes` flag skips all prompts and uses defaults. If your project has existing documentation you want `/init-specflow` to read, run the interactive mode (without `--yes`) which asks for the existing docs path.
+This updates the machine install. **It does not touch your projects.**
 
-### Update Templates Only
-
-After changing `.specflow-config.md`, re-render templates:
-
-```bash
-npx specflow-ai update
-```
-
-This updates skills, hooks, and rules without touching your documentation.
+If a release changes the config's shape, the next skill you run in a project
+notices, applies the additive parts, and offers anything needing a decision —
+without hijacking the task you actually asked for. A check that finds nothing to
+do writes nothing, so no spurious diffs appear in your repo.
 
 ---
 
-## Alternative: Manual Installation
+## Sharing with a Team
 
-If you prefer not to use the CLI:
-
-```bash
-cd your-project
-
-# Clone SpecFlow repository
-git clone https://github.com/jurebordon/specflow .specflow
-
-# Add to gitignore
-echo ".specflow/" >> .gitignore
-```
-
-Then in Claude Code, paste the contents of `.specflow/prompts/INIT.md` to run the setup prompt manually.
-
----
-
-## Sharing with Team
-
-When a team member clones your project:
-
-1. They clone your project (generated files are included)
-2. They can immediately use `/plan-session`, `/start-session`, etc.
-3. If they want to update templates, they run `npx specflow-ai update`
-
-The `.specflow-config.md` and `.claude/` directory are tracked, so the team shares the same configuration.
-
----
-
-## Updating SpecFlow
-
-To get the latest CLI and templates:
+Commit `.specflow/config.md`, your docs directory, and `.claude/hooks|rules`.
+Each teammate then runs, once:
 
 ```bash
-# Clear npx cache and get latest
-npx specflow-ai@latest init --help
+npm install -g specflow-ai && specflow install
 ```
 
-Or if using manual installation:
-
-```bash
-cd your-project/.specflow
-git pull
-```
+Their machine gets the skills; the repo supplies the project facts.
 
 ---
 
 ## Uninstalling
 
-To remove SpecFlow from a project:
-
 ```bash
-rm -rf docs_specflow/ .claude/
-rm CLAUDE.md
-# Remove docs_specflow/ line from .gitignore if present
+# Remove the machine install
+rm -rf ~/.claude/skills/{specflow-init,plan-session,start-session,end-session,plan-autonomous-batch}
+rm -f ~/.claude/skills/.specflow-install.json
+npm uninstall -g specflow-ai
+
+# Remove project files
+rm -rf .specflow .claude/hooks .claude/rules .claude/statusline.js
+# then drop the SpecFlow hook entries from .claude/settings.json
 ```
 
-Your project code remains unchanged.
+Your documentation is yours — deleting it is a separate decision.
+
+---
+
+## Requirements
+
+- Node.js 18+
+- git
+- An Agent Skills-compatible assistant (Claude Code, Codex CLI, …)
+
+Optional: the Codex CLI plus its Claude Code plugin, which enables the `codex`
+review gate for `plan-autonomous-batch`. Without it, that skill falls back to a
+subagent reviewer, or runs ungated if you choose.

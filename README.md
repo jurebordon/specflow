@@ -16,50 +16,40 @@ SpecFlow solves this with:
 - **Three-layer documentation** (strategic → tactical → operational)
 - **Feature-tagged tasks** (every task belongs to a feature)
 - **Session-based workflow** (plan → implement → wrap up)
-- **Tech-adaptive commands** (auto-detects your stack, generates appropriate commands)
+- **One config, read at runtime** (project facts live in one file every skill reads)
 - **Automatic feature detection** (from branch names, zero configuration)
 
 ## Quick Start
 
-### Option A: CLI (Recommended)
+Two steps: install once per machine, initialise once per project.
 
 ```bash
-cd your-project
+# 1. Once per machine — installs skills into ~/.claude/skills/
+npm install -g specflow-ai && specflow install
 
-# Interactive setup — scaffolds config, skills, hooks, rules
-npx specflow-ai init
-
-# AI detects tech stack, populates config, updates command files
-/init-specflow
+# 2. Once per project — run this skill inside your repo
+specflow-init
 
 # Start working
-/plan-session
+plan-session
 ```
 
-The CLI scaffolds structural files with placeholder values. Then `/init-specflow` analyzes your codebase, detects tech stack, populates documentation, AND updates skill files directly. No additional steps needed.
+Skills live on your machine, not in your project. A SpecFlow upgrade reaches
+every project at once — there is nothing to reinstall per repo, and nothing in
+your project for an upgrade to overwrite.
 
-To update skills to the latest templates (after SpecFlow releases):
+`specflow-init` interviews you for what cannot be detected, detects and confirms
+the rest, and writes `.specflow/config.md`. In an existing codebase it reads
+your code and writes real documentation rather than leaving empty templates
+behind.
+
+To upgrade later:
 
 ```bash
-npx specflow-ai update
+npm install -g specflow-ai@latest && specflow update
 ```
 
-### Option B: Manual (AI-Assisted)
-
-```bash
-cd your-project
-
-# Clone the framework
-git clone https://github.com/jurebordon/specflow .specflow
-echo ".specflow/" >> .gitignore
-
-# Start Claude Code (or your AI assistant)
-claude
-
-# Paste the INIT prompt from .specflow/prompts/INIT.md
-# Answer the discovery questions
-# Review and confirm generated files
-```
+That updates the machine install only. Your project files are untouched.
 
 ### Start Working
 
@@ -90,13 +80,25 @@ See [modes/](modes/) for detailed guidance on each.
 
 ## What Gets Generated
 
-After initialization, your project will have:
+Skills are installed once per machine:
+
+```
+~/.claude/skills/
+├── specflow-init/             # Sets up a project; carries the payload it installs
+├── plan-session/
+├── start-session/
+├── end-session/
+└── plan-autonomous-batch/     # Clears a whole feature tag hands-off
+```
+
+After running `specflow-init`, your project will have:
 
 ```
 your-project/
+├── .specflow/
+│   └── config.md              # Every project fact, read by every skill
 ├── CLAUDE.md                  # Root context for AI assistants
-├── docs_specflow/             # SpecFlow documentation (tracked or gitignored, your choice)
-│   ├── .specflow-config.md    # Project settings
+├── docs/                      # SpecFlow documentation (path is your choice)
 │   ├── ROADMAP.md             # All tasks, tagged [feature: name]
 │   ├── SESSION_LOG.md         # All sessions, tagged [feature-name]
 │   ├── VISION.md              # Product north star (strategic)
@@ -110,24 +112,17 @@ your-project/
 │   └── feature_docs/          # Per-feature specs
 │       └── feature-name/
 │           └── SPEC.md        # Feature requirements (frozen)
-├── .claude/
-│   ├── skills/                # Session skills (Agent Skills standard)
-│   │   ├── plan-session/SKILL.md
-│   │   ├── start-session/SKILL.md
-│   │   ├── end-session/SKILL.md
-│   │   ├── pivot-session/SKILL.md
-│   │   ├── verify/SKILL.md
-│   │   ├── new-feature/SKILL.md
-│   │   ├── explore-project/SKILL.md
-│   │   ├── new-worktree/SKILL.md
-│   │   └── init-specflow/SKILL.md
-│   ├── hooks/                 # Automation hooks (optional)
-│   ├── rules/                 # Coding standards (optional)
-│   ├── settings.json          # Hook & statusline config
-│   └── statusline.js          # Real-time status (optional)
-└── .codex/
-    └── skills/                # Codex-compatible skills (mirrored)
+└── .claude/
+    ├── hooks/                 # Automation hooks (optional)
+    ├── rules/                 # Coding standards (optional)
+    ├── settings.json          # Hook & statusline config (merged, not replaced)
+    └── statusline.js          # Real-time status (optional)
 ```
+
+Note what is **not** there: no `.claude/skills/`. Skills are on your machine.
+Hooks and rules are still per-project because they are per-project things, but
+they ship verbatim and read `.specflow/config.md` at runtime, so they never
+drift out of step with your config.
 
 All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
@@ -135,14 +130,15 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
 ### Getting Started
 - [Installation Guide](INSTALLATION.md) - How to install and update
-- [Migration Guide](configuration/MIGRATION.md) - Upgrading from pre-2026-01-20 versions
+- [Migration Guide](MIGRATION.md) - Upgrading to the global-skills layout
+- [Config Schema](configuration/CONFIG_SCHEMA.md) - What lives in `.specflow/config.md`
 - [FAQ](FAQ.md) - Common questions and troubleshooting
 
 ### Core Concepts
 - [Core Principles](core/PRINCIPLES.md) - Philosophy and core concepts
 - [Documentation Structure](core/DOCUMENTATION.md) - The three-layer system
 - [Session Workflow](core/SESSIONS.md) - Plan, implement, wrap up, pivot
-- [Agent Orchestration](templates/docs/ORCHESTRATION.md.template) - Session lifecycle, delegation rules, checkpoints
+- [Agent Orchestration](templates/payload/doc-templates/ORCHESTRATION.md) - Session lifecycle, delegation rules, checkpoints
 
 ### Project Modes
 - [Greenfield Mode](modes/GREENFIELD.md) - New projects (with full example)
@@ -176,22 +172,21 @@ All features use central ROADMAP/SESSION_LOG with `[feature: name]` tags.
 
 ## Updating
 
-### CLI
-
 ```bash
-npx specflow-ai update
+npm install -g specflow-ai@latest && specflow update
 ```
 
-This re-generates skills, hooks, and rules from the latest templates. Your documentation and config are preserved.
+This updates the machine-level skills. **It does not touch your projects** —
+there is nothing project-side for it to overwrite, so local customisation
+cannot be lost.
 
-### Manual
+If a release changes the shape of `.specflow/config.md`, the next skill you run
+in a project notices, applies the additive parts itself, and offers anything
+that needs a decision. It will not interrupt the task you asked for.
 
-```bash
-cd your-project/.specflow
-git pull
-```
-
-Your project files are unaffected — only the templates update. Re-run the INIT prompt to regenerate files from updated templates.
+Re-running `specflow-init` in an already-initialised project is safe: it adds
+what is missing and never rewrites a ROADMAP, SESSION_LOG or ADR that has real
+content in it.
 
 ## Support
 

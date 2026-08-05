@@ -110,7 +110,7 @@ Minimal but functional:
 ```
 project/
 ├── CLAUDE.md              # AI context for this project
-├── docs_specflow/
+├── docs/
 │   ├── OVERVIEW.md        # Current system (derived)
 │   ├── ROADMAP.md         # Current work tracking
 │   ├── WORKFLOW.md        # Your actual process
@@ -282,10 +282,10 @@ tests/            # Custom data tests
 
 | Doc | Purpose |
 |-----|---------|
-| [ROADMAP.md](docs_specflow/ROADMAP.md) | Current work |
-| [SESSION_LOG.md](docs_specflow/SESSION_LOG.md) | Session history |
-| [OVERVIEW.md](docs_specflow/OVERVIEW.md) | Model architecture |
-| [ADR.md](docs_specflow/ADR.md) | Modeling decisions |
+| [ROADMAP.md](docs/ROADMAP.md) | Current work |
+| [SESSION_LOG.md](docs/SESSION_LOG.md) | Session history |
+| [OVERVIEW.md](docs/OVERVIEW.md) | Model architecture |
+| [ADR.md](docs/ADR.md) | Modeling decisions |
 
 ## Key Commands
 
@@ -439,8 +439,8 @@ All tests must pass before proceeding.
 
 ## 2. Update Documentation
 
-**docs_specflow/ROADMAP.md**: Move task to Done
-**docs_specflow/SESSION_LOG.md**: Add session entry
+**docs/ROADMAP.md**: Move task to Done
+**docs/SESSION_LOG.md**: Add session entry
 
 ## 3. Commit
 
@@ -612,7 +612,7 @@ For large projects with multiple parallel features, project-level documentation 
 ```
 project/
 ├── CLAUDE.md                    # Project context
-├── docs_specflow/
+├── docs/
 │   ├── OVERVIEW.md              # Project architecture
 │   ├── ADR.md                   # Project decisions
 │   ├── ROADMAP.md               # All tasks with [feature: name] tags
@@ -635,8 +635,8 @@ Use the `/new-feature` skill (see [templates/skills/new-feature/SKILL.md.templat
 This will:
 1. Ask clarifying questions about the feature
 2. Optionally scan relevant code for context
-3. Create `docs_specflow/feature_docs/<name>/SPEC.md`
-4. Add feature tasks to central `docs_specflow/ROADMAP.md` with `[feature: name]` tags
+3. Create `docs/feature_docs/<name>/SPEC.md`
+4. Add feature tasks to central `docs/ROADMAP.md` with `[feature: name]` tags
 5. Link to ticket/MR if provided
 
 ### Feature SPEC.md
@@ -752,8 +752,8 @@ Session history for this feature only:
 - Created roadmap
 
 ### Files Changed
-- docs_specflow/feature_docs/customer-dimension/SPEC.md (new)
-- docs_specflow/ROADMAP.md (added [feature: customer-dimension] tasks)
+- docs/feature_docs/customer-dimension/SPEC.md (new)
+- docs/ROADMAP.md (added [feature: customer-dimension] tasks)
 
 ---
 ```
@@ -767,9 +767,9 @@ When working on a feature, session commands reference the feature docs:
 Working on feature: customer-dimension
 
 Read feature context:
-- docs_specflow/feature_docs/customer-dimension/SPEC.md (requirements)
-- docs_specflow/ROADMAP.md (filter tasks tagged [feature: customer-dimension])
-- docs_specflow/SESSION_LOG.md (recent sessions for this feature)
+- docs/feature_docs/customer-dimension/SPEC.md (requirements)
+- docs/ROADMAP.md (filter tasks tagged [feature: customer-dimension])
+- docs/SESSION_LOG.md (recent sessions for this feature)
 
 Plan the next task from the ROADMAP.
 ```
@@ -777,20 +777,20 @@ Plan the next task from the ROADMAP.
 **end-session.md** (feature mode):
 ```markdown
 Update documentation:
-- docs_specflow/ROADMAP.md (mark task done)
-- docs_specflow/SESSION_LOG.md (add entry with [customer-dimension] prefix)
+- docs/ROADMAP.md (mark task done)
+- docs/SESSION_LOG.md (add entry with [customer-dimension] prefix)
 
 If feature is complete:
-- Update docs_specflow/ADR.md if decisions were made
+- Update docs/ADR.md if decisions were made
 ```
 
 ### When Features Complete
 
 When a feature is done:
-1. Mark all feature tasks as done in `docs_specflow/ROADMAP.md`
-2. Add final `docs_specflow/SESSION_LOG.md` entry
-3. Update `docs_specflow/ADR.md` if significant decisions were made
-4. Update `docs_specflow/OVERVIEW.md` if architecture changed
+1. Mark all feature tasks as done in `docs/ROADMAP.md`
+2. Add final `docs/SESSION_LOG.md` entry
+3. Update `docs/ADR.md` if significant decisions were made
+4. Update `docs/OVERVIEW.md` if architecture changed
 
 ### Example: DBT Feature Workflow
 

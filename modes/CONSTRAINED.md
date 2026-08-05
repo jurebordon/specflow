@@ -117,7 +117,7 @@ Similar to greenfield, but:
 ```
 project/
 ├── CLAUDE.md              # Includes constraints
-├── docs_specflow/
+├── docs/
 │   ├── VISION.md
 │   ├── ADR.md
 │   ├── OVERVIEW.md

@@ -104,7 +104,7 @@ A clear plan with:
 
 2. **Consider specialist agents** (optional)
    - If you have community agents installed (e.g., from [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents)), invoke the appropriate specialist
-   - See `docs_specflow/AGENTS.md` for orchestration patterns
+   - See `docs/AGENTS.md` for orchestration patterns
 
 3. **Implement**
    - Follow the plan
