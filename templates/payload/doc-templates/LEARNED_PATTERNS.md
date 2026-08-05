@@ -9,23 +9,10 @@
 
 <!-- Recurring code patterns, idioms, and conventions discovered in this project -->
 
-{{#if EXAMPLE_PATTERNS}}
-{{#each EXAMPLE_PATTERNS}}
-### {{this.name}} [feature: {{this.feature}}]
-- **Pattern**: {{this.description}}
-- **Example**: `{{this.example}}`
-- **Discovered**: {{this.date}}
-{{/each}}
-{{/if}}
-
-{{#unless EXAMPLE_PATTERNS}}
-<!-- Example:
-### Error handling uses Result type [feature: infrastructure]
-- **Pattern**: All service functions return Result<T, AppError> instead of throwing
-- **Example**: `async function getUser(id: string): Promise<Result<User, AppError>>`
-- **Discovered**: 2026-01-20
--->
-{{/unless}}
+### <name> [feature: <feature>]
+- **Pattern**: <description>
+- **Example**: `<example>`
+- **Discovered**: <date>
 
 ## Anti-Patterns
 

@@ -22,22 +22,21 @@
 
 ### During Work
 
-- [ ] Create feature branch: `{{GIT_BRANCH_CONVENTION}}`
+- [ ] Create feature branch: `<git branch convention>`
 - [ ] Stay within scope of chosen task
 - [ ] Commit frequently with clear messages
 - [ ] Note any decisions made for later documentation
 
 ### After Work
 
-- [ ] Run tests: `{{TEST_COMMAND}}`
+- [ ] Run tests: `<test command>`
 - [ ] Update `ROADMAP.md` (mark done, adjust Next)
 - [ ] Append entry to `SESSION_LOG.md`
 - [ ] If architecture changed: update `OVERVIEW.md` and/or `ADR.md`
-- [ ] {{GIT_MERGE_INSTRUCTION}}
+- [ ] <git merge instruction>
 
 ## Git Workflow
 
-{{#if GIT_WORKFLOW_SOLO}}
 ### Solo Developer Flow
 
 ```
@@ -49,9 +48,7 @@ main ←── feature/branch
 - Work and commit on branch
 - When done: `./scripts/merge-to-main.sh` or merge manually
 - Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`
-{{/if}}
 
-{{#if GIT_WORKFLOW_PR}}
 ### PR Review Flow
 
 ```
@@ -64,9 +61,7 @@ main ←── PR ←── feature/branch
 - When done: create PR via `gh pr create` or platform UI
 - Do NOT merge locally - wait for review
 - Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`
-{{/if}}
 
-{{#if GIT_WORKFLOW_CICD}}
 ### CI/CD Gated Flow
 
 ```
@@ -76,10 +71,9 @@ main ←── CI/CD ←── MR ←── feature/branch
 
 - Branch from main: `git checkout -b type/description`
 - Work and commit on branch
-- When done: create MR via `{{MR_COMMAND}}`
+- When done: create MR via `<mr command>`
 - Do NOT merge locally - CI/CD handles merge
-- Branch naming: {{GIT_BRANCH_CONVENTION}}
-{{/if}}
+- Branch naming: <git branch convention>
 
 ## Documentation Update Rules
 
@@ -133,9 +127,9 @@ git checkout -b feat/my-feature
 # ... code ...
 
 # End work
-{{TEST_COMMAND}}
+<test command>
 git add . && git commit -m "feat: description"
-{{GIT_MERGE_INSTRUCTION}}
+<git merge instruction>
 ```
 
 ## Getting Help

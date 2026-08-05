@@ -5,7 +5,7 @@
 
 ## ADR-0001: Initial Architecture and Tech Stack
 
-- **Date**: {{CURRENT_DATE}}
+- **Date**: <current date>
 - **Status**: Accepted
 
 ### Context
@@ -14,10 +14,10 @@ Project initialized from PRD and Tech Spec. Need to establish baseline architect
 
 ### Decision
 
-- **Backend**: {{BACKEND_STACK}}
-- **Frontend**: {{FRONTEND_STACK}}
-- **Database**: {{DATABASE}}
-- **Infrastructure**: {{INFRASTRUCTURE}}
+- **Backend**: <backend stack>
+- **Frontend**: <frontend stack>
+- **Database**: <database>
+- **Infrastructure**: <infrastructure>
 
 ### Consequences
 

@@ -1,60 +1,39 @@
 # Roadmap
 
-**Last Updated**: {{CURRENT_DATE}}
-**Current Phase**: {{CURRENT_PHASE}}
+**Last Updated**: <current date>
+**Current Phase**: <current phase>
 
 ## Now (Current Work)
 
 <!-- Tag each task with [feature: name] -->
-- [ ] {{CURRENT_TASK}} [feature: {{FEATURE_NAME}}]
+- [ ] <current task> [feature: <feature name>]
 
 ## Next (Queued)
 
 <!-- Priority ordered - top item is next -->
 <!-- Tag each task with [feature: name] -->
-{{#each NEXT_TASKS}}
-{{@index}}. {{this}} [feature: {{FEATURE_NAME}}]
-{{/each}}
 
-{{#unless NEXT_TASKS}}
-1. TODO: Define next priority [feature: feature-name]
-2. TODO: Define following priority [feature: feature-name]
-{{/unless}}
+1. <item> [feature: <feature name>]
 
 ## Later (Backlog)
 
 <!-- Ideas and future work, not prioritized -->
-{{#each BACKLOG}}
-- {{this}}
-{{/each}}
 
-{{#unless BACKLOG}}
-- TODO: Add backlog items as they emerge
-{{/unless}}
+- <item>
 
 ## Done (Recent)
 
 <!-- Recently completed, for context -->
-{{#each DONE}}
-- [x] {{this.task}} ({{this.date}})
-{{/each}}
 
-{{#unless DONE}}
-- None yet (fresh project)
-{{/unless}}
+- [x] <task> (<date>)
 
 ## Blockers
 
 <!-- Anything preventing progress -->
-{{#each BLOCKERS}}
-- **{{this.id}}**: {{this.description}}
-  - Impact: {{this.impact}}
-  - Potential resolution: {{this.resolution}}
-{{/each}}
 
-{{#unless BLOCKERS}}
-- None
-{{/unless}}
+- **<id>**: <description>
+  - Impact: <impact>
+  - Potential resolution: <resolution>
 
 ---
 
