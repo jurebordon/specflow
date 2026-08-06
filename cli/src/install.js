@@ -18,6 +18,7 @@ import {
 import { homedir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import chalk from 'chalk';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -76,18 +77,41 @@ function skillAuthor(skillMdPath) {
   }
 }
 
+/** sha256 of a file, or null if it cannot be read. */
+function fileHash(filePath) {
+  try {
+    return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+  } catch {
+    return null;
+  }
+}
+
 /**
- * A skill directory is ours to replace only if SpecFlow wrote it. A user who
- * authored their own plan-session should not silently lose it to an install.
+ * A skill directory is ours to replace only if SpecFlow wrote it and nobody
+ * has changed it since. A user who authored their own plan-session should not
+ * silently lose it to an install.
+ *
+ * Ownership by name alone is not safe. A previous install records the names it
+ * wrote; if the user then replaces one of those directories with a skill of
+ * their own, a name check still grants SpecFlow ownership and the next install
+ * deletes their work without ever asking for --force.
+ *
+ * So the receipt stores a fingerprint per skill, and the fallback only applies
+ * when the file on disk is byte-identical to what we installed. Anything
+ * edited since is treated as the user's. Receipts from older versions record
+ * bare names and grant nothing.
  */
-function isOurs(skillDir, receiptNames) {
+function isOurs(skillDir, receiptEntries) {
   const skillMd = join(skillDir, 'SKILL.md');
   if (!existsSync(skillMd)) return true; // nothing meaningful there
   if (skillAuthor(skillMd) === 'specflow') return true;
-  // basename, not split('/') — path.join uses backslashes on Windows, which
-  // would compare a full path against a bare skill name and never match,
-  // wrongly flagging our own receipt-owned skill as foreign.
-  return receiptNames.includes(basename(skillDir));
+
+  const entry = receiptEntries.find(
+    (e) => e && typeof e === 'object' && e.name === basename(skillDir)
+  );
+  if (!entry?.sha256) return false;
+
+  return fileHash(skillMd) === entry.sha256;
 }
 
 /**
@@ -137,7 +161,7 @@ export async function install(options = {}) {
 
   const skillsRoot = join(homedir(), '.claude', 'skills');
   const previous = readReceipt(skillsRoot);
-  const previousNames = previous?.skills ?? [];
+  const previousEntries = previous?.skills ?? [];
 
   const pkg = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf-8'));
 
@@ -150,13 +174,13 @@ export async function install(options = {}) {
   const conflicts = [];
   for (const name of GLOBAL_SKILLS) {
     const dir = join(skillsRoot, name);
-    if (existsSync(dir) && !isOurs(dir, previousNames)) conflicts.push(name);
+    if (existsSync(dir) && !isOurs(dir, previousEntries)) conflicts.push(name);
   }
 
   if (conflicts.length > 0 && !force) {
     console.error(chalk.red('Refusing to overwrite skills SpecFlow did not install:'));
     for (const name of conflicts) console.error(`  ${join(skillsRoot, name)}`);
-    console.error('\nThese have no `author: specflow` marker, so they look hand-authored.');
+    console.error('\nThese are either hand-authored, or were edited since SpecFlow installed them.');
     console.error('Move them aside, or re-run with --force to replace them.');
     process.exitCode = 1;
     return;
@@ -201,8 +225,6 @@ export async function install(options = {}) {
     }
   }
 
-  const written = plan.map((s) => s.name);
-
   if (dryRun) {
     console.log();
     console.log(chalk.blue('Dry run — nothing written.'));
@@ -220,12 +242,23 @@ export async function install(options = {}) {
   // untouched until every byte is on disk; the swap is then a sequence of
   // renames, which are cheap and atomic per directory.
   //
-  // Staging lives inside skillsRoot so the rename never crosses a filesystem.
+  // Staging and backups live inside skillsRoot so renames never cross a
+  // filesystem boundary.
   const staging = join(skillsRoot, '.specflow-staging');
+  const backupRoot = join(skillsRoot, '.specflow-backup');
+
+  // Every destination replaced so far, with the backup it was moved to.
+  // Deleting a destination before renaming the new one into place would make
+  // any later failure unrecoverable -- the old skill is gone and the new one
+  // never arrived. Moving it aside instead keeps a rollback available right
+  // up until the receipt is written.
+  const swapped = [];
 
   try {
     if (existsSync(staging)) rmSync(staging, { recursive: true });
+    if (existsSync(backupRoot)) rmSync(backupRoot, { recursive: true });
     mkdirSync(staging, { recursive: true });
+    mkdirSync(backupRoot, { recursive: true });
 
     for (const { name, items } of plan) {
       const stageDir = join(staging, name);
@@ -236,34 +269,73 @@ export async function install(options = {}) {
     }
 
     for (const { name, dest } of plan) {
-      if (existsSync(dest)) rmSync(dest, { recursive: true });
+      let backup = null;
+      if (existsSync(dest)) {
+        backup = join(backupRoot, name);
+        renameSync(dest, backup);
+      }
       renameSync(join(staging, name), dest);
+      swapped.push({ dest, backup });
     }
-  } catch (err) {
-    console.error(chalk.red(`\nInstall failed: ${err.message}`));
-    console.error('Your previous install was left in place.');
-    process.exitCode = 1;
-    return;
-  } finally {
-    try {
-      if (existsSync(staging)) rmSync(staging, { recursive: true });
-    } catch {
-      // Leftover staging is harmless; it is replaced on the next run.
-    }
-  }
 
-  {
-    // The receipt records what this machine has, so a later install knows
-    // which directories are its own to replace.
+    // The receipt is part of the transaction: an install whose skills landed
+    // but whose receipt did not would lose track of what it owns, and the next
+    // run would treat its own skills as foreign.
     writeFileSync(
       join(skillsRoot, RECEIPT),
       JSON.stringify(
-        { version: pkg.version, config_schema: CONFIG_SCHEMA, skills: written, installed_at: new Date().toISOString() },
+        {
+          version: pkg.version,
+          config_schema: CONFIG_SCHEMA,
+          // Fingerprints, not bare names -- see isOurs().
+          skills: plan.map(({ name, dest }) => ({
+            name,
+            sha256: fileHash(join(dest, 'SKILL.md'))
+          })),
+          installed_at: new Date().toISOString()
+        },
         null,
         2
       ) + '\n',
       'utf-8'
     );
+  } catch (err) {
+    // Put back everything already swapped, newest first.
+    let restored = 0;
+    for (const { dest, backup } of swapped.reverse()) {
+      try {
+        if (existsSync(dest)) rmSync(dest, { recursive: true });
+        if (backup && existsSync(backup)) {
+          renameSync(backup, dest);
+          restored++;
+        }
+      } catch {
+        // Keep going: restoring the rest is still better than stopping here.
+      }
+    }
+
+    console.error(chalk.red(`\nInstall failed: ${err.message}`));
+    console.error(
+      restored > 0
+        ? `Rolled back ${restored} skill${restored === 1 ? '' : 's'}; your previous install is intact.`
+        : 'Nothing was replaced; your previous install is intact.'
+    );
+    process.exitCode = 1;
+    return;
+  } finally {
+    // Only now are the backups redundant.
+    for (const dir of [staging, backupRoot]) {
+      try {
+        if (existsSync(dir)) rmSync(dir, { recursive: true });
+      } catch (err) {
+        // Dot-directories are ignored as skills, so a leftover is not harmful
+        // -- but a leftover backup is a full copy of the previous install, and
+        // silently leaving one on disk is the kind of thing a user should hear
+        // about rather than discover later.
+        console.warn(chalk.yellow(`\nCould not remove ${dir}: ${err.message}`));
+        console.warn(chalk.dim('It is safe to delete manually; the next install replaces it.'));
+      }
+    }
   }
 
   console.log();
