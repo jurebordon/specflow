@@ -110,7 +110,7 @@ your-project/
     ├── hooks/                   # if enabled
     ├── rules/                   # if enabled
     ├── settings.json            # merged with yours, not replaced
-    └── statusline.js            # if enabled
+    └── statusline.cjs            # if enabled
 ```
 
 No `.claude/skills/` — skills live on your machine.
@@ -170,7 +170,7 @@ rm -f ~/.claude/skills/.specflow-install.json
 npm uninstall -g specflow-ai
 
 # Remove project files
-rm -rf .specflow .claude/hooks .claude/rules .claude/statusline.js
+rm -rf .specflow .claude/hooks .claude/rules .claude/statusline.cjs
 # then drop the SpecFlow hook entries from .claude/settings.json
 ```
 

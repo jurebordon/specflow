@@ -35,7 +35,7 @@ the project and not to a SpecFlow source checkout:
 ├── CONFIG_SCHEMA.md            ← the schema this skill writes
 ├── migrations/manifest.json    ← what changed between schema versions
 └── payload/
-    ├── hooks/                  ← including specflow-config.js
+    ├── hooks/                  ← including specflow-config.cjs
     ├── rules/
     └── settings/
 ```
@@ -234,10 +234,10 @@ render and nothing that can go stale:
 |---|---|---|
 | `payload/hooks/*` | `.claude/hooks/` | `Technical Layers > Hooks` is enabled |
 | `payload/rules/*` | `.claude/rules/` | `Technical Layers > Rules` is enabled |
-| `payload/settings/statusline.js` | `.claude/statusline.js` | `Technical Layers > Statusline` is enabled |
+| `payload/settings/statusline.cjs` | `.claude/statusline.cjs` | `Technical Layers > Statusline` is enabled |
 | `payload/settings/hooks.json` | merge into `.claude/settings.json` | Hooks enabled |
 
-`.claude/hooks/specflow-config.js` is required by every other hook and by the
+`.claude/hooks/specflow-config.cjs` is required by every other hook and by the
 statusline. Copy it whenever hooks or the statusline are enabled.
 
 **Merge `settings.json`; do not overwrite it.** Users keep their own permissions
@@ -336,7 +336,7 @@ Verify before reporting success:
 - [ ] `Config Schema` is 1
 - [ ] Every path in the config resolves to something that exists
 - [ ] Every command list has at least one entry, or is deliberately empty
-- [ ] Enabled payload files are in place, and `specflow-config.js` alongside
+- [ ] Enabled payload files are in place, and `specflow-config.cjs` alongside
       them
 - [ ] No document was left as a skeleton
 - [ ] The tasks file has tagged tasks

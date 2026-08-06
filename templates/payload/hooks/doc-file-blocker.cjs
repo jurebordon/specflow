@@ -6,7 +6,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const specflow = require('./specflow-config');
+const specflow = require('./specflow-config.cjs');
 
 async function main() {
   let input = '';

@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const specflow = require('./specflow-config');
+const specflow = require('./specflow-config.cjs');
 
 const REMINDER_INTERVAL = 30;
 

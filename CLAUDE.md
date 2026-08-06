@@ -33,7 +33,7 @@ specflow/
 │   │   ├── end-session/SKILL.md
 │   │   └── plan-autonomous-batch/SKILL.md
 │   ├── payload/                # Installed INTO projects by specflow-init. Verbatim.
-│   │   ├── hooks/              #   incl. specflow-config.js, the shared config reader
+│   │   ├── hooks/              #   incl. specflow-config.cjs, the shared config reader
 │   │   ├── rules/              #   reference the config; never bake values in
 │   │   ├── settings/
 │   │   ├── doc-templates/      #   skeletons the agent fills with real content
@@ -182,20 +182,38 @@ git push origin main
 
 ## Testing & Validation
 
-SpecFlow has no test framework. Validate by exercising the real paths:
-
 ```bash
-# Installer, without touching your real ~/.claude
-HOME=$(mktemp -d) node cli/bin/specflow.js install
-
-# Migration, against a COPY of a real project's legacy config
-node templates/payload/migrate-config.js <copy>/docs/.specflow-config.md --repo <copy> --json
-
-# Hooks, by piping the JSON payload Claude Code would send
-echo '{"cwd":"<fixture>","tool_input":{"file_path":"..."}}' | node templates/payload/hooks/doc-file-blocker.js
+npm test           # node --test test/*.test.mjs — no dependencies
+npm run test:watch
 ```
 
-Checklist:
+Four suites, all hermetic: each works in a temp directory with `HOME`
+redirected, and none reads a real project on this machine. That matters — an
+earlier manual check depended on a sibling repository that was renamed
+mid-session, and a check that silently changes what it covers is not a check.
+
+| Suite | Covers |
+|---|---|
+| `install.test.mjs` | layout, verbatim copy, receipt fingerprints, ownership refusal, dry run, **rollback under an injected swap failure** |
+| `migrate-config.test.mjs` | schema 0 → 1 transforms, the mixed-stack shape, prose rejection, round trip back through the hook reader |
+| `hooks.test.mjs` | anchor resolution, path traversal, frozen-file blocking, formatter routing, shell injection, ESM-project loading |
+| `invariants.test.mjs` | the rules below, mechanically |
+
+`install()` accepts `__failAfterSwaps` purely so rollback is testable. The swap
+deliberately renames rather than deletes, so no arrangement of real filesystem
+state can break it — without that seam, the one path whose entire job is
+recovering from failure would ship untested.
+
+**Hooks must stay `.cjs`.** They are copied into arbitrary user projects, and a
+project with `"type": "module"` would make Node treat a `.js` copy as ESM,
+breaking `require` and crashing every hook — including `doc-file-blocker`,
+which then silently stops protecting frozen files.
+
+**Write the failing test first when fixing a bug here.** Every guard in
+`invariants.test.mjs` exists because something was actually broken, and each was
+confirmed to fail against the broken version before being kept.
+
+Checklist for what the suite cannot check:
 
 - [ ] `templates/global-skills/` contains **no** project-config placeholders.
       Only `{{FEATURE_NAME}}`, `{{TICKET_ID}}`, `{{TASK_TITLE}}` (session
@@ -238,7 +256,7 @@ Break these and the design stops holding:
 - `configuration/CONFIG_SCHEMA.md` — authoritative config schema
 - `configuration/migrations/manifest.json` — gates migration; update it whenever
   the schema shape changes
-- `templates/payload/hooks/specflow-config.js` — the reader hooks parse with
+- `templates/payload/hooks/specflow-config.cjs` — the reader hooks parse with
 - `templates/payload/migrate-config.js` — deterministic 0 → 1 transform
 
 ---

@@ -9,8 +9,8 @@
  * Reads JSON context from stdin (provided by Claude Code),
  * gathers git and project info, and outputs a single status line.
  *
- * Placed at: .claude/statusline.js
- * Configured in settings.json: { "statusLine": { "command": "node .claude/statusline.js" } }
+ * Placed at: .claude/statusline.cjs
+ * Configured in settings.json: { "statusLine": { "command": "node .claude/statusline.cjs" } }
  */
 
 const { execSync } = require('child_process');
@@ -18,11 +18,11 @@ const fs = require('fs');
 const path = require('path');
 
 // Project facts come from .specflow/config.md via the shared reader that ships
-// alongside the hooks. The statusline sits at .claude/statusline.js, so the
+// alongside the hooks. The statusline sits at .claude/statusline.cjs, so the
 // reader is one directory down.
 let specflow = null;
 try {
-  specflow = require(path.join(__dirname, 'hooks', 'specflow-config.js'));
+  specflow = require(path.join(__dirname, 'hooks', 'specflow-config.cjs'));
 } catch {
   specflow = null; // Hooks disabled or not installed — degrade to no task count.
 }

@@ -151,6 +151,14 @@ export async function install(options = {}) {
   const dryRun = Boolean(options.dryRun);
   const force = Boolean(options.force);
 
+  // Test-only fault injection. Rollback is the one path that cannot be
+  // exercised by arranging real filesystem state: the swap deliberately
+  // renames rather than deletes, so the obvious ways to break it (unreadable
+  // or undeletable destinations) no longer fail. Without a seam the rollback
+  // code would ship untested, which for a path whose whole job is recovering
+  // from failure is exactly backwards. Not exposed on the CLI.
+  const failAfterSwaps = Number(options.__failAfterSwaps ?? 0);
+
   const sources = resolveSources();
   if (!sources) {
     console.error(chalk.red('Could not locate SpecFlow templates.'));
@@ -276,6 +284,10 @@ export async function install(options = {}) {
       }
       renameSync(join(staging, name), dest);
       swapped.push({ dest, backup });
+
+      if (failAfterSwaps && swapped.length === failAfterSwaps) {
+        throw new Error(`injected swap failure after ${failAfterSwaps}`);
+      }
     }
 
     // The receipt is part of the transaction: an install whose skills landed

@@ -10,7 +10,7 @@
 const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
-const specflow = require('./specflow-config');
+const specflow = require('./specflow-config.cjs');
 
 const SKIP_EXTENSIONS = new Set([
   '.md', '.markdown', '.txt', '.json', '.yaml', '.yml',

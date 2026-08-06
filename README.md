@@ -116,7 +116,7 @@ your-project/
     ├── hooks/                 # Automation hooks (optional)
     ├── rules/                 # Coding standards (optional)
     ├── settings.json          # Hook & statusline config (merged, not replaced)
-    └── statusline.js          # Real-time status (optional)
+    └── statusline.cjs          # Real-time status (optional)
 ```
 
 Note what is **not** there: no `.claude/skills/`. Skills are on your machine.

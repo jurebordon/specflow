@@ -182,7 +182,7 @@ If using the manual prompt flow (no CLI), these questions help gather tech conte
 |-------|----------------|---------|
 | **Hooks** | `.claude/hooks/*.js` + settings.json config | Automated behaviors: auto-load context, block frozen docs, auto-format, compact suggestions, git push reminders |
 | **Rules** | `.claude/rules/*.md` | Always-loaded guidelines: coding style, git workflow, security, testing, documentation conventions |
-| **Statusline** | `.claude/statusline.js` + settings.json config | Real-time display: context usage %, feature name, TODO progress, git status |
+| **Statusline** | `.claude/statusline.cjs` + settings.json config | Real-time display: context usage %, feature name, TODO progress, git status |
 
 ### Follow-up (if Partial)
 
