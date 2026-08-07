@@ -10,7 +10,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,9 +41,9 @@ process.on('exit', () => {
 });
 
 /** Run the CLI with HOME redirected. Never throws on non-zero exit. */
-export function runCli(args, { home, cwd = REPO_ROOT } = {}) {
+export function runCli(args, { home, cwd = REPO_ROOT, bin = CLI_BIN } = {}) {
   try {
-    const stdout = execFileSync('node', [CLI_BIN, ...args], {
+    const stdout = execFileSync('node', [bin, ...args], {
       cwd,
       env: { ...process.env, HOME: home, USERPROFILE: home },
       encoding: 'utf-8',
@@ -72,6 +72,34 @@ export function writeReceipt(home, receipt) {
 
 export function sha256(filePath) {
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+}
+
+/**
+ * A throwaway copy of the repo's installable parts, so a test can break the
+ * sources without touching the working tree.
+ *
+ * Necessary because tests run concurrently: a test that renamed the real
+ * templates/payload aside made every other suite fail intermittently, since
+ * they import from it. Anything that mutates sources must mutate a copy.
+ *
+ * node_modules is symlinked rather than copied — it is large and read-only
+ * here.
+ */
+export function makeRepoCopy({ omit = [] } = {}) {
+  const root = tmp('specflow-repo-');
+  mkdirSync(join(root, 'cli'), { recursive: true });
+
+  for (const dir of ['templates', 'configuration']) {
+    cpSync(join(REPO_ROOT, dir), join(root, dir), { recursive: true });
+  }
+  for (const entry of ['bin', 'src', 'package.json']) {
+    cpSync(join(REPO_ROOT, 'cli', entry), join(root, 'cli', entry), { recursive: true });
+  }
+  symlinkSync(join(REPO_ROOT, 'cli', 'node_modules'), join(root, 'cli', 'node_modules'), 'dir');
+
+  for (const rel of omit) rmSync(join(root, rel), { recursive: true, force: true });
+
+  return { root, bin: join(root, 'cli', 'bin', 'specflow.js') };
 }
 
 /** A minimal repo with a .specflow/config.md, for hook and reader tests. */

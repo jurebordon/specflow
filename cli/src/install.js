@@ -87,31 +87,106 @@ function fileHash(filePath) {
 }
 
 /**
- * A skill directory is ours to replace only if SpecFlow wrote it and nobody
- * has changed it since. A user who authored their own plan-session should not
- * silently lose it to an install.
+ * Every file under a directory, as `relative path -> sha256`.
  *
- * Ownership by name alone is not safe. A previous install records the names it
- * wrote; if the user then replaces one of those directories with a skill of
- * their own, a name check still grants SpecFlow ownership and the next install
- * deletes their work without ever asking for --force.
- *
- * So the receipt stores a fingerprint per skill, and the fallback only applies
- * when the file on disk is byte-identical to what we installed. Anything
- * edited since is treated as the user's. Receipts from older versions record
- * bare names and grant nothing.
+ * Dotfiles are ignored: editors and file managers scatter .DS_Store and
+ * friends, and treating those as user edits would demand --force for noise.
  */
-function isOurs(skillDir, receiptEntries) {
-  const skillMd = join(skillDir, 'SKILL.md');
-  if (!existsSync(skillMd)) return true; // nothing meaningful there
-  if (skillAuthor(skillMd) === 'specflow') return true;
+function hashTree(dir, prefix = '') {
+  const out = {};
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) continue;
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const abs = join(dir, entry.name);
+    if (entry.isDirectory()) Object.assign(out, hashTree(abs, rel));
+    else out[rel] = fileHash(abs);
+  }
+  return out;
+}
+
+/**
+ * Why a directory is, or is not, SpecFlow's to replace.
+ *
+ * Two things this deliberately does NOT do.
+ *
+ * It does not treat `author: specflow` as ownership. That marker only says
+ * where the file came from, not that it is still what we wrote -- so a user
+ * who tweaked an installed skill without touching the frontmatter, which is
+ * the common way to customise one, would have their edit silently overwritten
+ * by the next install.
+ *
+ * It does not fingerprint SKILL.md alone. specflow-init also owns
+ * CONFIG_SCHEMA.md, migrations/ and payload/; someone patching a hook or the
+ * migration manifest in place would otherwise be invisible to this check and
+ * lose the change.
+ *
+ * So ownership means: the receipt recorded this skill, and every file it
+ * recorded is still byte-identical. Anything else needs --force.
+ */
+function ownership(skillDir, receiptEntries) {
+  if (!existsSync(join(skillDir, 'SKILL.md'))) return { ours: true, reason: 'empty' };
 
   const entry = receiptEntries.find(
     (e) => e && typeof e === 'object' && e.name === basename(skillDir)
   );
-  if (!entry?.sha256) return false;
+  if (!entry?.files) {
+    // No verifiable record. `author: specflow` makes this *probably* ours, but
+    // probably is not a licence to delete someone's directory.
+    return {
+      ours: false,
+      reason: skillAuthor(join(skillDir, 'SKILL.md')) === 'specflow' ? 'unreceipted' : 'foreign'
+    };
+  }
 
-  return fileHash(skillMd) === entry.sha256;
+  const current = hashTree(skillDir);
+  const changed = Object.entries(entry.files)
+    .filter(([rel, hash]) => current[rel] !== hash)
+    .map(([rel]) => rel);
+  const added = Object.keys(current).filter((rel) => !(rel in entry.files));
+
+  if (changed.length || added.length) {
+    return { ours: false, reason: 'modified', changed, added };
+  }
+  return { ours: true, reason: 'unchanged' };
+}
+
+/**
+ * Recover from an install that was interrupted mid-swap.
+ *
+ * The swap renames each destination aside into .specflow-backup before moving
+ * the new one in. If the process dies between those two renames -- SIGKILL, a
+ * host reboot, a closed terminal -- the catch block never runs and the only
+ * copy of that skill is sitting in the backup directory.
+ *
+ * That makes a leftover backup a pending transaction, not scratch space.
+ * Deleting it at startup, which is what a naive cleanup does, destroys exactly
+ * what the backup existed to protect. So recovery runs first, and only
+ * unambiguously superseded backups are discarded.
+ */
+function recoverInterrupted(skillsRoot, backupRoot) {
+  if (!existsSync(backupRoot)) return { restored: [], superseded: [] };
+
+  const restored = [];
+  const superseded = [];
+
+  for (const entry of readdirSync(backupRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const backup = join(backupRoot, entry.name);
+    const dest = join(skillsRoot, entry.name);
+
+    if (existsSync(dest)) {
+      // The swap for this skill completed; the destination is a whole
+      // directory renamed atomically into place. The backup is the older copy.
+      superseded.push(entry.name);
+    } else {
+      // The crash landed between the two renames. This backup is the only copy.
+      renameSync(backup, dest);
+      restored.push(entry.name);
+    }
+  }
+
+  rmSync(backupRoot, { recursive: true, force: true });
+  return { restored, superseded };
 }
 
 /**
@@ -178,18 +253,56 @@ export async function install(options = {}) {
   if (previous) console.log(chalk.dim(`  replacing install of ${previous.version}`));
   console.log();
 
-  // Refuse before writing anything if a foreign skill would be clobbered.
+  const staging = join(skillsRoot, '.specflow-staging');
+  const backupRoot = join(skillsRoot, '.specflow-backup');
+
+  // Recover an interrupted previous run BEFORE anything else looks at the
+  // installed state -- a restored skill has to be visible to the ownership
+  // check below, and a leftover backup must never be cleaned up as scratch.
+  if (!dryRun) {
+    try {
+      const { restored, superseded } = recoverInterrupted(skillsRoot, backupRoot);
+      if (restored.length > 0) {
+        console.log(chalk.yellow(`  recovered ${restored.join(', ')} from an interrupted install`));
+      }
+      if (superseded.length > 0) {
+        console.log(chalk.dim(`  discarded superseded backup of ${superseded.join(', ')}`));
+      }
+    } catch (err) {
+      console.error(chalk.red(`Could not recover an interrupted install: ${err.message}`));
+      console.error(`A previous run left skills in ${backupRoot}.`);
+      console.error('Move them back into place manually before re-running; refusing to continue');
+      console.error('because proceeding would delete the only copy.');
+      process.exitCode = 1;
+      return;
+    }
+  }
+
+  // Refuse before writing anything if a directory that is not ours would be
+  // clobbered.
   const conflicts = [];
   for (const name of GLOBAL_SKILLS) {
     const dir = join(skillsRoot, name);
-    if (existsSync(dir) && !isOurs(dir, previousEntries)) conflicts.push(name);
+    if (!existsSync(dir)) continue;
+    const verdict = ownership(dir, previousEntries);
+    if (!verdict.ours) conflicts.push({ name, ...verdict });
   }
 
   if (conflicts.length > 0 && !force) {
-    console.error(chalk.red('Refusing to overwrite skills SpecFlow did not install:'));
-    for (const name of conflicts) console.error(`  ${join(skillsRoot, name)}`);
-    console.error('\nThese are either hand-authored, or were edited since SpecFlow installed them.');
-    console.error('Move them aside, or re-run with --force to replace them.');
+    console.error(chalk.red('Refusing to overwrite skills that are not SpecFlow\'s to replace:'));
+    for (const c of conflicts) {
+      console.error(`  ${join(skillsRoot, c.name)}`);
+      if (c.reason === 'modified') {
+        const detail = [...(c.changed ?? []), ...(c.added ?? []).map((f) => `${f} (added)`)];
+        console.error(chalk.dim(`    edited since install: ${detail.slice(0, 4).join(', ')}` +
+          (detail.length > 4 ? ` and ${detail.length - 4} more` : '')));
+      } else if (c.reason === 'unreceipted') {
+        console.error(chalk.dim('    looks like SpecFlow\'s, but no install record exists to verify it'));
+      } else {
+        console.error(chalk.dim('    hand-authored'));
+      }
+    }
+    console.error('\nRe-run with --force to replace them, or move them aside to keep them.');
     process.exitCode = 1;
     return;
   }
@@ -252,8 +365,6 @@ export async function install(options = {}) {
   //
   // Staging and backups live inside skillsRoot so renames never cross a
   // filesystem boundary.
-  const staging = join(skillsRoot, '.specflow-staging');
-  const backupRoot = join(skillsRoot, '.specflow-backup');
 
   // Every destination replaced so far, with the backup it was moved to.
   // Deleting a destination before renaming the new one into place would make
@@ -299,11 +410,8 @@ export async function install(options = {}) {
         {
           version: pkg.version,
           config_schema: CONFIG_SCHEMA,
-          // Fingerprints, not bare names -- see isOurs().
-          skills: plan.map(({ name, dest }) => ({
-            name,
-            sha256: fileHash(join(dest, 'SKILL.md'))
-          })),
+          // Every file we installed, not just SKILL.md -- see ownership().
+          skills: plan.map(({ name, dest }) => ({ name, files: hashTree(dest) })),
           installed_at: new Date().toISOString()
         },
         null,
