@@ -93,16 +93,12 @@
       ],
       "carried_keys": [
         "Project > Name",
-        "Project > Mode",
         "Project > Description",
         "Tech Stack > Languages",
         "Tech Stack > Frameworks",
         "Documentation > Existing Docs",
-        "Documentation > Tracking",
-        "Git Workflow > Platform",
         "Git Workflow > Default Branch",
         "Git Workflow > Branch Convention",
-        "Integrations > Ticketing",
         "Technical Layers > Hooks",
         "Technical Layers > Rules",
         "Technical Layers > Statusline"
@@ -263,6 +259,24 @@
           "prompt": "This project records a git workflow type schema 1 does not recognise. Is it solo or team?",
           "deferrable": false,
           "note": "Not deferrable: Type is required, and every session skill branches on it. Writing an unrecognised value fails silently at the point of use."
+        },
+        {
+          "id": "project_mode",
+          "prompt": "This project records a mode schema 1 does not recognise. Is it greenfield, adoption or constrained?",
+          "deferrable": false,
+          "note": "Not deferrable: the key is required and consumers branch on its value."
+        },
+        {
+          "id": "docs_tracking",
+          "prompt": "This project records a docs tracking value schema 1 does not recognise. Are the docs gitignored or tracked?",
+          "deferrable": false,
+          "note": "Not deferrable: the key is required and consumers branch on its value."
+        },
+        {
+          "id": "git_platform",
+          "prompt": "This project records a git platform schema 1 does not recognise. Which is it?",
+          "deferrable": false,
+          "note": "Not deferrable: the key is required and consumers branch on its value."
         }
       ],
       "cleanup": [
@@ -290,22 +304,94 @@
           ]
         }
       ],
-      "remapped_values": [
-        {
-          "key": "Git Workflow > Type",
-          "note": "Schema 0's vocabulary (documented in prompts/INIT.md) was solo | pr-review | ci-cd-gated. Schema 1 accepts solo | team.",
-          "mode": "auto",
+      "value_spaces": {
+        "_note": "Every schema-1 key with a constrained value space, and how schema 0's vocabulary maps onto it. Machine-readable on purpose: migrate-config.js drives normalisation from this table and the test suite asserts the whole legacy space against it, so adding a value in one place cannot leave the other stale.",
+        "Project > Mode": {
+          "scalar": "Mode",
+          "accepted": [
+            "greenfield",
+            "adoption",
+            "constrained"
+          ],
+          "map": {
+            "greenfield": "greenfield",
+            "adoption": "adoption",
+            "constrained": "constrained"
+          },
+          "on_unmapped": "project_mode"
+        },
+        "Documentation > Tracking": {
+          "scalar": "Tracking",
+          "accepted": [
+            "gitignored",
+            "tracked"
+          ],
+          "map": {
+            "gitignored": "gitignored",
+            "tracked": "tracked"
+          },
+          "on_unmapped": "docs_tracking"
+        },
+        "Git Workflow > Type": {
+          "scalar": "Type",
+          "accepted": [
+            "solo",
+            "team"
+          ],
           "map": {
             "solo": "solo",
+            "team": "team",
             "pr-review": "team",
-            "ci-cd-gated": "team",
-            "team": "team"
+            "ci-cd-gated": "team"
           },
-          "unmapped": "raise the git_workflow_type decision; do not carry the value through",
-          "why_it_matters": "end-session and rules/git-workflow.md branch on solo/team. An unmapped value matches neither, so the project silently gets no workflow instructions and nothing reports an error.",
-          "lossy": "ci-cd-gated collapses into team. Schema 1 has no separate CI type; the team workflow already covers waiting on a pipeline."
+          "lossy": {
+            "ci-cd-gated": "schema 1 has no separate CI-gated type; the team workflow covers waiting on CI"
+          },
+          "on_unmapped": "git_workflow_type",
+          "why": "end-session and rules/git-workflow.md branch on solo/team. An unmapped value matches neither, so the project silently gets no workflow instructions."
+        },
+        "Git Workflow > Platform": {
+          "scalar": "Platform",
+          "accepted": [
+            "GitHub",
+            "GitLab",
+            "Bitbucket",
+            "none"
+          ],
+          "map": {
+            "github": "GitHub",
+            "gitlab": "GitLab",
+            "bitbucket": "Bitbucket",
+            "none": "none"
+          },
+          "case_insensitive": true,
+          "on_unmapped": "git_platform",
+          "why": "Bitbucket was a schema-0 option that schema 1 did not list; it is a real platform, so the schema accepts it rather than the migration discarding it."
+        },
+        "Integrations > Ticketing": {
+          "scalar": "Ticketing",
+          "accepted": [
+            "none",
+            "jira",
+            "linear",
+            "github",
+            "gitlab"
+          ],
+          "map": {
+            "none": "none",
+            "jira": "jira",
+            "linear": "linear",
+            "github issues": "github",
+            "gitlab issues": "gitlab",
+            "github": "github",
+            "gitlab": "gitlab"
+          },
+          "case_insensitive": true,
+          "free_form": true,
+          "why": "Schema 0 wrote 'None' capitalised in every real project inspected, plus display labels like 'GitHub Issues'. Rules branch on the value being 'none', so the capital form reads as a configured ticketing system that does not exist.",
+          "note": "free_form: an unrecognised value is a ticketing system SpecFlow does not know by name, which is legitimate. It is kept verbatim rather than raising a decision."
         }
-      ]
+      }
     }
   ],
   "rules": {

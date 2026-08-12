@@ -161,6 +161,43 @@ describe('migration manifest', () => {
     }
   });
 
+  test('every constrained value space is documented in the schema', () => {
+    // The manifest drives migration; CONFIG_SCHEMA.md is what a human reads.
+    // If they disagree, one of them is lying about what a config may contain.
+    const doc = readFileSync(join(REPO_ROOT, 'configuration', 'CONFIG_SCHEMA.md'), 'utf-8');
+    const spaces = MANIFEST.migrations[0].value_spaces ?? {};
+
+    for (const [key, spec] of Object.entries(spaces)) {
+      if (key.startsWith('_')) continue;
+      for (const value of spec.accepted) {
+        assert.ok(doc.includes(`\`${value}\``),
+          `${key}: schema doc does not list accepted value "${value}"`);
+      }
+    }
+  });
+
+  test('every value space maps only onto accepted values', () => {
+    // A map entry pointing at something outside `accepted` would write a value
+    // no consumer matches -- the exact failure this table exists to prevent.
+    const spaces = MANIFEST.migrations[0].value_spaces ?? {};
+    for (const [key, spec] of Object.entries(spaces)) {
+      if (key.startsWith('_')) continue;
+      for (const [from, to] of Object.entries(spec.map)) {
+        assert.ok(spec.accepted.includes(to), `${key}: "${from}" maps to unaccepted "${to}"`);
+      }
+    }
+  });
+
+  test('every unmapped-value handler names a defined decision', () => {
+    const migration = MANIFEST.migrations[0];
+    const defined = new Set(migration.decisions.map((d) => d.id));
+    for (const [key, spec] of Object.entries(migration.value_spaces ?? {})) {
+      if (key.startsWith('_') || spec.free_form) continue;
+      assert.ok(defined.has(spec.on_unmapped),
+        `${key}: on_unmapped "${spec.on_unmapped}" has no decision`);
+    }
+  });
+
   test('covers every key of a schema-0 config', () => {
     // A fixture, not a real project: an earlier manual check depended on
     // sibling repositories, one of which was renamed mid-session.
@@ -172,7 +209,7 @@ describe('migration manifest', () => {
       ...migration.split_keys.map((k) => k.from),
       ...migration.renamed_keys.flatMap((r) => r.from_any_of ?? [r.from]),
       // Keys whose vocabulary changed rather than merely moving.
-      ...(migration.remapped_values ?? []).map((r) => r.key)
+      ...Object.keys(migration.value_spaces ?? {}).filter((k) => !k.startsWith('_'))
     ]);
 
     let section = '';

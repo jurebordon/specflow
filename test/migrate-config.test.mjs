@@ -4,11 +4,14 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { PAYLOAD, tmp } from './helpers.mjs';
+import { PAYLOAD, REPO_ROOT, tmp } from './helpers.mjs';
+import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const { parseLegacy, migrate, render } = require(join(PAYLOAD, 'migrate-config.js'));
 const specflow = require(join(PAYLOAD, 'hooks', 'specflow-config.cjs'));
+
+const MANIFEST = JSON.parse(readFileSync(join(REPO_ROOT, 'configuration', 'migrations', 'manifest.json'), 'utf-8'));
 
 const legacy = (body) => `# SpecFlow Project Configuration\n\n${body}\n`;
 const cmds = (r, kind) => r.commands[kind];
@@ -130,33 +133,62 @@ describe('migrate: keys', () => {
   });
 });
 
-describe('migrate: git workflow type', () => {
-  // Schema 0's vocabulary was solo | pr-review | ci-cd-gated (prompts/INIT.md).
-  // Schema 1 accepts solo | team, and end-session plus rules/git-workflow.md
-  // branch on exactly those. An unmapped value matches neither branch, so the
-  // project silently gets no workflow instructions at all.
-  const workflow = (type) => legacy(`## Git Workflow\n- **Type**: ${type}\n- **Default Branch**: main`);
+describe('migrate: constrained value spaces', () => {
+  // The whole legacy vocabulary, driven from the manifest so this cannot drift
+  // from what the migration actually does. The Type bug reached review because
+  // the fixture and tests only ever contained `solo`: the shapes were covered
+  // exhaustively, the value space inside each key was not.
+  const SPACES = Object.entries(MANIFEST.migrations[0].value_spaces)
+    .filter(([k]) => !k.startsWith('_'));
 
-  for (const [from, to] of [['solo', 'solo'], ['pr-review', 'team'], ['ci-cd-gated', 'team'], ['team', 'team']]) {
-    test(`maps ${from} to ${to}`, () => {
-      const r = migrate(workflow(from), { repo: tmp() });
-      assert.equal(r.out.Type, to);
-      assert.ok(!decisionIds(r).has('git_workflow_type'));
+  const withScalar = (key, value) => legacy(`## Section\n- **${key}**: ${value}`);
+
+  test('the table covers every key that has one', () => {
+    assert.deepEqual(
+      SPACES.map(([k]) => k).sort(),
+      ['Documentation > Tracking', 'Git Workflow > Platform', 'Git Workflow > Type',
+       'Integrations > Ticketing', 'Project > Mode']
+    );
+  });
+
+  for (const [key, spec] of SPACES) {
+    for (const legacyValue of Object.keys(spec.map)) {
+      test(`${spec.scalar}: "${legacyValue}" migrates to an accepted value`, () => {
+        const r = migrate(withScalar(spec.scalar, legacyValue), { repo: tmp() });
+        const result = r.out[spec.scalar];
+        assert.ok(
+          spec.accepted.includes(result),
+          `"${legacyValue}" produced "${result}", which schema 1 does not accept`
+        );
+      });
+    }
+
+    test(`${spec.scalar}: an unrecognised value never reaches the config`, () => {
+      const r = migrate(withScalar(spec.scalar, 'zzz-not-a-real-value'), { repo: tmp() });
+      if (spec.free_form) {
+        // Legitimate: SpecFlow does not need to know every tracker by name.
+        assert.equal(r.out[spec.scalar], 'zzz-not-a-real-value');
+      } else {
+        assert.equal(r.out[spec.scalar], undefined,
+          'a value no consumer matches must not be written');
+        const decision = r.decisions.find((d) => d.id === spec.on_unmapped);
+        assert.ok(decision, `expected decision "${spec.on_unmapped}"`);
+        assert.equal(decision.deferrable, false);
+      }
     });
   }
 
-  test('records the CI distinction it cannot represent', () => {
-    const r = migrate(workflow('ci-cd-gated'), { repo: tmp() });
-    assert.ok(r.notes.some((n) => /CI/.test(n)), 'collapsing ci-cd-gated into team must be stated, not silent');
+  test('every case difference is normalised, not passed through', () => {
+    // All three real schema-0 projects inspected recorded "Ticketing: None".
+    const r = migrate(withScalar('Ticketing', 'None'), { repo: tmp() });
+    assert.equal(r.out.Ticketing, 'none',
+      'capitalised None reads as a configured ticketing system that does not exist');
   });
 
-  test('refuses to carry an unrecognised type through', () => {
-    const r = migrate(workflow('mob-programming'), { repo: tmp() });
-    assert.equal(r.out.Type, undefined, 'a value no skill matches must not reach the config');
-    const decision = r.decisions.find((d) => d.id === 'git_workflow_type');
-    assert.ok(decision);
-    assert.equal(decision.deferrable, false);
-    assert.equal(decision.found, 'mob-programming');
+  test('records the CI distinction it cannot represent', () => {
+    const r = migrate(withScalar('Type', 'ci-cd-gated'), { repo: tmp() });
+    assert.equal(r.out.Type, 'team');
+    assert.ok(r.notes.some((n) => /CI/.test(n)), 'a lossy mapping must be stated, not silent');
   });
 });
 

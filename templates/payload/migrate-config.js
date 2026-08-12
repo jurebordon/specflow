@@ -184,35 +184,38 @@ function migrate(legacyText, opts = {}) {
     if (scalars[name]) out[name] = scalars[name];
   }
 
-  // -- git workflow type: legacy vocabulary -> schema 1 ---------------------
+  // -- constrained value spaces --------------------------------------------
   //
-  // Schema 0 recorded solo | pr-review | ci-cd-gated. Schema 1 has solo | team,
-  // and end-session plus the git-workflow rules branch on exactly those two.
-  // Carrying "pr-review" through verbatim produces a config that every
-  // consumer silently fails to match, so the project gets no workflow
-  // instructions at all -- a failure with no error attached to it.
-  // Read the scalar directly: Type is deliberately not in carried_keys,
-  // because its vocabulary changed rather than merely moving.
-  if (scalars.Type) {
-    const found = scalars.Type.trim();
-    const mapped = { solo: 'solo', 'pr-review': 'team', 'ci-cd-gated': 'team', team: 'team' }[found];
-    if (mapped) {
-      out.Type = mapped;
-      if (mapped !== found) {
-        notes.push(`mapped Git Workflow Type "${found}" to "${mapped}"`);
-        // The CI distinction is not representable in schema 1. The team
-        // workflow already covers waiting on a pipeline, but say so rather
-        // than dropping it silently.
-        if (found === 'ci-cd-gated') {
-          notes.push('schema 1 has no separate CI-gated type; the team workflow covers waiting on CI');
-        }
-      }
+  // Some keys did not just move between schemas, their vocabulary changed.
+  // Carrying such a value through verbatim produces a config that every
+  // consumer silently fails to match: the project gets no workflow
+  // instructions, or a ticketing system that does not exist, and nothing
+  // reports an error. The mapping table lives in the manifest so this code and
+  // the tests read the same source.
+  for (const [key, spec] of Object.entries(mig.value_spaces || {})) {
+    if (key.startsWith('_')) continue;
+
+    const raw = scalars[spec.scalar];
+    if (raw === undefined || raw === '') continue;
+
+    const found = raw.trim();
+    const lookup = spec.case_insensitive ? found.toLowerCase() : found;
+    const mapped = spec.map[lookup];
+
+    if (mapped !== undefined) {
+      out[spec.scalar] = mapped;
+      if (mapped !== found) notes.push(`normalised ${spec.scalar} "${found}" to "${mapped}"`);
+      if (spec.lossy && spec.lossy[lookup]) notes.push(spec.lossy[lookup]);
+    } else if (spec.free_form) {
+      // A value SpecFlow does not know by name is still legitimate here.
+      out[spec.scalar] = found;
+      notes.push(`kept unrecognised ${spec.scalar} "${found}" verbatim`);
     } else {
       decisions.push({
-        id: 'git_workflow_type',
+        id: spec.on_unmapped,
         deferrable: false,
         found,
-        why: 'schema 1 accepts only solo or team, and every skill branches on those'
+        why: `schema 1 accepts only ${spec.accepted.join(', ')} for ${spec.scalar}`
       });
     }
   }

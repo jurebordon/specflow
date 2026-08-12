@@ -152,7 +152,7 @@ autonomous batch rather than trusting an old entry.
 | Key | Type | Required | Source |
 |---|---|---|---|
 | `Type` | `solo` \| `team` | yes | interview |
-| `Platform` | `GitHub` \| `GitLab` \| `none` | no | detected from remote |
+| `Platform` | `GitHub` \| `GitLab` \| `Bitbucket` \| `none` | no | detected from remote |
 | `Default Branch` | string | yes | detected, confirmed |
 | `Branch Convention` | string | yes | interview |
 | `Commit Convention` | string | yes | interview |
@@ -163,9 +163,15 @@ hardcoding `main`/`master` misses projects using anything else.
 
 ### `## Integrations`
 
+Values are lowercase. Schema 0 wrote `None` capitalised and used display
+labels like `GitHub Issues`; rules branch on the value being `none`, so the
+capital form reads as a configured ticketing system that does not exist.
+An unrecognised system is kept verbatim — SpecFlow does not need to know every
+tracker by name.
+
 | Key | Type | Required | Source |
 |---|---|---|---|
-| `Ticketing` | `none` \| `jira` \| `linear` \| `github` \| string | yes | interview |
+| `Ticketing` | `none` \| `jira` \| `linear` \| `github` \| `gitlab` \| string | yes | interview |
 | `Ticket Format` | string | no | interview |
 
 ### `## Review Gate`
