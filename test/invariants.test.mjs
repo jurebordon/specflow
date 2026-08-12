@@ -170,7 +170,9 @@ describe('migration manifest', () => {
     const covered = new Set([
       ...migration.carried_keys,
       ...migration.split_keys.map((k) => k.from),
-      ...migration.renamed_keys.flatMap((r) => r.from_any_of ?? [r.from])
+      ...migration.renamed_keys.flatMap((r) => r.from_any_of ?? [r.from]),
+      // Keys whose vocabulary changed rather than merely moving.
+      ...(migration.remapped_values ?? []).map((r) => r.key)
     ]);
 
     let section = '';

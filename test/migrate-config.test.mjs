@@ -130,6 +130,36 @@ describe('migrate: keys', () => {
   });
 });
 
+describe('migrate: git workflow type', () => {
+  // Schema 0's vocabulary was solo | pr-review | ci-cd-gated (prompts/INIT.md).
+  // Schema 1 accepts solo | team, and end-session plus rules/git-workflow.md
+  // branch on exactly those. An unmapped value matches neither branch, so the
+  // project silently gets no workflow instructions at all.
+  const workflow = (type) => legacy(`## Git Workflow\n- **Type**: ${type}\n- **Default Branch**: main`);
+
+  for (const [from, to] of [['solo', 'solo'], ['pr-review', 'team'], ['ci-cd-gated', 'team'], ['team', 'team']]) {
+    test(`maps ${from} to ${to}`, () => {
+      const r = migrate(workflow(from), { repo: tmp() });
+      assert.equal(r.out.Type, to);
+      assert.ok(!decisionIds(r).has('git_workflow_type'));
+    });
+  }
+
+  test('records the CI distinction it cannot represent', () => {
+    const r = migrate(workflow('ci-cd-gated'), { repo: tmp() });
+    assert.ok(r.notes.some((n) => /CI/.test(n)), 'collapsing ci-cd-gated into team must be stated, not silent');
+  });
+
+  test('refuses to carry an unrecognised type through', () => {
+    const r = migrate(workflow('mob-programming'), { repo: tmp() });
+    assert.equal(r.out.Type, undefined, 'a value no skill matches must not reach the config');
+    const decision = r.decisions.find((d) => d.id === 'git_workflow_type');
+    assert.ok(decision);
+    assert.equal(decision.deferrable, false);
+    assert.equal(decision.found, 'mob-programming');
+  });
+});
+
 describe('migrate: round trip', () => {
   test('rendered output parses back through the hook reader intact', () => {
     const repo = tmp();

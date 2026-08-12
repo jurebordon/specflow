@@ -184,6 +184,39 @@ function migrate(legacyText, opts = {}) {
     if (scalars[name]) out[name] = scalars[name];
   }
 
+  // -- git workflow type: legacy vocabulary -> schema 1 ---------------------
+  //
+  // Schema 0 recorded solo | pr-review | ci-cd-gated. Schema 1 has solo | team,
+  // and end-session plus the git-workflow rules branch on exactly those two.
+  // Carrying "pr-review" through verbatim produces a config that every
+  // consumer silently fails to match, so the project gets no workflow
+  // instructions at all -- a failure with no error attached to it.
+  // Read the scalar directly: Type is deliberately not in carried_keys,
+  // because its vocabulary changed rather than merely moving.
+  if (scalars.Type) {
+    const found = scalars.Type.trim();
+    const mapped = { solo: 'solo', 'pr-review': 'team', 'ci-cd-gated': 'team', team: 'team' }[found];
+    if (mapped) {
+      out.Type = mapped;
+      if (mapped !== found) {
+        notes.push(`mapped Git Workflow Type "${found}" to "${mapped}"`);
+        // The CI distinction is not representable in schema 1. The team
+        // workflow already covers waiting on a pipeline, but say so rather
+        // than dropping it silently.
+        if (found === 'ci-cd-gated') {
+          notes.push('schema 1 has no separate CI-gated type; the team workflow covers waiting on CI');
+        }
+      }
+    } else {
+      decisions.push({
+        id: 'git_workflow_type',
+        deferrable: false,
+        found,
+        why: 'schema 1 accepts only solo or team, and every skill branches on those'
+      });
+    }
+  }
+
   // -- split: "jira (format: PROJ-123)" -> two keys --------------------------
   if (out.Ticketing) {
     const m = out.Ticketing.match(/^(.*?)\s*\(format:\s*(.+?)\)\s*$/i);

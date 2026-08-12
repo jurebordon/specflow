@@ -10,7 +10,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -83,7 +83,9 @@ export function sha256(filePath) {
  * they import from it. Anything that mutates sources must mutate a copy.
  *
  * node_modules is symlinked rather than copied — it is large and read-only
- * here.
+ * here. Both locations are linked when present: npm workspaces hoist the CLI's
+ * dependencies to the repo root, but a standalone `npm install` inside cli/
+ * puts them in cli/node_modules, and the copy has to resolve either way.
  */
 export function makeRepoCopy({ omit = [] } = {}) {
   const root = tmp('specflow-repo-');
@@ -95,7 +97,11 @@ export function makeRepoCopy({ omit = [] } = {}) {
   for (const entry of ['bin', 'src', 'package.json']) {
     cpSync(join(REPO_ROOT, 'cli', entry), join(root, 'cli', entry), { recursive: true });
   }
-  symlinkSync(join(REPO_ROOT, 'cli', 'node_modules'), join(root, 'cli', 'node_modules'), 'dir');
+
+  for (const rel of ['node_modules', join('cli', 'node_modules')]) {
+    const source = join(REPO_ROOT, rel);
+    if (existsSync(source)) symlinkSync(source, join(root, rel), 'dir');
+  }
 
   for (const rel of omit) rmSync(join(root, rel), { recursive: true, force: true });
 
