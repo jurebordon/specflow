@@ -29,6 +29,7 @@ export const GLOBAL_SKILLS = [
   'plan-session',
   'start-session',
   'end-session',
+  'new-feature',
   'plan-autonomous-batch'
 ];
 

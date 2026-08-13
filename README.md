@@ -88,6 +88,7 @@ Skills are installed once per machine:
 ├── plan-session/
 ├── start-session/
 ├── end-session/
+├── new-feature/               # Creates a feature SPEC and tagged tasks
 └── plan-autonomous-batch/     # Clears a whole feature tag hands-off
 ```
 

@@ -26,11 +26,12 @@ specflow/
 │   ├── scripts/bundle-templates.js  # copies templates+configuration into the package
 │   └── package.json
 ├── templates/
-│   ├── global-skills/          # The five machine-installed skills. Ship VERBATIM.
+│   ├── global-skills/          # The six machine-installed skills. Ship VERBATIM.
 │   │   ├── specflow-init/SKILL.md
 │   │   ├── plan-session/SKILL.md
 │   │   ├── start-session/SKILL.md
 │   │   ├── end-session/SKILL.md
+│   │   ├── new-feature/SKILL.md
 │   │   └── plan-autonomous-batch/SKILL.md
 │   ├── payload/                # Installed INTO projects by specflow-init. Verbatim.
 │   │   ├── hooks/              #   incl. specflow-config.cjs, the shared config reader
@@ -93,19 +94,20 @@ markers the agent fills per invocation — `{{FEATURE_NAME}}`, `{{TICKET_ID}}`,
 
 ### 5. Session-Based Workflow
 
-The five machine-installed skills:
+The six machine-installed skills:
 
 ```
 specflow-init          → Set up or migrate a project; the only writer of config
 plan-session           → Read context, filter tasks, create plan
 start-session          → Verify environment, record baseline, implement
 end-session            → Verify, document, commit, merge/PR
+new-feature            → Create a feature SPEC and tagged tasks
 plan-autonomous-batch  → Clear a whole feature tag hands-off, through review gates
 ```
 
-`explore-project`, `new-feature`, `new-worktree`, `pivot-session` and `verify`
-are **not** part of the 2.0 set. They were per-project skills in 1.x and have
-not yet been converted to the config-driven model.
+`explore-project`, `new-worktree`, `pivot-session` and `verify` are **not** part
+of the 2.0 set and are not planned. They saw no real use, and Claude Code's own
+worktree support supersedes `new-worktree`.
 
 ---
 

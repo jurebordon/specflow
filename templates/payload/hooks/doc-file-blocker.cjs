@@ -48,9 +48,15 @@ async function main() {
     process.exit(2);
   }
 
-  // Feature SPEC.md — requirements sections are frozen.
+  // Feature SPEC.md — requirements sections are frozen once written.
   const rel = path.relative(docsAbs, resolved).split(path.sep);
   if (rel.length === 3 && rel[0] === 'feature_docs' && rel[2] === 'SPEC.md') {
+    // Creation is allowed: "frozen" applies to requirements that exist, and
+    // new-feature's entire job is writing this file for the first time. A
+    // guard that blocked creation would make that skill unusable wherever
+    // hooks are enabled.
+    if (!fs.existsSync(resolved)) process.exit(0);
+
     process.stderr.write(
       'BLOCKED: Feature SPEC.md files have frozen requirements sections. ' +
       'Modifications require explicit user approval. ' +

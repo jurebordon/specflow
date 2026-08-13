@@ -25,7 +25,7 @@ plan-session
 
 ## Step 1: `specflow install`
 
-Places five skills into `~/.claude/skills/`:
+Places six skills into `~/.claude/skills/`:
 
 ```
 ~/.claude/skills/
@@ -38,6 +38,7 @@ Places five skills into `~/.claude/skills/`:
 ├── plan-session/
 ├── start-session/
 ├── end-session/
+├── new-feature/
 └── plan-autonomous-batch/
 ```
 

@@ -112,6 +112,14 @@ describe('doc-file-blocker', () => {
     assert.equal(block(root, 'backend/service.py'), 0);
   });
 
+  test('allows creating a feature SPEC that does not exist yet', () => {
+    // new-feature's whole job is writing this file for the first time. A guard
+    // that blocked creation as well as modification would make that skill
+    // unusable wherever hooks are enabled -- frozen applies to requirements
+    // that exist, not to the act of writing them.
+    assert.equal(block(project(), 'docs/feature_docs/brand-new/SPEC.md'), 0);
+  });
+
   test('allows a skeleton VISION.md so init can populate it', () => {
     const root = makeProject({
       config: SCHEMA_1_CONFIG,

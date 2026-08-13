@@ -85,9 +85,9 @@ If the failure is new, or the message differs, it is yours. Fix it.
 
 ## Which skills carry it
 
-All five machine-installed skills: `specflow-init` (in reduced form — it is the
+All six machine-installed skills: `specflow-init` (in reduced form — it is the
 skill that *creates* the config), `plan-session`, `start-session`,
-`end-session`, `plan-autonomous-batch`.
+`end-session`, `new-feature`, `plan-autonomous-batch`.
 
 ## What the contract replaces
 
