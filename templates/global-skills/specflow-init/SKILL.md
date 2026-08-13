@@ -246,6 +246,24 @@ and settings there.
 In amend mode, refresh payload files that SpecFlow ships. Leave anything else in
 those directories untouched — it is the user's.
 
+### Remove superseded 1.x payload files
+
+A 1.x project has `.js` hooks and a `.js` statusline. The 2.0 payload ships
+`.cjs`, so copying it in **leaves both versions side by side** — eight orphaned
+hooks and a stale statusline that look installed but are wired to nothing.
+
+After copying, delete the 1.x file wherever SpecFlow shipped a `.cjs`
+replacement:
+
+| Remove | When |
+|---|---|
+| `.claude/hooks/<name>.js` | `.claude/hooks/<name>.cjs` now exists |
+| `.claude/statusline.js` | `.claude/statusline.cjs` now exists |
+
+List them before deleting, and delete only names SpecFlow ships. A `.js` hook
+the user wrote themselves is theirs — leave it, and say that it may now be
+shadowed by a `.cjs` file of the same name.
+
 ---
 
 ## Step 6: Scaffold and populate the docs
@@ -314,9 +332,18 @@ Per-project skill copies under `.claude/skills/` are superseded by the machine
 install.
 
 1. **List exactly what will be deleted** and show it to the user.
-2. Delete only skills SpecFlow ships. Anything else in that directory is
+2. **Say which ones do not come back.** Four 1.x skills have no 2.0
+   replacement — `explore-project`, `new-worktree`, `pivot-session` and
+   `verify`. They were dropped deliberately (Claude Code's own worktree support
+   supersedes `new-worktree`), but a user who relies on one is losing a
+   capability, not migrating it. That has to be stated before they agree, not
+   discovered afterwards.
+
+   The rest map across: `plan-session`, `start-session`, `end-session` and
+   `new-feature` keep their names, and `init-specflow` becomes `specflow-init`.
+3. Delete only skills SpecFlow ships. Anything else in that directory is
    project-authored — never touch it.
-3. Delete the legacy config once its values are carried into the anchor.
+4. Delete the legacy config once its values are carried into the anchor.
 
 State the consequence plainly: these files are usually git-tracked, so a
 teammate cloning the repo will get no skills until they install SpecFlow
