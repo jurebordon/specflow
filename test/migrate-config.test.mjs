@@ -2,10 +2,11 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 
 import { PAYLOAD, REPO_ROOT, tmp } from './helpers.mjs';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
 const { parseLegacy, migrate, render } = require(join(PAYLOAD, 'migrate-config.js'));
@@ -189,6 +190,102 @@ describe('migrate: constrained value spaces', () => {
     const r = migrate(withScalar('Type', 'ci-cd-gated'), { repo: tmp() });
     assert.equal(r.out.Type, 'team');
     assert.ok(r.notes.some((n) => /CI/.test(n)), 'a lossy mapping must be stated, not silent');
+  });
+});
+
+describe('migrate: blockers and detection', () => {
+  /** A git repo with a legacy config, optionally gitignoring the anchor. */
+  function repo({ ignoreAnchor = false, extra = {} } = {}) {
+    const root = tmp('specflow-repo-');
+    execFileSync('git', ['init', '-q'], { cwd: root });
+    mkdirSync(join(root, 'docs'), { recursive: true });
+    writeFileSync(join(root, 'docs', '.specflow-config.md'),
+      '## Tech Stack\n- **Test Command**: cd backend && pytest\n## Documentation\n- **Path**: docs\n');
+    writeFileSync(join(root, '.gitignore'), ignoreAnchor ? 'node_modules\n.specflow/\n' : 'node_modules\n');
+    for (const [rel, body] of Object.entries(extra)) {
+      mkdirSync(join(root, rel, '..'), { recursive: true });
+      mkdirSync(dirname(join(root, rel)), { recursive: true });
+      writeFileSync(join(root, rel), body);
+    }
+    return root;
+  }
+
+  test('refuses when git would ignore the anchor', () => {
+    // 1.x setup docs told people to add .specflow/ to .gitignore, and real
+    // projects did. Ignored, the config is invisible to teammates and CI and
+    // every skill reports "not initialised" forever, with nothing explaining it.
+    const root = repo({ ignoreAnchor: true });
+    const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });
+
+    const blocker = r.blockers.find((b) => b.id === 'anchor_gitignored');
+    assert.ok(blocker, 'an ignored anchor must be a blocker, not a note');
+    assert.match(blocker.rule, /\.gitignore/);
+    assert.equal(r.writable, false);
+  });
+
+  test('does not block when the anchor is trackable', () => {
+    const root = repo({ ignoreAnchor: false });
+    const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });
+    assert.deepEqual(r.blockers, []);
+  });
+
+  test('detects a suite the legacy config never recorded', () => {
+    // The defect list-valued commands exist to fix. Detection is mechanical
+    // because delegating it to agent diligence is how it happened originally.
+    const root = repo({ extra: { 'frontend/package.json': JSON.stringify({ scripts: { 'test:e2e': 'playwright test' } }) } });
+    const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });
+
+    assert.ok(r.candidates.Test.includes('cd frontend && npm run test:e2e'));
+    const decision = r.decisions.find((d) => d.detected_not_recorded?.some((c) => /test:e2e/.test(c)));
+    assert.ok(decision, 'an unrecorded suite must be raised, not silently omitted');
+  });
+
+  test('ignores vendored directories when detecting', () => {
+    const root = repo({ extra: { 'node_modules/pkg/package.json': JSON.stringify({ scripts: { test: 'x' } }) } });
+    const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });
+    assert.ok(!JSON.stringify(r.candidates).includes('node_modules'));
+  });
+});
+
+describe('migrate: honest output', () => {
+  test('carries Existing Docs through to the rendered file', () => {
+    const r = migrate(legacy('## Documentation\n- **Path**: docs\n- **Existing Docs**: legacy-docs'), { repo: tmp() });
+    assert.match(render(r, '2.0.0'), /Existing Docs.*legacy-docs/);
+  });
+
+  test('never claims a green baseline it did not verify', () => {
+    // Migration runs no tests. Writing "None recorded." would assert a verified
+    // baseline, turning every later failure into "probably pre-existing".
+    const out = render(migrate(legacy('## Project\n- **Name**: x'), { repo: tmp() }), '2.0.0');
+    assert.match(out, /UNVERIFIED/);
+    assert.doesNotMatch(out, /^- None recorded\.$/m);
+  });
+
+  test('marks output as a proposal while anything is unresolved', () => {
+    const out = render(migrate(legacy('## Project\n- **Name**: x'), { repo: tmp() }), '2.0.0');
+    assert.match(out, /^<!-- PROPOSAL ONLY/, 'unresolved output must not look writable');
+  });
+});
+
+describe('migrate: commands that do nothing', () => {
+  test('flags an npm command whose flag never reaches the script', () => {
+    // A real project carried `npm run lint --fix` as its formatter for months.
+    // npm keeps the flag; the script sees no arguments, runs, and exits 0.
+    const r = migrate(legacy('## Technical Layers\n- **Format Command**: cd frontend && npm run lint --fix'), { repo: tmp() });
+    const d = r.decisions.find((x) => x.command === 'cd frontend && npm run lint --fix');
+    assert.ok(d, 'a command that silently does nothing must be raised');
+    assert.equal(d.deferrable, false);
+    assert.match(d.suggestion, /npm run lint -- --fix/);
+  });
+
+  test('leaves a correctly-delimited command alone', () => {
+    const r = migrate(legacy('## Technical Layers\n- **Format Command**: cd frontend && npm run lint -- --fix'), { repo: tmp() });
+    assert.ok(!r.decisions.some((x) => x.command));
+  });
+
+  test('does not flag commands that are not npm run', () => {
+    const r = migrate(legacy('## Tech Stack\n- **Lint Command**: ruff check --fix .'), { repo: tmp() });
+    assert.ok(!r.decisions.some((x) => x.command));
   });
 });
 

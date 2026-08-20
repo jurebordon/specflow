@@ -132,6 +132,17 @@ Ask these. Do not guess them, and do not accept a detected value in their place.
 In **amend mode**, ask only for keys that are missing. Do not re-ask what the
 config already records.
 
+In **migration mode**, the legacy config answers most of these, and re-asking
+them is noise. But "carried forward" is not "verified" — a value can be wrong,
+and carrying it forward preserves the error rather than the answer. So:
+
+- Carry values forward silently where nothing can check them.
+- **Where reality can be checked, check it, and only ask when they disagree.**
+  `Tracking` is the one that goes stale: a project marked `gitignored` whose
+  docs are in fact committed will carry that lie into schema 1. Run
+  `git ls-files <docs path> | head -1` — output means the docs are tracked. Same
+  for `Default Branch` against the actual remote HEAD.
+
 Batch these into as few questions as possible. This is the only interactive part
 of initialisation; everything after it is detection and confirmation.
 
@@ -162,9 +173,20 @@ silently.
 Each command must run from the repository root — bake in the directory change:
 `cd frontend && npm run test`.
 
-Search existing documentation (README, CONTRIBUTING, WORKFLOW docs) for command
-names before falling back to file-pattern detection. A README usually states the
-real command, including flags the manifest does not show.
+`migrate-config.js --json` reports `candidates` and raises a `command_lists`
+decision listing commands the project has that the config never recorded. Work
+through every one: keep it, or say why not. This is mechanical precisely because
+leaving it to diligence is how the original bug happened.
+
+Then search existing documentation (README, CONTRIBUTING, WORKFLOW docs) for
+command names too. A README usually states the real command, including flags and
+prerequisites the manifest does not show — a database that must be up, or a
+wrapper script that replaces the bare runner.
+
+**Check that each command does what its key claims.** A real project recorded
+`cd frontend && npm run lint --fix` as its formatter; npm gives `--fix` to
+itself, not to the script, so it had been formatting nothing for months. A
+command that runs successfully is not the same as a command that works.
 
 ### Record a failure baseline
 
@@ -176,8 +198,12 @@ and today's date. The message is required: skills compare against it before
 attributing a later failure to the baseline. Matching on test path alone is
 forbidden, because a listed test can still break for a new reason.
 
-If the suite is green, write `- None recorded.` An empty baseline is valid and
-safer than a guessed one.
+If the suite is green, write `- None recorded.`
+
+**If you did not actually run the tests, leave the `UNVERIFIED` line the script
+writes.** Do not replace it with `- None recorded.` on the assumption things are
+fine. A baseline nobody verified is worse than none: it converts every future
+failure into "probably pre-existing".
 
 If the suite cannot run at all (missing dependencies, no database), record that
 as a note rather than inventing entries, and say so in the summary.
@@ -206,9 +232,34 @@ codex login status
 
 Record `Mode`, `Probed` (today's date) and any `Notes`.
 
+Note the scope mismatch this creates, and do not be surprised by it later: the
+gate is a property of **this machine**, recorded in **per-project** config. A
+teammate without Codex, or you on another laptop, will read a `codex` gate that
+is not there. Skills that gate must therefore re-check availability at run time
+and fall back rather than trusting the recorded value. The record says what was
+available when the project was set up, not what is available now.
+
 ---
 
 ## Step 4: Write the config
+
+### First: the anchor must not be gitignored
+
+`migrate-config.js` exits **3** with an `anchor_gitignored` blocker when git
+would ignore `.specflow/config.md`. **Do not write the config until that is
+resolved.**
+
+1.x's own setup instructions told people to add `.specflow/` to `.gitignore`,
+and real projects did — so this is the common case, not the edge case. Ignored,
+the anchor is invisible to teammates and CI, every skill on another machine
+reports "not initialised" forever, and nothing anywhere explains why.
+
+Show the offending `.gitignore` line, explain the consequence, and ask the user
+to remove it. **Do not edit their `.gitignore` yourself without asking** — it is
+their file and may be shared. If they decline, stop: an ignored anchor is not a
+degraded install, it is a non-functional one.
+
+### Then write it
 
 Write `.specflow/config.md` from the schema in this skill's `CONFIG_SCHEMA.md`.
 Fill every required key. Paths carry no trailing slash.
@@ -243,8 +294,20 @@ statusline. Copy it whenever hooks or the statusline are enabled.
 **Merge `settings.json`; do not overwrite it.** Users keep their own permissions
 and settings there.
 
+If `.claude/settings.json` does not exist, create it from
+`payload/settings/hooks.json`. Its absence is common — many projects gitignore
+it and commit a `settings.example.json` instead — and is not a reason to skip
+wiring the hooks up.
+
 In amend mode, refresh payload files that SpecFlow ships. Leave anything else in
 those directories untouched — it is the user's.
+
+**Diff before overwriting a shipped file, in every mode.** The "leave anything
+else untouched" rule protects files SpecFlow does not ship; it does nothing for
+a *shipped* file the user has edited in place. A hand-tuned `.claude/rules/`
+file is exactly that, and replacing it without showing the diff destroys work
+silently. If a shipped file differs from what this version installs, show the
+difference and ask.
 
 ### Remove superseded 1.x payload files
 
@@ -263,6 +326,12 @@ replacement:
 List them before deleting, and delete only names SpecFlow ships. A `.js` hook
 the user wrote themselves is theirs — leave it, and say that it may now be
 shadowed by a `.cjs` file of the same name.
+
+**Check `.claude/settings.example.json` too.** Projects that gitignore
+`settings.json` commit an example instead, and it is the file a teammate copies.
+It references the `.js` hooks you just deleted, so after migration the only
+git-tracked hook wiring in the repo points at nothing. Update it alongside
+`settings.json`, or tell the user it is now stale.
 
 ---
 
@@ -323,6 +392,15 @@ Resolve `<docs>` from `Documentation > Docs Path`.
   invented convention is worse than an empty section.
 - **`<docs>/feature_docs/`** — create the directory. Add a SPEC only when a
   feature is already well defined.
+- **`<docs>/ORCHESTRATION.md`** — **create it if missing.** `plan-session`,
+  `start-session` and `end-session` all read this file. A skeleton ships in
+  `payload/doc-templates/`.
+- **`<docs>/WORKFLOW.md`, `AGENTS.md`, `LEARNED_PATTERNS.md`** — create from the
+  shipped skeletons when missing, populated the same way as the rest.
+
+Every file in `payload/doc-templates/` should exist in the project when this
+step finishes. Check the directory rather than working from this list, so a
+template added later is not missed.
 
 ---
 
@@ -349,8 +427,12 @@ State the consequence plainly: these files are usually git-tracked, so a
 teammate cloning the repo will get no skills until they install SpecFlow
 themselves. The deletion is reversible through git.
 
-If the user declines, leave everything and note that the project now has both
-project-level and machine-level copies, which may shadow each other.
+If the user declines, leave everything — but be clear about what declining does
+and does not achieve. **Machine-level skills take precedence over project-level
+ones** (verified, not assumed). The project's own copies are already inert the
+moment SpecFlow is installed on this machine, so keeping them preserves nothing;
+it only leaves dead files that look live. Declining is a reasonable choice for
+teammates who have not installed SpecFlow yet, and a poor one for anything else.
 
 ---
 

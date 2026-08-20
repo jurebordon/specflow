@@ -391,7 +391,8 @@
           "why": "Schema 0 wrote 'None' capitalised in every real project inspected, plus display labels like 'GitHub Issues'. Rules branch on the value being 'none', so the capital form reads as a configured ticketing system that does not exist.",
           "note": "free_form: an unrecognised value is a ticketing system SpecFlow does not know by name, which is legitimate. It is kept verbatim rather than raising a decision."
         }
-      }
+      },
+      "_session_policy_note": "rules.session_policy describes mid-session migration, which cannot fire for 0 -> 1: a schema-0 project has no .specflow/config.md, so every skill takes the 'not initialised' branch and stops rather than migrating in place. The policy is written for future schema bumps, where an anchor already exists and its version is merely older."
     }
   ],
   "rules": {

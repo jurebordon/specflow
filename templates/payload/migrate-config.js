@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 /**
  * Locate the migration manifest in either layout: installed (this script sits
@@ -126,8 +127,120 @@ function looksLikeCommand(value) {
   return true;
 }
 
+/**
+ * `npm run lint --fix` gives `--fix` to npm, not to the script. The script sees
+ * no arguments at all, so the command runs, exits 0, and does nothing.
+ *
+ * A real project carried exactly this as its formatter through a 1.x config and
+ * had been formatting nothing for months. Exit status is not evidence that a
+ * command did its job.
+ */
+function swallowedNpmFlag(command) {
+  const m = command.match(/npm run [\w:.-]+\s+(--?[\w-]+)/);
+  if (!m || / -- /.test(command)) return null;
+  return { flag: m[1], suggestion: command.replace(/(npm run [\w:.-]+)\s+/, '$1 -- ') };
+}
+
 function uniq(list) {
   return [...new Set(list.filter(Boolean))];
+}
+
+
+/**
+ * Would the anchor be invisible to git?
+ *
+ * 1.x's own setup docs told people to add `.specflow/` to .gitignore, and real
+ * projects did. Schema 1 requires the anchor to be tracked: ignored, the config
+ * is invisible to teammates and CI, and every skill on another machine reports
+ * "not initialised" forever with nothing to explain why.
+ *
+ * Checked here rather than left to the agent because it is silent and total --
+ * nothing downstream errors, it simply never works.
+ */
+function anchorIgnored(repo) {
+  try {
+    execFileSync('git', ['check-ignore', '-q', '.specflow/config.md'], { cwd: repo, stdio: 'ignore' });
+    return true; // exit 0 means "is ignored"
+  } catch {
+    return false;
+  }
+}
+
+/** Which .gitignore line does it, so the report can name it. */
+function ignoreRule(repo) {
+  try {
+    const out = execFileSync('git', ['check-ignore', '-v', '.specflow/config.md'], { cwd: repo, encoding: 'utf-8' });
+    return out.trim().split('\t')[0];
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Commands the project has that the legacy config never recorded.
+ *
+ * Schema 0 held one command per category, so a monorepo's second suite went
+ * unrecorded -- the defect list-valued commands exist to fix. Leaving detection
+ * to "the agent should notice" reproduces it, so it is mechanical here. These
+ * are candidates, not conclusions: the caller confirms them.
+ */
+function detectCommands(repo) {
+  const found = { Test: [], Lint: [], Build: [], Typecheck: [], Format: [] };
+  const SCRIPT_MAP = {
+    Test: /^(test|tests|test:.*|e2e|test-e2e)$/,
+    Lint: /^(lint|lint:.*)$/,
+    Build: /^(build|build:.*)$/,
+    Typecheck: /^(typecheck|type-check|tsc)$/,
+    Format: /^(format|fmt|prettier)$/
+  };
+
+  const walk = (dir, depth) => {
+    if (depth > 2) return;
+    let entries;
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    const rel = path.relative(repo, dir);
+    const prefix = rel ? `cd ${rel} && ` : '';
+
+    for (const entry of entries) {
+      const abs = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (['node_modules', '.git', 'venv', '.venv', '__pycache__', 'dist', 'build', 'target'].includes(entry.name)) continue;
+        walk(abs, depth + 1);
+        continue;
+      }
+
+      if (entry.name === 'package.json') {
+        try {
+          const scripts = JSON.parse(fs.readFileSync(abs, 'utf-8')).scripts || {};
+          for (const name of Object.keys(scripts)) {
+            for (const [kind, re] of Object.entries(SCRIPT_MAP)) {
+              // `npm run x --flag` gives the flag to npm, not the script, so a
+              // detected script is recorded bare.
+              if (re.test(name)) found[kind].push(`${prefix}npm run ${name}`);
+            }
+          }
+        } catch {
+          // Unparseable manifest is not our problem to report here.
+        }
+      }
+
+      if (entry.name === 'pytest.ini' || entry.name === 'tox.ini') found.Test.push(`${prefix}pytest`);
+      if (entry.name === 'pyproject.toml') {
+        try {
+          if (/\[tool\.pytest/.test(fs.readFileSync(abs, 'utf-8'))) found.Test.push(`${prefix}pytest`);
+        } catch { /* ignore */ }
+      }
+    }
+  };
+
+  walk(repo, 0);
+  for (const k of Object.keys(found)) found[k] = uniq(found[k]);
+  return found;
 }
 
 function migrate(legacyText, opts = {}) {
@@ -141,6 +254,7 @@ function migrate(legacyText, opts = {}) {
   const decisions = [];
   const notes = [];
   const rejected = [];
+  const blockers = [];
 
   // -- renamed scalars (match on key name; schema 0 put the same key under
   //    different headings in different projects, so section is ignored) -----
@@ -270,15 +384,63 @@ function migrate(legacyText, opts = {}) {
   decisions.push({ id: 'failure_baseline', deferrable: true });
   decisions.push({ id: 'review_gate', deferrable: true, rerunnable: true });
 
-  return { out, commands, decisions, notes };
+  // -- blockers: things that make the result unusable if written as-is ------
+  const repoDir = opts.repo || process.cwd();
+  if (anchorIgnored(repoDir)) {
+    blockers.push({
+      id: 'anchor_gitignored',
+      rule: ignoreRule(repoDir),
+      why: 'git ignores .specflow/config.md, so the anchor would be invisible to teammates and CI',
+      consequence: 'every skill on another machine reports "not initialised" forever, with nothing to explain why',
+      fix: 'remove that .gitignore rule (1.x setup docs added it; schema 1 requires the anchor tracked)'
+    });
+  }
+
+  // -- command candidates the legacy config never recorded ------------------
+  const candidates = detectCommands(repoDir);
+  for (const [kind, list] of Object.entries(candidates)) {
+    const missing = list.filter((c) => !commands[kind].includes(c));
+    if (missing.length) {
+      decisions.push({
+        id: 'command_lists',
+        key: kind,
+        deferrable: true,
+        detected_not_recorded: missing,
+        why: 'the project has this command but the schema 0 config never recorded it; confirm whether it belongs'
+      });
+    }
+  }
+
+  // Commands that run cleanly but do nothing.
+  for (const [kind, list] of Object.entries(commands)) {
+    for (const command of list) {
+      const swallowed = swallowedNpmFlag(command);
+      if (!swallowed) continue;
+      decisions.push({
+        id: 'command_lists',
+        key: kind,
+        deferrable: false,
+        command,
+        why: `npm gives ${swallowed.flag} to itself, not to the script, so this runs and does nothing`,
+        suggestion: swallowed.suggestion
+      });
+    }
+  }
+
+  const unresolved = decisions.some((d) => d.deferrable === false) || blockers.length > 0;
+
+  return { out, commands, decisions, notes, blockers, candidates, writable: !unresolved };
 }
 
 function render(result, version) {
   const { out, commands } = result;
+  const banner = result.writable === false
+    ? '<!-- PROPOSAL ONLY — unresolved markers below. Do not write this to\n     .specflow/config.md until every <angle bracket> and UNVERIFIED line is\n     replaced. See --json for what is outstanding. -->\n\n'
+    : '';
   const list = (k) => (commands[k].length ? commands[k].map((c) => '- `' + c + '`').join('\n') : '');
   const v = (k, fallback) => out[k] || fallback;
 
-  return `# SpecFlow Project Configuration
+  return `${banner}# SpecFlow Project Configuration
 
 ## SpecFlow
 - **Config Schema**: 1
@@ -294,7 +456,7 @@ function render(result, version) {
 - **Frameworks**: ${v('Frameworks', '')}
 
 ## Documentation
-- **Docs Path**: ${v('Docs Path', '<docs>')}
+- **Docs Path**: ${v('Docs Path', '<docs>')}${out['Existing Docs'] ? `\n- **Existing Docs**: ${out['Existing Docs']}` : ''}
 - **Tasks File**: ${v('Tasks File', '<UNRESOLVED: see decisions>')}
 - **Session Log**: ${v('Session Log', '<UNRESOLVED: see decisions>')}
 - **Tracking**: ${v('Tracking', 'tracked')}
@@ -317,7 +479,13 @@ ${list('Typecheck')}
 ${list('Format')}
 
 ## Known Test Failures
-- None recorded.
+<!--
+  UNVERIFIED: migration does not run your tests, so no baseline was established.
+  Run every command under ### Test, then either record each failure with its
+  message, or replace this block with "- None recorded." if the suite is green.
+  Do not leave this as-is: a baseline nobody verified is worse than none.
+-->
+- UNVERIFIED: no test run was performed during migration.
 
 ## Git Workflow
 - **Type**: ${v('Type', 'solo')}
@@ -358,9 +526,26 @@ if (require.main === module) {
   const result = migrate(fs.readFileSync(legacyPath, 'utf-8'), { repo });
 
   if (args.includes('--json')) {
-    console.log(JSON.stringify({ decisions: result.decisions, notes: result.notes, commands: result.commands }, null, 2));
+    console.log(JSON.stringify({
+      blockers: result.blockers,
+      writable: result.writable,
+      decisions: result.decisions,
+      notes: result.notes,
+      commands: result.commands,
+      candidates: result.candidates
+    }, null, 2));
   } else {
     console.log(render(result, version));
+  }
+
+  if (result.blockers.length > 0) {
+    for (const b of result.blockers) {
+      console.error(`\nBLOCKER (${b.id}): ${b.why}`);
+      if (b.rule) console.error(`  rule: ${b.rule}`);
+      console.error(`  consequence: ${b.consequence}`);
+      console.error(`  fix: ${b.fix}`);
+    }
+    process.exit(3);
   }
 }
 

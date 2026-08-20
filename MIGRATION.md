@@ -98,9 +98,11 @@ skills until they install SpecFlow themselves:
 npm install -g specflow-ai && specflow install
 ```
 
-If your team is not ready for that, decline. The project then has both
-project-level and machine-level copies, one of which shadows the other — work
-out which before relying on either.
+If your team is not ready for that, decline — but know what declining buys you.
+**Machine-level skills take precedence over project-level ones.** Once anyone
+installs SpecFlow 2.0, that machine's copies win, and the project's own skills
+are already inert. Keeping them preserves nothing on your machine; it only helps
+teammates who have not installed SpecFlow yet.
 
 The deletion is reversible through git.
 

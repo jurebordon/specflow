@@ -238,6 +238,38 @@ describe('documented invariants hold', () => {
     }
   });
 
+  test('settings wires up every shipped hook and the statusline', () => {
+    // The statusline was installed but referenced by nothing: hooks.json had no
+    // statusLine key, and migration deletes the 1.x statusline.js that was the
+    // only thing pointing at one. Installed-but-unwired passes an existence
+    // check and does nothing.
+    const settings = JSON.parse(readFileSync(join(PAYLOAD_DIR, 'settings', 'hooks.json'), 'utf-8'));
+    assert.ok(settings.statusLine, 'hooks.json has no statusLine key');
+    assert.match(settings.statusLine.command, /statusline\.cjs/);
+
+    const wired = JSON.stringify(settings);
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'hooks'))) {
+      if (file === 'specflow-config.cjs') continue; // required by the others, not run directly
+      assert.ok(wired.includes(file), `${file} ships but nothing invokes it`);
+    }
+  });
+
+  test('every shipped doc template is one specflow-init creates', () => {
+    // ORCHESTRATION.md was read by three skills, shipped as a template, and
+    // created by nothing.
+    const skill = readFileSync(join(GLOBAL_SKILLS_DIR, 'specflow-init', 'SKILL.md'), 'utf-8');
+
+    // These two are referred to by config key, not filename, precisely because
+    // a project may rename them. Anything else must be named.
+    const BY_CONFIG_KEY = { ROADMAP: 'tasks file', SESSION_LOG: 'session log' };
+
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'doc-templates'))) {
+      const name = file.replace(/\.md$/, '');
+      const needle = BY_CONFIG_KEY[name] ?? name;
+      assert.ok(skill.includes(needle), `${file} ships but Step 6 never mentions ${needle}`);
+    }
+  });
+
   test('the hook config reader is present for hooks and statusline', () => {
     // Every other hook and the statusline require it; shipping without it
     // breaks all of them at once.
