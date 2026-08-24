@@ -56,6 +56,25 @@ describe('specflow-config: values', () => {
     assert.equal(specflow.docFile(c, 'Session Log', 'SESSION_LOG.md'), join(c.root, 'docs/JOURNAL.md'));
   });
 
+  test('the same bare key in two sections stays distinct', () => {
+    // The schema defines Mode twice -- Project > Mode and Review Gate > Mode.
+    // Bare-name lookup returns whichever came last, so asking for the project
+    // mode answered "codex". Notes has the same exposure.
+    const root = makeProject({
+      config: [
+        '## SpecFlow', '- **Config Schema**: 1',
+        '## Project', '- **Mode**: adoption', '- **Notes**: project note',
+        '## Review Gate', '- **Mode**: codex', '- **Notes**: gate note'
+      ].join('\n')
+    });
+    const cfg = specflow.load(root);
+
+    assert.equal(specflow.get(cfg, 'Project > Mode'), 'adoption');
+    assert.equal(specflow.get(cfg, 'Review Gate > Mode'), 'codex');
+    assert.equal(specflow.get(cfg, 'Project > Notes'), 'project note');
+    assert.equal(specflow.get(cfg, 'Review Gate > Notes'), 'gate note');
+  });
+
   test('paths escaping the repo root are refused', () => {
     const root = makeProject({ config: SCHEMA_1_CONFIG.replace('- **Docs Path**: docs/', '- **Docs Path**: ../elsewhere') });
     assert.equal(specflow.docsPath(specflow.load(root)), null);

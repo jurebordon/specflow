@@ -186,6 +186,11 @@ function ignoreRule(repo) {
  */
 function detectCommands(repo) {
   const found = { Test: [], Lint: [], Build: [], Typecheck: [], Format: [] };
+  // Scripts that never exit on their own. Proposing one puts a command into
+  // the config that start-session is told to run every time, and the session
+  // hangs. A watcher or an interactive UI is not a verification command.
+  const NON_TERMINATING = /(^|[:.-])(ui|watch|serve|dev|debug)$/;
+
   const SCRIPT_MAP = {
     Test: /^(test|tests|test:.*|e2e|test-e2e)$/,
     Lint: /^(lint|lint:.*)$/,
@@ -218,6 +223,7 @@ function detectCommands(repo) {
         try {
           const scripts = JSON.parse(fs.readFileSync(abs, 'utf-8')).scripts || {};
           for (const name of Object.keys(scripts)) {
+            if (NON_TERMINATING.test(name)) continue;
             for (const [kind, re] of Object.entries(SCRIPT_MAP)) {
               // `npm run x --flag` gives the flag to npm, not the script, so a
               // detected script is recorded bare.
@@ -293,9 +299,13 @@ function migrate(legacyText, opts = {}) {
   for (const k of Object.keys(commands)) commands[k] = uniq(commands[k]);
 
   // -- carried scalars ------------------------------------------------------
+  const PATH_KEYS = new Set(['Existing Docs']);
   for (const key of mig.carried_keys) {
     const name = key.split('>').pop().trim();
-    if (scalars[name]) out[name] = scalars[name];
+    if (!scalars[name]) continue;
+    // CONFIG_SCHEMA's normalisation rule is "writers emit the bare form", and
+    // it applies to every path value, not just Docs Path.
+    out[name] = PATH_KEYS.has(name) ? scalars[name].replace(/\/+$/, '') : scalars[name];
   }
 
   // -- constrained value spaces --------------------------------------------

@@ -61,6 +61,7 @@ ls .claude/skills/ 2>/dev/null
 | `.specflow/config.md` | Already initialised | Step 1, **amend mode** |
 | Only a legacy config in a docs directory | Pre-anchor project | Step 1, **migration mode** |
 | Neither | Fresh project | Step 1, **fresh mode** |
+| **Both** an anchor and a legacy config | A migration that did not finish, or a hand-made anchor | Step 1, **amend mode** — then finish the migration: carry anything the legacy file still holds that the anchor lacks, and delete the legacy file only once nothing is left in it |
 
 If not inside a git repository, say so and stop. SpecFlow's workflow is built on
 branches; there is nothing sensible to configure without one.
@@ -215,6 +216,11 @@ as a note rather than inventing entries, and say so in the summary.
 This step is **re-runnable** on its own, so a user who installs Codex later can
 upgrade their gate without a full re-init.
 
+Probe the **real** machine — the user's actual home directory — not whatever
+`HOME` this process happens to have. The gate describes what is installed on
+this machine; a sandboxed or overridden `HOME` will find nothing and record
+`none`, which is wrong rather than merely cautious.
+
 Probe for `codex`, which requires **all** of:
 
 ```bash
@@ -298,6 +304,16 @@ If `.claude/settings.json` does not exist, create it from
 `payload/settings/hooks.json`. Its absence is common — many projects gitignore
 it and commit a `settings.example.json` instead — and is not a reason to skip
 wiring the hooks up.
+
+**When it does exist, merge like this:** keep every key the user has that
+SpecFlow does not ship (`permissions`, `env`, `model`, anything else) exactly as
+it is. Replace `statusLine` wholesale. For `hooks`, replace SpecFlow's own
+entries per event and keep any others — match on the command string containing
+`.claude/hooks/`, so a hook the user added survives while a stale SpecFlow one
+is replaced rather than duplicated.
+
+**Show the merged result before writing it.** This is the one file in the
+payload that reliably contains something you did not put there.
 
 In amend mode, refresh payload files that SpecFlow ships. Leave anything else in
 those directories untouched — it is the user's.
@@ -395,6 +411,11 @@ Resolve `<docs>` from `Documentation > Docs Path`.
 - **`<docs>/ORCHESTRATION.md`** — **create it if missing.** `plan-session`,
   `start-session` and `end-session` all read this file. A skeleton ships in
   `payload/doc-templates/`.
+
+  This one is **general by design** — its own text says to keep it stable and
+  put volatile project detail in `CUSTOM.md`. Copy it close to verbatim. It is
+  the exception to "populate everything", and Step 8's skeleton check does not
+  apply to it.
 - **`<docs>/WORKFLOW.md`, `AGENTS.md`, `LEARNED_PATTERNS.md`** — create from the
   shipped skeletons when missing, populated the same way as the rest.
 
@@ -406,8 +427,18 @@ template added later is not missed.
 
 ## Step 7: Legacy cleanup (migration mode only)
 
-Per-project skill copies under `.claude/skills/` are superseded by the machine
-install.
+Per-project skill copies are superseded by the machine install. **Check every
+directory that holds them, not just `.claude/skills/`:**
+
+```bash
+ls .claude/skills/ .codex/skills/ 2>/dev/null
+```
+
+1.x mirrored its skills into `.codex/skills/` as well, and those copies are
+git-tracked too. Deleting only `.claude/skills/` leaves a complete second copy
+of the superseded set in the repository — including `init-specflow`, the skill
+this one replaces. The migration then reports success with the old world still
+sitting there.
 
 1. **List exactly what will be deleted** and show it to the user.
 2. **Say which ones do not come back.** Four 1.x skills have no 2.0
@@ -421,7 +452,21 @@ install.
    `new-feature` keep their names, and `init-specflow` becomes `specflow-init`.
 3. Delete only skills SpecFlow ships. Anything else in that directory is
    project-authored — never touch it.
-4. Delete the legacy config once its values are carried into the anchor.
+4. **Fix what still points at the deleted skills.** Deleting the files does not
+   delete the references, and the project's own docs are full of them. Search
+   and update:
+
+   ```bash
+   grep -rn "claude/skills\|codex/skills\|/verify\|/pivot-session\|/explore-project\|/new-worktree" \
+     CLAUDE.md README.md <docs path>/ 2>/dev/null
+   ```
+
+   A `CLAUDE.md` telling the next session to run `/verify` is worse than a
+   missing file: the file is absent, so the instruction just fails, and the
+   reader has no idea the capability was removed on purpose. Say what replaced
+   each one, or that it was dropped.
+
+5. Delete the legacy config once its values are carried into the anchor.
 
 State the consequence plainly: these files are usually git-tracked, so a
 teammate cloning the repo will get no skills until they install SpecFlow

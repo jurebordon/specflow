@@ -240,6 +240,26 @@ describe('migrate: blockers and detection', () => {
     assert.ok(decision, 'an unrecorded suite must be raised, not silently omitted');
   });
 
+  test('never proposes a command that does not terminate', () => {
+    // start-session runs every Test entry. A watcher or interactive UI runner
+    // in that list hangs the session forever.
+    const root = repo({ extra: { 'frontend/package.json': JSON.stringify({
+      scripts: { 'test:e2e': 'playwright test', 'test:e2e:ui': 'playwright test --ui', 'test:watch': 'jest --watch' }
+    }) } });
+    const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });
+
+    assert.ok(r.candidates.Test.includes('cd frontend && npm run test:e2e'));
+    for (const bad of ['test:e2e:ui', 'test:watch']) {
+      assert.ok(!r.candidates.Test.some((c) => c.includes(bad)), `${bad} must not be proposed`);
+    }
+  });
+
+  test('strips trailing slashes from every path value, not just Docs Path', () => {
+    const r = migrate(legacy('## Documentation\n- **Path**: docs/\n- **Existing Docs**: legacy/'), { repo: tmp() });
+    assert.equal(r.out['Docs Path'], 'docs');
+    assert.equal(r.out['Existing Docs'], 'legacy');
+  });
+
   test('ignores vendored directories when detecting', () => {
     const root = repo({ extra: { 'node_modules/pkg/package.json': JSON.stringify({ scripts: { test: 'x' } }) } });
     const r = migrate(readFileSync(join(root, 'docs', '.specflow-config.md'), 'utf-8'), { repo: root });

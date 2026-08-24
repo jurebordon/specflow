@@ -88,15 +88,18 @@ function load(startDir) {
     return null;
   }
 
-  const scalars = Object.create(null);
+  const scalars = Object.create(null);   // bare key -> value (last wins)
+  const qualified = Object.create(null); // "Section > Key" -> value
   const commands = Object.create(null);
   let inCommands = false;
+  let section = '';
   let bucket = null;
 
   for (const line of text.split('\n')) {
     const h2 = line.match(/^##\s+(.+?)\s*$/);
     if (h2) {
-      inCommands = h2[1].toLowerCase() === 'commands';
+      section = h2[1].trim();
+      inCommands = section.toLowerCase() === 'commands';
       bucket = null;
       continue;
     }
@@ -110,7 +113,10 @@ function load(startDir) {
 
     const scalar = line.match(/^-\s+\*\*(.+?)\*\*:\s*(.*)$/);
     if (scalar) {
-      scalars[scalar[1].trim()] = scalar[2].trim();
+      const key = scalar[1].trim();
+      const value = scalar[2].trim();
+      scalars[key] = value;
+      if (section) qualified[`${section} > ${key}`] = value;
       continue;
     }
 
@@ -129,9 +135,28 @@ function load(startDir) {
     root: found.root,
     configPath: found.configPath,
     scalars,
+    qualified,
     commands,
     schema: Number.isNaN(rawSchema) ? null : rawSchema
   };
+}
+
+/**
+ * Read a value by its full "Section > Key" name.
+ *
+ * Prefer this over `scalars` wherever the schema defines the same bare key in
+ * more than one section. It defines `Mode` twice -- `Project > Mode` and
+ * `Review Gate > Mode` -- and bare-name lookup silently returns whichever came
+ * last in the file, so asking for the project mode answers "codex". `Notes` has
+ * the same exposure.
+ *
+ * `scalars` still exists, and still matches on the bare name, because schema 0
+ * put the same key under different headings in different projects and migration
+ * has to tolerate that. For reading a schema 1 config, use this.
+ */
+function get(cfg, qualifiedKey) {
+  if (!cfg) return undefined;
+  return cfg.qualified?.[qualifiedKey];
 }
 
 /**
@@ -170,6 +195,7 @@ function docFile(cfg, key, fallbackName) {
 
 module.exports = {
   ANCHOR,
+  get,
   findRoot,
   safeResolve,
   load,
