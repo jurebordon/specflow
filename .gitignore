@@ -11,3 +11,6 @@ package-lock.json
 
 # Build artefact: written by cli prepublishOnly, never committed
 cli/templates/
+
+# Dependencies (root is an npm workspace root; cli/ has its own)
+node_modules/
