@@ -257,6 +257,48 @@ function detectCommands(repo) {
  * never fire on a project that had never used SpecFlow -- the case the skill's
  * own text calls "the common case, not the edge case".
  */
+/**
+ * SpecFlow installs sitting below the repo root.
+ *
+ * Step 0 globs the root only, so a subtree-merged project carrying a complete
+ * 1.x install one directory down is classified FRESH, and the legacy cleanup
+ * never runs. Subtree merges make this shape common rather than exotic, and the
+ * result is a second superseded copy of the whole toolchain left in the repo
+ * with nothing reporting it.
+ */
+function findNestedInstalls(repo, maxDepth = 3) {
+  const found = [];
+  const SKIP = new Set(['node_modules', '.git', 'venv', '.venv', '__pycache__', 'dist', 'build', 'target']);
+
+  const walk = (dir, depth) => {
+    if (depth > maxDepth) return;
+    let entries;
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory() || SKIP.has(entry.name)) continue;
+      const abs = path.join(dir, entry.name);
+      if (abs === repo) continue;
+
+      const markers = [
+        path.join(abs, 'docs', '.specflow-config.md'),
+        path.join(abs, 'docs_specflow', '.specflow-config.md'),
+        path.join(abs, '.claude', 'skills'),
+        path.join(abs, '.codex', 'skills')
+      ].filter((m) => fs.existsSync(m));
+
+      if (markers.length) found.push({ dir: path.relative(repo, abs), markers: markers.map((m) => path.relative(repo, m)) });
+      walk(abs, depth + 1);
+    }
+  };
+
+  walk(repo, 0);
+  return found;
+}
+
 function preflight(repo) {
   const blockers = [];
   if (anchorIgnored(repo)) {
@@ -269,6 +311,17 @@ function preflight(repo) {
     });
   }
   return blockers;
+}
+
+/** Advisory findings: real, but not reasons to refuse to write. */
+function advisories(repo) {
+  return findNestedInstalls(repo).map((n) => ({
+    id: 'nested_specflow_install',
+    dir: n.dir,
+    markers: n.markers,
+    why: 'a SpecFlow install exists below the repo root; Step 0 only looks at the root, so it would be classified fresh',
+    fix: 'decide whether it is live or dead tooling from a subtree merge, and say so rather than leaving it unmentioned'
+  }));
 }
 
 function reportBlockers(blockers) {
@@ -563,8 +616,12 @@ if (require.main === module) {
   // on exactly the projects the check exists for.
   if (flags['--check']) {
     const blockers = preflight(repo);
-    if (flags['--json']) console.log(JSON.stringify({ blockers, writable: blockers.length === 0 }, null, 2));
+    const notes = advisories(repo);
+    if (flags['--json']) {
+      console.log(JSON.stringify({ blockers, advisories: notes, writable: blockers.length === 0 }, null, 2));
+    }
     reportBlockers(blockers);
+    for (const a of notes) console.error(`\nNOTE (${a.id}): ${a.dir} — ${a.why}`);
     process.exit(blockers.length ? 3 : 0);
   }
 
@@ -597,4 +654,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { parseLegacy, migrate, render, preflight, detectCommands };
+module.exports = { parseLegacy, migrate, render, preflight, advisories, findNestedInstalls, detectCommands };

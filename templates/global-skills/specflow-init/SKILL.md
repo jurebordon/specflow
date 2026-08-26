@@ -61,7 +61,21 @@ ls .claude/skills/ 2>/dev/null
 | `.specflow/config.md` | Already initialised | Step 1, **amend mode** |
 | Only a legacy config in a docs directory | Pre-anchor project | Step 1, **migration mode** |
 | Neither | Fresh project | Step 1, **fresh mode** |
+| A SpecFlow install **below** the root | Subtree-merged project | Treat the root normally, then ask about the nested one — see below |
 | **Both** an anchor and a legacy config | A migration that did not finish, or a hand-made anchor | Step 1, **amend mode** — then finish the migration: carry anything the legacy file still holds that the anchor lacks, and delete the legacy file only once nothing is left in it |
+
+Run the repo preflight before deciding anything:
+
+```bash
+node <this skill's directory>/payload/migrate-config.js --check --repo . --json
+```
+
+It reports blockers (an anchor git would ignore) and advisories — including a
+`nested_specflow_install`, which is a SpecFlow install in a subdirectory. A
+subtree-merged project can carry a complete 1.x toolchain one level down;
+globbing only the root classifies it fresh and the legacy cleanup never runs,
+leaving a superseded copy nothing reports. Ask whether it is live or dead, and
+say what you found either way rather than passing over it.
 
 If not inside a git repository, say so and stop. SpecFlow's workflow is built on
 branches; there is nothing sensible to configure without one.
@@ -344,15 +358,21 @@ If `.claude/settings.json` does not exist, create it from
 it and commit a `settings.example.json` instead — and is not a reason to skip
 wiring the hooks up.
 
-**When it does exist, merge like this:** keep every key the user has that
-SpecFlow does not ship (`permissions`, `env`, `model`, anything else) exactly as
-it is. Replace `statusLine` wholesale. For `hooks`, replace SpecFlow's own
-entries per event and keep any others — match on the command string containing
-`.claude/hooks/`, so a hook the user added survives while a stale SpecFlow one
-is replaced rather than duplicated.
+**When it does exist, use the script — do not merge by hand:**
+
+```bash
+node <this skill's directory>/payload/merge-settings.js \
+  .claude/settings.json <this skill's directory>/payload/settings/hooks.json
+```
+
+It keeps every key SpecFlow does not ship (`permissions`, `env`, `model`),
+keeps hooks the user added, replaces SpecFlow's own by matching on the
+`.claude/hooks/` path so a renamed hook is replaced rather than duplicated, and
+is idempotent. It prints the result and writes nothing.
 
 **Show the merged result before writing it.** This is the one file in the
-payload that reliably contains something you did not put there.
+payload that reliably contains something you did not put there, and the only
+one where getting the merge wrong loses work rather than just looking untidy.
 
 In amend mode, refresh payload files that SpecFlow ships. Leave anything else in
 those directories untouched — it is the user's.
