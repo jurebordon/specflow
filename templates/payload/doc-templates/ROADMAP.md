@@ -5,13 +5,13 @@
 
 ## Now (Current Work)
 
-<!-- Tag each task with [feature: name] -->
+<!-- Every task needs a feature tag. See the note at the bottom. -->
 - [ ] <current task> [feature: <feature name>]
 
 ## Next (Queued)
 
 <!-- Priority ordered - top item is next -->
-<!-- Tag each task with [feature: name] -->
+<!-- Every task needs a feature tag. See the note at the bottom. -->
 
 1. <item> [feature: <feature name>]
 
@@ -43,7 +43,8 @@
 - Move items between sections as priorities change
 - Add blockers immediately when encountered
 - Reference tasks by ID in SESSION_LOG entries
-- **Feature tagging**: Every task must be tagged with `[feature: name]`
-  - Example: `- [ ] Add login endpoint [feature: user-auth]`
+- **Feature tagging**: every task carries a feature tag in square brackets.
+  Write the feature's own name there. Tags are how every skill filters work, so
+  an untagged task is one nobody will be offered.
   - Use `[feature: infrastructure]` for project-wide work (upgrades, refactors, etc.)
   - AI agents use feature tags to filter tasks when planning sessions

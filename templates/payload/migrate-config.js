@@ -249,6 +249,37 @@ function detectCommands(repo) {
   return found;
 }
 
+/**
+ * Repo-level checks that do not depend on a legacy config existing.
+ *
+ * Kept separate so fresh mode can run them: the anchor-gitignored check used to
+ * live inside migrate(), which only runs on parsed legacy text, so it could
+ * never fire on a project that had never used SpecFlow -- the case the skill's
+ * own text calls "the common case, not the edge case".
+ */
+function preflight(repo) {
+  const blockers = [];
+  if (anchorIgnored(repo)) {
+    blockers.push({
+      id: 'anchor_gitignored',
+      rule: ignoreRule(repo),
+      why: 'git ignores .specflow/config.md, so the anchor would be invisible to teammates and CI',
+      consequence: 'every skill on another machine reports "not initialised" forever, with nothing to explain why',
+      fix: 'remove that .gitignore rule (1.x setup docs added it; schema 1 requires the anchor tracked)'
+    });
+  }
+  return blockers;
+}
+
+function reportBlockers(blockers) {
+  for (const b of blockers) {
+    console.error(`\nBLOCKER (${b.id}): ${b.why}`);
+    if (b.rule) console.error(`  rule: ${b.rule}`);
+    console.error(`  consequence: ${b.consequence}`);
+    console.error(`  fix: ${b.fix}`);
+  }
+}
+
 function migrate(legacyText, opts = {}) {
   const manifest = JSON.parse(fs.readFileSync(findManifest(), 'utf-8'));
   const mig = manifest.migrations.find((m) => m.from === 0 && m.to === 1);
@@ -396,15 +427,7 @@ function migrate(legacyText, opts = {}) {
 
   // -- blockers: things that make the result unusable if written as-is ------
   const repoDir = opts.repo || process.cwd();
-  if (anchorIgnored(repoDir)) {
-    blockers.push({
-      id: 'anchor_gitignored',
-      rule: ignoreRule(repoDir),
-      why: 'git ignores .specflow/config.md, so the anchor would be invisible to teammates and CI',
-      consequence: 'every skill on another machine reports "not initialised" forever, with nothing to explain why',
-      fix: 'remove that .gitignore rule (1.x setup docs added it; schema 1 requires the anchor tracked)'
-    });
-  }
+  blockers.push(...preflight(repoDir));
 
   // -- command candidates the legacy config never recorded ------------------
   const candidates = detectCommands(repoDir);
@@ -520,18 +543,38 @@ ${out['Ticket Format'] ? `- **Ticket Format**: ${out['Ticket Format']}\n` : ''}
 
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const legacyPath = args.find((a) => !a.startsWith('--'));
-  const repoIdx = args.indexOf('--repo');
-  const repo = repoIdx !== -1 ? args[repoIdx + 1] : path.dirname(path.dirname(legacyPath || '.'));
+  // Parse properly: a flag's value is also a non-flag argument, so scanning
+  // for "the first thing without --" hands back --repo's value when the
+  // positional is omitted -- which is exactly what a fresh-mode run does.
+  const VALUE_FLAGS = new Set(['--repo', '--version-string']);
+  const positional = [];
+  const flags = {};
+  for (let i = 0; i < args.length; i++) {
+    if (VALUE_FLAGS.has(args[i])) { flags[args[i]] = args[++i]; continue; }
+    if (args[i].startsWith('--')) { flags[args[i]] = true; continue; }
+    positional.push(args[i]);
+  }
 
-  if (!legacyPath || !fs.existsSync(legacyPath)) {
+  const legacyPath = positional[0];
+  const repo = flags['--repo'] || (legacyPath ? path.dirname(path.dirname(legacyPath)) : process.cwd());
+
+  // --check runs the repo-level preflight alone. Fresh mode has no legacy
+  // config, so routing the anchor check through migrate() made it unreachable
+  // on exactly the projects the check exists for.
+  if (flags['--check']) {
+    const blockers = preflight(repo);
+    if (flags['--json']) console.log(JSON.stringify({ blockers, writable: blockers.length === 0 }, null, 2));
+    reportBlockers(blockers);
+    process.exit(blockers.length ? 3 : 0);
+  }
+
+  if (!legacyPath || !fs.existsSync(legacyPath) || fs.statSync(legacyPath).isDirectory()) {
     console.error('usage: migrate-config.js <legacy-config-path> [--repo <dir>] [--json]');
+    console.error('       migrate-config.js --check --repo <dir> [--json]   (repo preflight, no legacy config)');
     process.exit(2);
   }
 
-  const version = args.includes('--version-string')
-    ? args[args.indexOf('--version-string') + 1]
-    : '2.0.0';
+  const version = typeof flags['--version-string'] === 'string' ? flags['--version-string'] : '2.0.0';
 
   const result = migrate(fs.readFileSync(legacyPath, 'utf-8'), { repo });
 
@@ -549,14 +592,9 @@ if (require.main === module) {
   }
 
   if (result.blockers.length > 0) {
-    for (const b of result.blockers) {
-      console.error(`\nBLOCKER (${b.id}): ${b.why}`);
-      if (b.rule) console.error(`  rule: ${b.rule}`);
-      console.error(`  consequence: ${b.consequence}`);
-      console.error(`  fix: ${b.fix}`);
-    }
+    reportBlockers(result.blockers);
     process.exit(3);
   }
 }
 
-module.exports = { parseLegacy, migrate, render };
+module.exports = { parseLegacy, migrate, render, preflight, detectCommands };

@@ -8,7 +8,7 @@
 |-------|-----------|------------------|
 | **Strategic** | VISION.md, ADR.md | Rarely (pivots, major decisions) |
 | **Tactical** | OVERVIEW.md, ROADMAP.md, WORKFLOW.md | Per milestone/feature |
-| **Operational** | SESSION_LOG.md, .claude/skills/* | Every session |
+| **Operational** | Session log | Every session |
 | **Frozen** | feature_docs/*/SPEC.md | Never (feature north star) |
 
 ## Session Lifecycle
@@ -22,18 +22,18 @@
 
 ### During Work
 
-- [ ] Create feature branch: `<git branch convention>`
+- [ ] Create feature branch: the pattern in `Git Workflow > Branch Convention`
 - [ ] Stay within scope of chosen task
 - [ ] Commit frequently with clear messages
 - [ ] Note any decisions made for later documentation
 
 ### After Work
 
-- [ ] Run tests: `<test command>`
+- [ ] Run tests: every command under `## Commands` → `### Test`
 - [ ] Update `ROADMAP.md` (mark done, adjust Next)
 - [ ] Append entry to `SESSION_LOG.md`
 - [ ] If architecture changed: update `OVERVIEW.md` and/or `ADR.md`
-- [ ] <git merge instruction>
+- [ ] Merge or open a PR per `Git Workflow > Type`
 
 ## Git Workflow
 
@@ -71,9 +71,9 @@ main ←── CI/CD ←── MR ←── feature/branch
 
 - Branch from main: `git checkout -b type/description`
 - Work and commit on branch
-- When done: create MR via `<mr command>`
+- When done: create MR via `gh pr create` / `glab mr create`
 - Do NOT merge locally - CI/CD handles merge
-- Branch naming: <git branch convention>
+- Branch naming: see `Git Workflow > Branch Convention` in `.specflow/config.md`
 
 ## Documentation Update Rules
 
@@ -114,9 +114,9 @@ If metrics are needed, they must be:
 | `/plan-session` | Before starting work |
 | `/start-session` | Beginning implementation |
 | `/end-session` | Wrapping up, merging |
-| `/pivot-session` | Reassessing direction |
 
-Skills are in `.claude/skills/` ([Agent Skills](https://agentskills.io) standard, also output to `.codex/skills/`).
+Skills are installed once per machine in `~/.claude/skills/` and read project
+facts from `.specflow/config.md`. They are not copied into this repository.
 
 ## Quick Reference
 
@@ -127,9 +127,9 @@ git checkout -b feat/my-feature
 # ... code ...
 
 # End work
-<test command>
+every command under `## Commands` → `### Test` in `.specflow/config.md`
 git add . && git commit -m "feat: description"
-<git merge instruction>
+Merge or open a PR per `Git Workflow > Type`
 ```
 
 ## Getting Help

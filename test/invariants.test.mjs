@@ -270,6 +270,31 @@ describe('documented invariants hold', () => {
     }
   });
 
+  test('shipped doc skeletons carry no 1.x model or fake features', () => {
+    // These propagate into every project initialised from this branch. A
+    // skeleton that mentions a dropped skill, the per-project skill model, or
+    // an example feature tag ships that error everywhere.
+    const DROPPED = ['pivot-session', 'explore-project', 'new-worktree', '/verify'];
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'doc-templates'))) {
+      const text = readFileSync(join(PAYLOAD_DIR, 'doc-templates', file), 'utf-8');
+
+      for (const skill of DROPPED) {
+        assert.ok(!text.includes(skill), `${file} references dropped skill ${skill}`);
+      }
+      assert.ok(!text.includes('.codex/skills'), `${file} describes the 1.x mirrored-skill model`);
+      // ~/.claude/skills/ is the 2.0 machine install and correct; a bare
+      // .claude/skills/ is the 1.x per-project model.
+      assert.doesNotMatch(text, /(?<!~\/|\/)(?<!\w)\.claude\/skills\//,
+        `${file} describes per-project skills`);
+
+      // `infrastructure` is a real SpecFlow-defined tag; anything else in a
+      // skeleton is a phantom feature a scan would report as real.
+      for (const [, tag] of text.matchAll(/\[feature: ([a-z-]+)\]/g)) {
+        assert.equal(tag, 'infrastructure', `${file} ships a phantom feature tag "${tag}"`);
+      }
+    }
+  });
+
   test('the hook config reader is present for hooks and statusline', () => {
     // Every other hook and the statusline require it; shipping without it
     // breaks all of them at once.

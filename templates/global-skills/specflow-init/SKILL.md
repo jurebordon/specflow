@@ -129,6 +129,24 @@ Ask these. Do not guess them, and do not accept a detected value in their place.
 4. **Branching strategy** — solo or team, and the branch naming convention.
 5. **Commit convention.**
 6. **Ticketing** — none, or which system and what the ticket format looks like.
+7. **Project name and one-line description.** Propose the directory name and a
+   description drafted from the README, and have them confirmed. Both are
+   schema keys and neither is detectable.
+8. **Which technical layers to install** — hooks, rules, statusline. All three
+   are **required** schema keys and Step 5 branches on them, so leaving them
+   unanswered writes a config the schema rejects.
+
+   Say what "yes" costs before asking. Rules are always-loaded context: five
+   files, roughly 400 lines, in every session forever. A project that manages
+   its own context budget may not want them, and a project with its own
+   `.claude/rules/` certainly needs to be asked rather than told.
+
+Then derive and confirm two more:
+
+- **Tasks file and session log.** Default to `ROADMAP.md` and `SESSION_LOG.md`
+  under the docs path, but **show the paths and have them confirmed** — the
+  schema requires them explicit precisely because projects rename them, and a
+  skill that assumes the default silently reads the wrong file.
 
 In **amend mode**, ask only for keys that are missing. Do not re-ask what the
 config already records.
@@ -178,6 +196,21 @@ Each command must run from the repository root — bake in the directory change:
 decision listing commands the project has that the config never recorded. Work
 through every one: keep it, or say why not. This is mechanical precisely because
 leaving it to diligence is how the original bug happened.
+
+**If there is no manifest at all, do not stop there.** A project can have real
+tests and declare them nowhere: no `package.json`, no `pyproject.toml`, no
+`Makefile`. Detection returns empty and the README may not say either. Look at
+what is actually in the repository:
+
+```bash
+git ls-files | grep -iE '(^|/)(tests?|spec)/' | head -20
+git ls-files | grep -iE '(test|spec)[._-]' | head -20
+```
+
+Then open what you find — a test runner usually documents itself in its own
+header comment. **Never conclude "this project has no tests" without having
+looked at its test directory.** An empty `### Test` list means every skill that
+"runs the tests" runs nothing, forever, and reports success.
 
 Then search existing documentation (README, CONTRIBUTING, WORKFLOW docs) for
 command names too. A README usually states the real command, including flags and
@@ -297,6 +330,12 @@ render and nothing that can go stale:
 `.claude/hooks/specflow-config.cjs` is required by every other hook and by the
 statusline. Copy it whenever hooks or the statusline are enabled.
 
+**If hooks are enabled, gitignore the state file they write.**
+`session-end-persist.cjs` rewrites `<docs>/.session-state.md` at the end of
+every session. In a tracked docs directory that is an auto-generated file
+someone will commit, and then a merge conflict every session. Add it to
+`.gitignore` when it is not already covered.
+
 **Merge `settings.json`; do not overwrite it.** Users keep their own permissions
 and settings there.
 
@@ -391,8 +430,17 @@ Resolve `<docs>` from `Documentation > Docs Path`.
   schemas) where they exist; 3–5 invariants that must always hold.
 - **`<docs>/VISION.md`** — problem statement, solution hypothesis, target users,
   qualitative success metrics, non-goals, confirmed stack. **Do not invent
-  numeric targets.** This file is frozen after creation and a hook blocks later
-  edits, so get it right now.
+  numeric targets.**
+
+  **In adoption mode, ask before writing this one.** Everything else in Step 6
+  is recoverable from the code; product intent is not. Reading a codebase tells
+  you what it does, never why it was built or who for — so a VISION written from
+  source is the agent's inference presented as the project's intent, and this
+  file is frozen after creation.
+
+  Offer the user a draft and let them correct it, or offer to leave it as a
+  stub. If they accept a draft, record its provenance in the file: which sources
+  it came from, and that nobody stated it directly.
 - **The tasks file** — current phase; 1–3 tasks under "Now"; 2–3 under "Next";
   2–3 under "Later". **Every task carries a `[feature: name]` tag** — untagged
   tasks are invisible to every filtering skill. For adoption, focus the first
@@ -414,8 +462,14 @@ Resolve `<docs>` from `Documentation > Docs Path`.
 
   This one is **general by design** — its own text says to keep it stable and
   put volatile project detail in `CUSTOM.md`. Copy it close to verbatim. It is
-  the exception to "populate everything", and Step 8's skeleton check does not
+  an exception to "populate everything", and Step 8's skeleton check does not
   apply to it.
+
+  **`AGENTS.md` is the same**: it describes how to install and delegate to
+  community agents, which is not project-specific. Copy it near-verbatim too,
+  and note in it whether `.claude/agents/` exists — if it does not, the
+  delegation guidance in it and in `ORCHESTRATION.md` has nothing to delegate
+  to, and saying so is more useful than pretending otherwise.
 - **`<docs>/WORKFLOW.md`, `AGENTS.md`, `LEARNED_PATTERNS.md`** — create from the
   shipped skeletons when missing, populated the same way as the rest.
 
@@ -489,7 +543,11 @@ Verify before reporting success:
       `<angle bracket>` fill-ins left
 - [ ] `Config Schema` is 1
 - [ ] Every path in the config resolves to something that exists
-- [ ] Every command list has at least one entry, or is deliberately empty
+- [ ] Every command list has at least one entry, or is empty **and you have
+      said out loud why** — naming what you looked at and what was not there.
+      "Detection found nothing" is not a reason; it is the thing that needs
+      explaining. An unexplained empty `### Test` is the most likely silent
+      failure this skill has.
 - [ ] Enabled payload files are in place, and `specflow-config.cjs` alongside
       them
 - [ ] No document was left as a skeleton

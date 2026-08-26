@@ -15,7 +15,7 @@ SpecFlow orchestrates the **development session lifecycle**:
 4. Verify changes against repo-local commands
 5. Persist decisions and next steps
 
-SpecFlow does **not** replace repo-local tooling. Builds, tests, formatters, deploy scripts, review policy, and domain-specific checks belong in `WORKFLOW.md`, `CUSTOM.md`, `.claude/rules/`, `.codex/skills/`, or project scripts.
+SpecFlow does **not** replace repo-local tooling. Builds, tests, formatters, deploy scripts, review policy, and domain-specific checks belong in `WORKFLOW.md`, `CUSTOM.md`, `.claude/rules/`, or project scripts.
 
 Use this file as the default operating model. Override it only when `CUSTOM.md`, feature specs, or explicit user instructions are more specific.
 

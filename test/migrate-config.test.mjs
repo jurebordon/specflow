@@ -6,10 +6,10 @@ import { join, dirname } from 'node:path';
 
 import { PAYLOAD, REPO_ROOT, tmp } from './helpers.mjs';
 import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
-const { parseLegacy, migrate, render } = require(join(PAYLOAD, 'migrate-config.js'));
+const { parseLegacy, migrate, render, preflight } = require(join(PAYLOAD, 'migrate-config.js'));
 const specflow = require(join(PAYLOAD, 'hooks', 'specflow-config.cjs'));
 
 const MANIFEST = JSON.parse(readFileSync(join(REPO_ROOT, 'configuration', 'migrations', 'manifest.json'), 'utf-8'));
@@ -221,6 +221,28 @@ describe('migrate: blockers and detection', () => {
     assert.ok(blocker, 'an ignored anchor must be a blocker, not a note');
     assert.match(blocker.rule, /\.gitignore/);
     assert.equal(r.writable, false);
+  });
+
+  test('the anchor check is reachable without a legacy config', () => {
+    // The check used to live inside migrate(), which only runs on parsed legacy
+    // text -- so it could never fire on a project that had never used SpecFlow,
+    // which is precisely the case the skill calls "the common case".
+    const root = repo({ ignoreAnchor: true });
+    const blockers = preflight(root);
+    assert.ok(blockers.some((b) => b.id === 'anchor_gitignored'),
+      'fresh mode must be able to detect an ignored anchor');
+  });
+
+  test('--repo value is not mistaken for the legacy path', () => {
+    // `args.find(a => !a.startsWith('--'))` grabbed --repo's value when the
+    // positional was omitted, producing a raw EISDIR stack trace.
+    const root = repo({ ignoreAnchor: true });
+    const r = spawnSync('node', [join(PAYLOAD, 'migrate-config.js'), '--check', '--repo', root, '--json'],
+      { encoding: 'utf-8' });
+
+    assert.equal(r.status, 3, 'should exit 3 on the blocker, not crash');
+    assert.doesNotMatch(r.stderr, /EISDIR|at Object\.readFileSync/, 'raw stack trace leaked');
+    assert.ok(JSON.parse(r.stdout).blockers.some((b) => b.id === 'anchor_gitignored'));
   });
 
   test('does not block when the anchor is trackable', () => {
