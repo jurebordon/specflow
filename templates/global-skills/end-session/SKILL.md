@@ -90,8 +90,17 @@ If the failure is new, or the message differs, it is yours. Fix it.
 Run **every** command in the config under `### Test`, `### Lint`, `### Build`
 and `### Typecheck`. All entries in each list.
 
-Fix failures before proceeding. Compare anything still failing against the
-baseline from `start-session` — by message, not by path.
+Fix failures before proceeding. Compare anything still failing against
+`.specflow/.session-baseline.md`, written by `start-session` — by message, not
+by path.
+
+**If that file does not exist, say so.** It means no baseline was taken this
+session — `start-session` was skipped, or the file was cleaned up. Do not
+proceed as though a comparison happened: fall back to `## Known Test Failures`
+in the config, and state that the comparison is against the recorded baseline
+rather than this session's.
+
+Delete the file once the session is wrapped up. It describes one session.
 
 **Optional quality reviews** for significant changes. If specialist agents are
 installed in `.claude/agents/`, run applicable reviews in parallel:
@@ -126,8 +135,10 @@ commit into one unchecked sequence.
 
 Edit the file named by `Documentation > Tasks File`:
 
-1. **Mark the task complete** — check its box.
-2. **Move to Done** if the "Now" section is cluttered, with a date.
+1. **Mark the task complete.** Either check its box in place, **or** move it to
+   "Done" with a date — not both. Match whatever the file already does; a task
+   appearing in two sections is worse than either convention.
+2. **Move to Done** when "Now" is getting cluttered.
 3. **Add blockers** you discovered.
 
 ```markdown
@@ -149,6 +160,10 @@ Prepend an entry to the file named by `Documentation > Session Log`. Other
 skills reference this format by name — `end-session` → *Session log entry*.
 Keep the anchor stable if you edit it.
 
+Match the format already in the file if it differs from this — the project's own
+log is the authority, and an entry that does not match the entries around it is
+harder to read than one that does.
+
 ```markdown
 ## [{{FEATURE_NAME}}] {{CURRENT_DATE}}
 
@@ -165,10 +180,21 @@ Keep the anchor stable if you edit it.
 - [Design decisions made, or "None"]
 
 ### Blockers
-- [Issues encountered, or "None"]
+- [Issues still standing at the end of this session, or "None"]
+- Resolved-along-the-way issues belong under Summary, not here. The tasks file
+  has its own Blockers section for anything outstanding; keep them consistent.
+
+### Near-misses
+- [Anything that nearly went wrong and did not, and why]
+- Omit the heading if there were none. This is the field a future session most
+  needs and the one with nowhere else to go: "the tests hit the live service and
+  nothing was written only because the ids were malformed" is not a decision,
+  not a blocker, and not an accomplishment.
 
 ### Next
 - [Suggested next task]
+- [Follow-up work discovered mid-session — add it to the tasks file too, or it
+  is lost. Noticing it is part of the session; recording it is not optional.]
 
 ---
 ```
@@ -214,7 +240,31 @@ Read `Git Workflow > Type` and `Git Workflow > Default Branch` from the config.
 Other skills reference this step by name — `end-session` → *Merge or open a PR*.
 Some deliberately skip it; keep the anchor stable.
 
+**Propose, then wait. Do not run any of this unprompted.**
+
+Merging to the default branch and pushing it is the only irreversible thing in
+this skill, and a session that went sideways ends the same way as one that went
+well. `new-feature` already *offers* rather than acts for the far more harmless
+act of creating a branch; this step is where offering actually matters.
+
+Show the user what you propose to run, then stop and ask. If they decline, the
+work is committed on the branch and nothing is lost.
+
 ### Solo
+
+Check first, and say what you find:
+
+```bash
+git log --oneline <default branch> ^<current branch>   # would the merge pull in more?
+git status -sb                                          # is the branch ahead of its remote?
+```
+
+If the current branch **is** the default branch, say so and stop — there is
+nothing to merge, and running this anyway would merge a branch into itself and
+push whatever else was sitting on it. That is the common case when a session
+picked a task off the roadmap without branching first.
+
+Then propose:
 
 ```bash
 git checkout <default branch>
@@ -224,7 +274,14 @@ git push origin <default branch>
 git branch -d <current branch>
 ```
 
+Name explicitly, before asking: this pushes to the shared remote, and
+`git branch -d` deletes the branch (recoverable through the reflog, but a
+deletion). If anything in the log check was unexpected — commits the user did
+not put there, a branch already ahead of its remote — lead with that.
+
 ### Team
+
+Propose, then wait:
 
 ```bash
 git push -u origin <current branch>
@@ -233,6 +290,10 @@ git push -u origin <current branch>
 Then open a PR (`gh pr create`) or MR (`glab mr create`) with a summary and a
 test plan listing **every** test command from the config. Wait for review — and
 for CI where it runs — before merging.
+
+Pushing a feature branch is far less consequential than pushing the default
+branch, but it is still the first time this work leaves the machine. Say so and
+let the user decline.
 
 ---
 

@@ -90,7 +90,13 @@ reminder.
 
 ```bash
 git branch --show-current
+git status --short
 ```
+
+If the working tree is dirty, say what is uncommitted before planning against
+it. A plan built on an unknown state is a plan for a different repository.
+`new-feature` in particular leaves its SPEC and roadmap edit uncommitted, so
+running these two back to back hits this every time.
 
 Extract the feature from the branch name:
 
@@ -118,7 +124,10 @@ Resolve `<docs>` from `Documentation > Docs Path`.
 
 **If a feature was detected:**
 
-- `<docs>/feature_docs/{{FEATURE_NAME}}/SPEC.md` — requirements
+- `<docs>/feature_docs/{{FEATURE_NAME}}/SPEC.md` — requirements. **Its absence is
+  normal and not an error**: only `new-feature` writes SPECs, so features that
+  came from an adoption-mode init have none. Say you are planning without one
+  and carry on — do not stop, and do not silently pretend you read it.
 
 **Optional, only if something is unclear:**
 
@@ -200,6 +209,18 @@ with read-only tools first.
 **If in plan mode:** call `ExitPlanMode` to present the plan. Do not also ask
 "Approve this plan?" — `ExitPlanMode` handles approval. If rejected, revise and
 call it again.
+
+**When approval comes back, do not start editing.** The harness says "you can
+now start coding"; this skill means something narrower. Approval here means *the
+plan is right*, not *begin now* — implementation belongs to `start-session`,
+which is where the failure baseline is taken and where the work gets a branch.
+Skip it and both are silently missing for the rest of the session, and
+`end-session` will compare against a baseline that was never recorded.
+
+So on approval, say what was approved and hand over:
+
+> Plan approved. Run `start-session` to begin — it takes the test baseline and
+> branches for the work before any edit.
 
 **If not in plan mode:** ask "Approve this plan to start implementation?"
 

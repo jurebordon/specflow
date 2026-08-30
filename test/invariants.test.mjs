@@ -302,6 +302,41 @@ describe('documented invariants hold', () => {
     assert.ok(statSync(reader).isFile());
   });
 
+  test('destructive git commands are proposed, never handed over bare', () => {
+    // end-session shipped a fenced block that merged to the default branch,
+    // pushed it, and deleted the branch, with no confirmation anywhere near it.
+    // A session that went sideways ended exactly like one that went well.
+    //
+    // Checked near the command, not anywhere in the file: a whole-file search
+    // for "ask" matches "task" and passes on everything.
+    const DESTRUCTIVE = /^\s*git (push|merge|branch -d|branch -D|reset --hard)\b/;
+    const CONSENT = /\b(propose|proposes?|offer|offers?|confirm|decline|do not run|stop and ask|wait)\b/i;
+    const WINDOW = 15; // lines above the command
+
+    const offenders = [];
+    for (const name of GLOBAL_SKILLS) {
+      const lines = skillText(name).split('\n');
+      lines.forEach((line, i) => {
+        if (!DESTRUCTIVE.test(line)) return;
+        const preceding = lines.slice(Math.max(0, i - WINDOW), i).join('\n');
+        if (!CONSENT.test(preceding)) offenders.push(`${name}:${i + 1} ${line.trim()}`);
+      });
+    }
+    assert.deepEqual(offenders, [],
+      'a destructive git command with no consent language in the preceding lines');
+  });
+
+  test('the session baseline has somewhere to live', () => {
+    // start-session records it and end-session compares against it. Held in
+    // conversation only, it evaporates on the /clear that plan-session itself
+    // recommends -- and end-session then reads as though a comparison happened.
+    const start = skillText('start-session');
+    const end = skillText('end-session');
+    assert.match(start, /\.specflow\/\.session-baseline\.md/, 'start-session must write the baseline down');
+    assert.match(end, /\.specflow\/\.session-baseline\.md/, 'end-session must read it');
+    assert.match(end, /does not exist/i, 'end-session must handle the file being absent');
+  });
+
   test('no skill hardcodes main or master as the default branch', () => {
     const offenders = [];
     for (const name of GLOBAL_SKILLS) {

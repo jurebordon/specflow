@@ -93,8 +93,33 @@ git status
 - The working tree should be clean, or WIP should be saved first.
 
 **Check for a plan file (Claude Code):** if a plan from `plan-session` exists in
-`~/.claude/plans/`, read the most recent one. If not, the plan was delivered
-inline — proceed from conversation context.
+`~/.claude/plans/`, read the most recent one — then **confirm it is actually
+this project's plan before using it.** That directory is shared by every project
+on the machine and the filenames are randomly generated, carrying no project,
+repo or feature identity. "Most recent" is a guess that happens to be right when
+you have just written one. If the newest plan does not match the task at hand,
+say so rather than working from it.
+
+If there is no plan file, it was delivered inline — proceed from conversation
+context.
+
+### Branch for the work
+
+If the current branch is the one named in `Git Workflow > Default Branch`, you
+are about to implement a roadmap task directly on it. Nothing upstream creates a
+branch — `plan-session` does not, and `new-feature` only branches for a feature
+it just created — so this is the normal state, not an unusual one.
+
+Propose a branch following `Git Workflow > Branch Convention` and let the user
+decline:
+
+```bash
+git checkout -b <branch>
+```
+
+It matters more than it looks: `end-session` ends by merging the current branch
+into the default branch. Start on the default branch and that step merges it
+into itself and pushes whatever else was sitting there.
 
 **Read project-specific context**, resolving `<docs>` from `Documentation >
 Docs Path`:
@@ -110,9 +135,47 @@ Run **every** command listed under `## Commands` → `### Test` in the config.
 Not the first one — all of them. A repo with a backend and a frontend has two
 suites, and a baseline taken from one of them is not a baseline.
 
-Record which tests fail and **what each failure says**. This is the comparison
-point for the rest of the session: anything failing at the end that was not
-failing now, or that fails now with a different message, is yours.
+Record which tests fail and **what each failure says**, and **write it to
+`.specflow/.session-baseline.md`** — do not keep it in conversation only.
+
+`end-session` is instructed to compare against this baseline. Held only in
+context, it survives one unbroken conversation and evaporates on a `/clear`, a
+compaction, or a wrap-up done in a fresh window — and `plan-session` recommends
+`/clear` between sessions. When it evaporates, `end-session` does not error: it
+compares against nothing while reading as though a comparison happened. That is
+invisible exactly while the suite is green, which is when nobody looks.
+
+```markdown
+# Session baseline — <YYYY-MM-DD>, branch <branch>
+
+## <the exact command>
+exit: 0
+failures: none
+
+## <the next command>
+exit: 1
+failures:
+- `tests/test_x.py::test_y` — AssertionError: expected 3, got 2
+```
+
+Write one section per command in the `### Test` list, including the ones that
+passed — "this command passed at the start" is the fact that matters when it
+fails at the end. Overwrite any previous file; it describes this session only.
+
+Add `.specflow/.session-baseline.md` to `.gitignore` if it is not already
+covered. It is machine- and moment-specific and should never be committed.
+
+### Is the suite safe to run?
+
+Before running anything, check whether these commands are hermetic. A test
+command can reach a real database, a staging environment or a live local
+daemon, and "run every command under `### Test`" treats that as bookkeeping.
+
+Look at what the suite imports and what the project's docs say about it. If
+anything suggests it talks to something real, **ask before running it.** This is
+not hypothetical: a suite documented as "fixtures only, no daemon needed" was
+found firing real write calls at a live service, because a module froze its
+endpoint at import time before the test file could override it.
 
 If tests fail:
 

@@ -82,6 +82,26 @@ interrogating them.
 
 ---
 
+## Step 1b: Read before you write
+
+**This is the step that decides whether the SPEC is worth anything.** Step 1
+gives you five answers; the document you are about to write is declared frozen
+the moment it lands. Writing it from those five answers alone produces the
+skeleton with the user's words pasted in.
+
+Before drafting, read what the project already says about this area:
+
+- The architecture and domain docs under `<docs>` — especially anything
+  describing the subsystem this feature touches
+- The code it will interact with
+- `<docs>/CUSTOM.md` for conventions and known gotchas
+- Existing SPECs under `<docs>/feature_docs/`, for shape and for overlap
+
+`plan-session` has a required reading list before it writes a *disposable* plan.
+This skill writes the frozen one and had none. Bring back specifics: real
+constraints, real interactions, real open questions. A SPEC whose Open Questions
+are generic is a SPEC nobody will reread.
+
 ## Step 2: Create the feature SPEC
 
 Write `<docs>/feature_docs/{{FEATURE_NAME}}/SPEC.md`.
@@ -185,6 +205,12 @@ task is a task nobody will be offered.
 
 Append to the existing sections. Never rewrite tasks that are already there.
 
+**One exception: retire the item this feature came from.** A backlog line like
+"Decide whether to do X" is superseded the moment X becomes a feature with real
+tasks. Leaving it produces a roadmap that lists the same work twice, in two
+sections, at two levels of detail. Move it to Done with a pointer to the feature,
+or delete it — and say which you did.
+
 ---
 
 ## Step 4: Create a feature branch
@@ -201,7 +227,11 @@ Then branch according to `Git Workflow > Type`:
 
 **`solo`** — offer it; the user may prefer to keep working where they are.
 
+Branch from the default branch, not from wherever you happen to be. Taking a
+branch off an unrelated unmerged feature stacks this work on top of it.
+
 ```bash
+git checkout <Git Workflow > Default Branch>
 git checkout -b <branch>
 ```
 
@@ -230,7 +260,10 @@ Feature created: {{FEATURE_NAME}}
 
 **Next**:
 1. Review the SPEC and confirm the requirements before building against them.
-2. Run `plan-session` — it will filter for [feature: {{FEATURE_NAME}}] tasks.
+2. Commit the SPEC and the task file edit. This skill does not commit, and
+   `start-session` expects a clean tree — leaving them uncommitted guarantees
+   friction on the very next command.
+3. Run `plan-session` — it will filter for [feature: {{FEATURE_NAME}}] tasks.
 ```
 
 ---
