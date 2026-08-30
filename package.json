@@ -1,0 +1,15 @@
+{
+  "name": "specflow-repo",
+  "private": true,
+  "description": "Development root for SpecFlow. The published package is cli/.",
+  "workspaces": [
+    "cli"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:watch": "node --test --watch test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

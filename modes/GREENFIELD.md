@@ -133,7 +133,7 @@ Full documentation suite:
 ```
 project/
 ├── CLAUDE.md
-├── docs_specflow/
+├── docs/
 │   ├── VISION.md
 │   ├── ADR.md
 │   ├── OVERVIEW.md

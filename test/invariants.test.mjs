@@ -1,0 +1,352 @@
+/**
+ * Invariants that keep the design coherent.
+ *
+ * SKILL.md files are prose and cannot be unit tested for behaviour, but every
+ * rule the design depends on is mechanically checkable. These are the six
+ * invariants listed in CLAUDE.md, plus the cross-artifact consistency that a
+ * schema change is easy to half-apply.
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
+
+import { REPO_ROOT } from './helpers.mjs';
+import { GLOBAL_SKILLS, CONFIG_SCHEMA } from '../cli/src/install.js';
+
+const GLOBAL_SKILLS_DIR = join(REPO_ROOT, 'templates', 'global-skills');
+const PAYLOAD_DIR = join(REPO_ROOT, 'templates', 'payload');
+const MANIFEST = JSON.parse(readFileSync(join(REPO_ROOT, 'configuration', 'migrations', 'manifest.json'), 'utf-8'));
+
+const skillText = (name) => readFileSync(join(GLOBAL_SKILLS_DIR, name, 'SKILL.md'), 'utf-8');
+
+function walk(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const abs = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walk(abs));
+    else out.push(abs);
+  }
+  return out;
+}
+
+/** Placeholders that are legitimately supplied per invocation or per run. */
+const ALLOWED_PLACEHOLDERS = new Set([
+  'FEATURE_NAME', 'TICKET_ID', 'TASK_TITLE',   // session arguments
+  'CURRENT_BRANCH', 'CURRENT_DATE', 'DATE'      // runtime values
+]);
+
+describe('skills ship verbatim', () => {
+  test('no project-config placeholder survives in any skill', () => {
+    const offenders = [];
+    for (const name of GLOBAL_SKILLS) {
+      for (const [, key] of skillText(name).matchAll(/\{\{([A-Z][A-Z0-9_]*)\}\}/g)) {
+        if (!ALLOWED_PLACEHOLDERS.has(key)) offenders.push(`${name}: {{${key}}}`);
+      }
+    }
+    assert.deepEqual(offenders, [],
+      'a project value baked into a skill goes stale in every project that installed it');
+  });
+
+  test('the payload contains no template syntax at all', () => {
+    const offenders = walk(PAYLOAD_DIR)
+      .filter((f) => readFileSync(f, 'utf-8').includes('{{'))
+      .map((f) => relative(REPO_ROOT, f));
+    assert.deepEqual(offenders, [], 'payload files are copied byte-for-byte and cannot be rendered');
+  });
+});
+
+describe('skill frontmatter', () => {
+  for (const name of GLOBAL_SKILLS) {
+    test(`${name} declares a matching name and the current schema`, () => {
+      const text = skillText(name);
+      assert.ok(text.startsWith('---\n'), 'missing frontmatter');
+
+      const end = text.indexOf('\n---', 4);
+      assert.ok(end > 0, 'unterminated frontmatter');
+      const frontmatter = text.slice(4, end);
+
+      assert.match(frontmatter, new RegExp(`^name:\\s*${name}$`, 'm'), 'name must match the directory');
+      assert.match(frontmatter, /^\s+author:\s*specflow$/m, 'author marker drives install ownership');
+
+      const schema = frontmatter.match(/^\s+config_schema:\s*(\d+)$/m);
+      assert.ok(schema, 'missing config_schema');
+      assert.equal(Number(schema[1]), CONFIG_SCHEMA,
+        'skill expects a different schema than the installer ships');
+    });
+  }
+});
+
+describe('the config contract', () => {
+  const CONTRACT = readFileSync(join(REPO_ROOT, 'core', 'CONFIG_CONTRACT.md'), 'utf-8');
+
+  // Load-bearing sentences from the canonical block. Skills embed a copy, so
+  // the risk is drift: a rule fixed in one place and forgotten in four others.
+  const CLAUSES = [
+    'Never lower `Config Schema`',
+    'A no-op writes nothing',
+    'Matching on test path alone is forbidden'
+  ];
+
+  test('the canonical block states each rule', () => {
+    for (const clause of CLAUSES) assert.ok(CONTRACT.includes(clause), `contract lost: ${clause}`);
+  });
+
+  for (const name of GLOBAL_SKILLS.filter((s) => s !== 'specflow-init')) {
+    test(`${name} reads the anchor and refuses to guess without it`, () => {
+      const text = skillText(name);
+      assert.match(text, /\.specflow\/config\.md/, 'skill does not read the anchor');
+      assert.match(text, /has not been initialised for SpecFlow/,
+        'skill must say so and offer init rather than guessing');
+      assert.match(text, /Never lower `Config Schema`|never lower/i);
+    });
+  }
+});
+
+describe('cross-skill references', () => {
+  // Skills used to reference each other by step number, which rots the moment
+  // either is edited. Named anchors replaced them; this checks they resolve.
+  const ANCHORS = {
+    'plan-session': ['plan-structure'],
+    'end-session': ['session-log-entry', 'merge-or-pr']
+  };
+
+  for (const [name, ids] of Object.entries(ANCHORS)) {
+    for (const id of ids) {
+      test(`${name} defines the "${id}" anchor`, () => {
+        assert.match(skillText(name), new RegExp(`<a id="${id}"></a>`), 'anchor missing or renamed');
+      });
+    }
+  }
+
+  test('no skill references another by step number', () => {
+    const offenders = [];
+    for (const name of GLOBAL_SKILLS) {
+      for (const other of GLOBAL_SKILLS) {
+        if (name === other) continue;
+        const pattern = new RegExp(`\`?${other}\`?\\s+Step\\s+\\d`, 'i');
+        if (pattern.test(skillText(name))) offenders.push(`${name} -> ${other}`);
+      }
+    }
+    assert.deepEqual(offenders, [], 'reference sibling skills by named anchor, not step number');
+  });
+});
+
+describe('migration manifest', () => {
+  test('declares the schema the installer ships', () => {
+    assert.equal(MANIFEST.current_schema, CONFIG_SCHEMA);
+    assert.equal(MANIFEST.anchor, '.specflow/config.md');
+  });
+
+  test('every referenced decision exists', () => {
+    for (const migration of MANIFEST.migrations) {
+      const defined = new Set(migration.decisions.map((d) => d.id));
+      const referenced = migration.added_keys.flatMap((k) =>
+        [k.decision, k.fallback_decision].filter(Boolean));
+      for (const ref of referenced) {
+        assert.ok(defined.has(ref), `added_keys references undefined decision "${ref}"`);
+      }
+    }
+  });
+
+  test('every decision declares whether it can be deferred', () => {
+    for (const migration of MANIFEST.migrations) {
+      for (const decision of migration.decisions) {
+        assert.equal(typeof decision.deferrable, 'boolean', `decision "${decision.id}" lacks deferrable`);
+        if (decision.deferrable) {
+          assert.ok(decision.on_defer, `deferrable decision "${decision.id}" lacks on_defer behaviour`);
+        }
+      }
+    }
+  });
+
+  test('every constrained value space is documented in the schema', () => {
+    // The manifest drives migration; CONFIG_SCHEMA.md is what a human reads.
+    // If they disagree, one of them is lying about what a config may contain.
+    const doc = readFileSync(join(REPO_ROOT, 'configuration', 'CONFIG_SCHEMA.md'), 'utf-8');
+    const spaces = MANIFEST.migrations[0].value_spaces ?? {};
+
+    for (const [key, spec] of Object.entries(spaces)) {
+      if (key.startsWith('_')) continue;
+      for (const value of spec.accepted) {
+        assert.ok(doc.includes(`\`${value}\``),
+          `${key}: schema doc does not list accepted value "${value}"`);
+      }
+    }
+  });
+
+  test('every value space maps only onto accepted values', () => {
+    // A map entry pointing at something outside `accepted` would write a value
+    // no consumer matches -- the exact failure this table exists to prevent.
+    const spaces = MANIFEST.migrations[0].value_spaces ?? {};
+    for (const [key, spec] of Object.entries(spaces)) {
+      if (key.startsWith('_')) continue;
+      for (const [from, to] of Object.entries(spec.map)) {
+        assert.ok(spec.accepted.includes(to), `${key}: "${from}" maps to unaccepted "${to}"`);
+      }
+    }
+  });
+
+  test('every unmapped-value handler names a defined decision', () => {
+    const migration = MANIFEST.migrations[0];
+    const defined = new Set(migration.decisions.map((d) => d.id));
+    for (const [key, spec] of Object.entries(migration.value_spaces ?? {})) {
+      if (key.startsWith('_') || spec.free_form) continue;
+      assert.ok(defined.has(spec.on_unmapped),
+        `${key}: on_unmapped "${spec.on_unmapped}" has no decision`);
+    }
+  });
+
+  test('covers every key of a schema-0 config', () => {
+    // A fixture, not a real project: an earlier manual check depended on
+    // sibling repositories, one of which was renamed mid-session.
+    const legacy = readFileSync(join(REPO_ROOT, 'test', 'fixtures', 'legacy-config.md'), 'utf-8');
+
+    const migration = MANIFEST.migrations.find((m) => m.from === 0);
+    const covered = new Set([
+      ...migration.carried_keys,
+      ...migration.split_keys.map((k) => k.from),
+      ...migration.renamed_keys.flatMap((r) => r.from_any_of ?? [r.from]),
+      // Keys whose vocabulary changed rather than merely moving.
+      ...Object.keys(migration.value_spaces ?? {}).filter((k) => !k.startsWith('_'))
+    ]);
+
+    let section = '';
+    const unmapped = [];
+    for (const line of legacy.split('\n')) {
+      const heading = line.match(/^## (.+)/);
+      if (heading) { section = heading[1]; continue; }
+      const key = line.match(/^- \*\*(.+?)\*\*:/);
+      if (!key) continue;
+
+      const full = `${section} > ${key[1]}`;
+      const plural = migration.merged_keys?.some((m) => m.mapping.some((x) => x.from === key[1]));
+      if (!covered.has(full) && !plural) unmapped.push(full);
+    }
+    assert.deepEqual(unmapped, [], 'a schema-0 key would be silently dropped by migration');
+  });
+});
+
+describe('documented invariants hold', () => {
+  test('rules reference the config rather than baking values in', () => {
+    const rules = walk(join(PAYLOAD_DIR, 'rules'));
+    assert.ok(rules.length > 0, 'no rules found');
+    for (const file of rules) {
+      assert.match(readFileSync(file, 'utf-8'), /\.specflow\/config\.md|`## Commands`|config/i,
+        `${relative(REPO_ROOT, file)} does not point at the config`);
+    }
+  });
+
+  test('settings wires up every shipped hook and the statusline', () => {
+    // The statusline was installed but referenced by nothing: hooks.json had no
+    // statusLine key, and migration deletes the 1.x statusline.js that was the
+    // only thing pointing at one. Installed-but-unwired passes an existence
+    // check and does nothing.
+    const settings = JSON.parse(readFileSync(join(PAYLOAD_DIR, 'settings', 'hooks.json'), 'utf-8'));
+    assert.ok(settings.statusLine, 'hooks.json has no statusLine key');
+    assert.match(settings.statusLine.command, /statusline\.cjs/);
+
+    const wired = JSON.stringify(settings);
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'hooks'))) {
+      if (file === 'specflow-config.cjs') continue; // required by the others, not run directly
+      assert.ok(wired.includes(file), `${file} ships but nothing invokes it`);
+    }
+  });
+
+  test('every shipped doc template is one specflow-init creates', () => {
+    // ORCHESTRATION.md was read by three skills, shipped as a template, and
+    // created by nothing.
+    const skill = readFileSync(join(GLOBAL_SKILLS_DIR, 'specflow-init', 'SKILL.md'), 'utf-8');
+
+    // These two are referred to by config key, not filename, precisely because
+    // a project may rename them. Anything else must be named.
+    const BY_CONFIG_KEY = { ROADMAP: 'tasks file', SESSION_LOG: 'session log' };
+
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'doc-templates'))) {
+      const name = file.replace(/\.md$/, '');
+      const needle = BY_CONFIG_KEY[name] ?? name;
+      assert.ok(skill.includes(needle), `${file} ships but Step 6 never mentions ${needle}`);
+    }
+  });
+
+  test('shipped doc skeletons carry no 1.x model or fake features', () => {
+    // These propagate into every project initialised from this branch. A
+    // skeleton that mentions a dropped skill, the per-project skill model, or
+    // an example feature tag ships that error everywhere.
+    const DROPPED = ['pivot-session', 'explore-project', 'new-worktree', '/verify'];
+    for (const file of readdirSync(join(PAYLOAD_DIR, 'doc-templates'))) {
+      const text = readFileSync(join(PAYLOAD_DIR, 'doc-templates', file), 'utf-8');
+
+      for (const skill of DROPPED) {
+        assert.ok(!text.includes(skill), `${file} references dropped skill ${skill}`);
+      }
+      assert.ok(!text.includes('.codex/skills'), `${file} describes the 1.x mirrored-skill model`);
+      // ~/.claude/skills/ is the 2.0 machine install and correct; a bare
+      // .claude/skills/ is the 1.x per-project model.
+      assert.doesNotMatch(text, /(?<!~\/|\/)(?<!\w)\.claude\/skills\//,
+        `${file} describes per-project skills`);
+
+      // `infrastructure` is a real SpecFlow-defined tag; anything else in a
+      // skeleton is a phantom feature a scan would report as real.
+      for (const [, tag] of text.matchAll(/\[feature: ([a-z-]+)\]/g)) {
+        assert.equal(tag, 'infrastructure', `${file} ships a phantom feature tag "${tag}"`);
+      }
+    }
+  });
+
+  test('the hook config reader is present for hooks and statusline', () => {
+    // Every other hook and the statusline require it; shipping without it
+    // breaks all of them at once.
+    const reader = join(PAYLOAD_DIR, 'hooks', 'specflow-config.cjs');
+    assert.ok(statSync(reader).isFile());
+  });
+
+  test('destructive git commands are proposed, never handed over bare', () => {
+    // end-session shipped a fenced block that merged to the default branch,
+    // pushed it, and deleted the branch, with no confirmation anywhere near it.
+    // A session that went sideways ended exactly like one that went well.
+    //
+    // Checked near the command, not anywhere in the file: a whole-file search
+    // for "ask" matches "task" and passes on everything.
+    const DESTRUCTIVE = /^\s*git (push|merge|branch -d|branch -D|reset --hard)\b/;
+    const CONSENT = /\b(propose|proposes?|offer|offers?|confirm|decline|do not run|stop and ask|wait)\b/i;
+    const WINDOW = 15; // lines above the command
+
+    const offenders = [];
+    for (const name of GLOBAL_SKILLS) {
+      const lines = skillText(name).split('\n');
+      lines.forEach((line, i) => {
+        if (!DESTRUCTIVE.test(line)) return;
+        const preceding = lines.slice(Math.max(0, i - WINDOW), i).join('\n');
+        if (!CONSENT.test(preceding)) offenders.push(`${name}:${i + 1} ${line.trim()}`);
+      });
+    }
+    assert.deepEqual(offenders, [],
+      'a destructive git command with no consent language in the preceding lines');
+  });
+
+  test('the session baseline has somewhere to live', () => {
+    // start-session records it and end-session compares against it. Held in
+    // conversation only, it evaporates on the /clear that plan-session itself
+    // recommends -- and end-session then reads as though a comparison happened.
+    const start = skillText('start-session');
+    const end = skillText('end-session');
+    assert.match(start, /\.specflow\/\.session-baseline\.md/, 'start-session must write the baseline down');
+    assert.match(end, /\.specflow\/\.session-baseline\.md/, 'end-session must read it');
+    assert.match(end, /does not exist/i, 'end-session must handle the file being absent');
+  });
+
+  test('no skill hardcodes main or master as the default branch', () => {
+    const offenders = [];
+    for (const name of GLOBAL_SKILLS) {
+      for (const line of skillText(name).split('\n')) {
+        // Allowed when explicitly warning against the assumption.
+        if (/\bgit (checkout|merge|pull|push)[^\n]*\b(main|master)\b/.test(line) && !/do not|never|rather than/i.test(line)) {
+          offenders.push(`${name}: ${line.trim()}`);
+        }
+      }
+    }
+    assert.deepEqual(offenders, [], 'read Git Workflow > Default Branch instead');
+  });
+});

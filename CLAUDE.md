@@ -9,7 +9,7 @@
 **SpecFlow** is a lightweight, spec-driven framework for AI-assisted software development. It provides a structured approach to documentation and session-based workflows that helps developers maintain context across AI-assisted coding sessions.
 
 **Mode**: Adoption (improving an existing framework)
-**Tech Stack**: Markdown templates with Handlebars variables
+**Tech Stack**: Markdown skills + a small Node CLI. No templating engine.
 **Repository**: https://github.com/jurebordon/specflow
 
 ---
@@ -19,45 +19,43 @@
 ### Directory Structure
 
 ```
-ai-vibe-framework/
-├── cli/                   # NPM package for `npx specflow-ai init/update`
-│   ├── src/
-│   │   ├── index.js       # CLI entry point
-│   │   ├── init.js        # `specflow-ai init` command
-│   │   ├── update.js      # `specflow-ai update` command
-│   │   ├── config.js      # Shared config utilities (deriveGitVariables)
-│   │   ├── detect.js      # Tech stack detection (used by update)
-│   │   └── questions.js   # Interactive prompts
+specflow/
+├── cli/                        # NPM package — a machine installer, nothing more
+│   ├── bin/specflow.js         # CLI entry point (install / update)
+│   ├── src/install.js          # the only command; places skills in ~/.claude/skills/
+│   ├── scripts/bundle-templates.js  # copies templates+configuration into the package
 │   └── package.json
-├── .claude/
-│   └── skills/            # Agent Skills (agentskills.io standard)
-│       ├── plan-session/SKILL.md
-│       ├── start-session/SKILL.md
-│       ├── end-session/SKILL.md
-│       └── ...
-├── prompts/
-│   └── INIT.md            # Main initialization prompt
 ├── templates/
-│   ├── CLAUDE.md.template # Project context template
-│   ├── skills/            # Skill templates (Agent Skills standard)
-│   ├── docs/              # Documentation templates
-│   ├── hooks/             # Hook script templates
-│   ├── rules/             # Coding rule templates
-│   ├── settings/          # Settings templates (hooks.json, statusline.js)
-│   ├── feature_docs/
-│   │   └── SPEC.md.template
-│   └── gitignore-specflow.template
+│   ├── global-skills/          # The six machine-installed skills. Ship VERBATIM.
+│   │   ├── specflow-init/SKILL.md
+│   │   ├── plan-session/SKILL.md
+│   │   ├── start-session/SKILL.md
+│   │   ├── end-session/SKILL.md
+│   │   ├── new-feature/SKILL.md
+│   │   └── plan-autonomous-batch/SKILL.md
+│   ├── payload/                # Installed INTO projects by specflow-init. Verbatim.
+│   │   ├── hooks/              #   incl. specflow-config.cjs, the shared config reader
+│   │   ├── rules/              #   reference the config; never bake values in
+│   │   ├── settings/
+│   │   ├── doc-templates/      #   skeletons the agent fills with real content
+│   │   └── migrate-config.js   #   deterministic schema 0 -> 1 transform
+│   ├── specflow/config.md.template
+│   ├── CLAUDE.md.template
+│   └── feature_docs/SPEC.md.template
 ├── configuration/
-│   └── TECH_STACKS.md     # Tech detection reference
-├── docs_specflow/         # SpecFlow's own documentation (gitignored)
-│   ├── .specflow-config.md
-│   ├── ROADMAP.md
-│   ├── SESSION_LOG.md
-│   ├── ADR.md
-│   └── feature_docs/
+│   ├── CONFIG_SCHEMA.md        # authoritative schema for .specflow/config.md
+│   ├── migrations/manifest.json # machine-readable, gates migration
+│   └── TECH_STACKS.md
+├── core/
+│   ├── CONFIG_CONTRACT.md      # the block every global skill embeds
+│   └── PRINCIPLES.md, DOCUMENTATION.md, SESSIONS.md
+├── prompts/INIT.md             # superseded; kept as the schema 0 shape reference
+├── MIGRATION.md                # 1.x -> 2.0 upgrade guide
 └── README.md
-
 ```
+
+**`docs_specflow/`** holds SpecFlow's own operational docs and is gitignored, so
+it will not be present in a fresh clone.
 
 ---
 
@@ -69,34 +67,70 @@ ai-vibe-framework/
 - Use `[feature: infrastructure]` for project-wide work
 - Automatic feature detection from branch names
 
-### 2. Template System
-- Handlebars syntax: `{{VARIABLE}}`, `{{#if CONDITION}}`, `{{#each ARRAY}}`
-- Variables defined in `.specflow-config.md` or detected automatically
-- Tech-adaptive commands (TEST_COMMAND, BUILD_COMMAND, LINT_COMMAND)
+### 2. No Build-Time Substitution
 
-### 3. Three-Layer Documentation
+Handlebars templating is **gone** from everything that ships. Skills and payload
+files are copied byte-for-byte and resolve project facts at runtime from
+`.specflow/config.md`.
+
+The only remaining `{{...}}` in `templates/global-skills/` are prompt-level
+markers the agent fills per invocation — `{{FEATURE_NAME}}`, `{{TICKET_ID}}`,
+`{{TASK_TITLE}}` — and runtime values it reads fresh each time,
+`{{CURRENT_BRANCH}}` and `{{CURRENT_DATE}}`. Anything else is a bug.
+
+`templates/payload/` must contain no `{{` at all.
+
+### 3. Two Version Numbers
+
+- `specflow_version` moves with every release. Informational only.
+- `config_schema` moves only when the config's **shape** changes, and is what
+  gates migration. Gating on the package version would trigger a migration
+  check on releases that changed nothing structural.
+
+### 4. Three-Layer Documentation
 - **Strategic**: VISION.md, ADR.md (rarely changes)
 - **Tactical**: OVERVIEW.md, ROADMAP.md, WORKFLOW.md (evolves with project)
 - **Operational**: SESSION_LOG.md (append-only journal)
 
-### 4. Session-Based Workflow
+### 5. Session-Based Workflow
+
+The six machine-installed skills:
+
 ```
-/plan-session   → Read context, filter tasks, create plan
-/start-session  → Verify environment, begin implementation
-/end-session    → Test, document, commit, merge/PR
-/verify         → Validate docs consistency and project health
+specflow-init          → Set up or migrate a project; the only writer of config
+plan-session           → Read context, filter tasks, create plan
+start-session          → Verify environment, record baseline, implement
+end-session            → Verify, document, commit, merge/PR
+new-feature            → Create a feature SPEC and tagged tasks
+plan-autonomous-batch  → Clear a whole feature tag hands-off, through review gates
 ```
+
+`explore-project`, `new-worktree`, `pivot-session` and `verify` are **not** part
+of the 2.0 set and are not planned. They saw no real use, and Claude Code's own
+worktree support supersedes `new-worktree`.
 
 ---
 
 ## Development Guidelines
 
-### When Working on Templates
-1. **Read existing templates** to understand patterns
-2. **Test with sample variables** to ensure correct rendering
-3. **Keep instructions concise** - AI agents should move fast
-4. **Use consistent formatting** - Markdown with clear headings
-5. **Document variables** in comments or examples
+### When Working on Skills
+1. **Read the existing skills** — they share a deliberate structure
+2. **Never reintroduce a project value.** If a skill needs a fact, add it to
+   `configuration/CONFIG_SCHEMA.md` and have the skill read it
+3. **Update `core/CONFIG_CONTRACT.md` first**, then propagate the block to every
+   skill that carries it — it is duplicated on purpose, so it drifts easily
+4. **Reference other skills by named anchor**, never by step number; step
+   numbers rot the moment either skill is edited
+5. **Keep instructions concise** — agents should move fast
+
+### When Changing the Config Shape
+1. Update `configuration/CONFIG_SCHEMA.md`
+2. Add a migration entry to `configuration/migrations/manifest.json`, marking
+   each change `auto` or `decision`
+3. Bump `config_schema` in the schema doc, the manifest, `cli/src/install.js`
+   and every skill's frontmatter
+4. Teach `templates/payload/migrate-config.js` the transform
+5. Verify against copies of real legacy configs — never the originals
 
 ### When Working on Prompts
 1. **Be directive** - Tell AI what to do, not just what to consider
@@ -150,41 +184,88 @@ git push origin main
 
 ## Testing & Validation
 
-SpecFlow has no automated tests. Manual validation checklist:
+```bash
+npm test           # node --test test/*.test.mjs — no dependencies
+npm run test:watch
+```
 
-- [ ] Template syntax is valid Handlebars
-- [ ] Variable references match schema in TECH_STACKS.md
-- [ ] Markdown renders correctly
-- [ ] Examples are realistic and clear
-- [ ] Documentation is up to date
+Four suites, all hermetic: each works in a temp directory with `HOME`
+redirected, and none reads a real project on this machine. That matters — an
+earlier manual check depended on a sibling repository that was renamed
+mid-session, and a check that silently changes what it covers is not a check.
+
+| Suite | Covers |
+|---|---|
+| `install.test.mjs` | layout, verbatim copy, receipt fingerprints, ownership refusal, dry run, **rollback under an injected swap failure** |
+| `migrate-config.test.mjs` | schema 0 → 1 transforms, the mixed-stack shape, prose rejection, round trip back through the hook reader |
+| `hooks.test.mjs` | anchor resolution, path traversal, frozen-file blocking, formatter routing, shell injection, ESM-project loading |
+| `invariants.test.mjs` | the rules below, mechanically |
+
+`install()` accepts `__failAfterSwaps` purely so rollback is testable. The swap
+deliberately renames rather than deletes, so no arrangement of real filesystem
+state can break it — without that seam, the one path whose entire job is
+recovering from failure would ship untested.
+
+**Hooks must stay `.cjs`.** They are copied into arbitrary user projects, and a
+project with `"type": "module"` would make Node treat a `.js` copy as ESM,
+breaking `require` and crashing every hook — including `doc-file-blocker`,
+which then silently stops protecting frozen files.
+
+**Write the failing test first when fixing a bug here.** Every guard in
+`invariants.test.mjs` exists because something was actually broken, and each was
+confirmed to fail against the broken version before being kept.
+
+Checklist for what the suite cannot check:
+
+- [ ] `templates/global-skills/` contains **no** project-config placeholders.
+      Only `{{FEATURE_NAME}}`, `{{TICKET_ID}}`, `{{TASK_TITLE}}` (session
+      arguments) and `{{CURRENT_BRANCH}}`, `{{CURRENT_DATE}}` (runtime).
+- [ ] `templates/payload/` contains no Handlebars at all — it ships verbatim.
+- [ ] `configuration/migrations/manifest.json` parses, and every `decision`
+      referenced by an added key exists in `decisions`.
+- [ ] The manifest still covers every key in real legacy configs.
+- [ ] Hook functions are total — a malformed config must never break a session.
+- [ ] Consumer projects are treated as **read only**. Copy to `/tmp` to test.
 
 ---
 
-## Current Focus
+## Invariants
 
-See `docs_specflow/ROADMAP.md` for current priorities. Key ongoing work:
+Break these and the design stops holding:
 
-1. **CLI Simplification** - CLI scaffolds with placeholders, `/init-specflow` detects tech stack and updates command files directly
-2. **Documentation audit** - Ensure docs reflect the simplified two-step flow
-3. **CUSTOM.md extension** - User-extensible project context file for project-specific customizations
+1. **One source of project facts.** Skills read `.specflow/config.md` and
+   nothing else. If a skill re-detects something, that logic belongs in
+   `specflow-init`.
+2. **Skills ship verbatim.** No build-time substitution. A value baked into a
+   skill is a value that goes stale in every project that installed it.
+3. **Never lower `Config Schema`.** It destroys the mismatch signal permanently.
+4. **A no-op writes nothing.** The config is git-tracked; restamping it produces
+   churn and merge conflicts on shared repos.
+5. **Commands are lists.** Every entry, every time. This is the bug the whole
+   schema change exists to fix.
+6. **Known-failure attribution requires reading the message.** Matching on test
+   path alone has already let a real regression through.
 
 ---
 
 ## Key Files to Know
 
-- `cli/src/init.js` - CLI `specflow-ai init` command (scaffolds with placeholders)
-- `cli/src/update.js` - CLI `specflow-ai update` command (re-renders templates)
-- `cli/src/config.js` - Shared utilities (deriveGitVariables)
-- `prompts/INIT.md` - AI `/init-specflow` command (detects tech stack, populates config)
-- `templates/skills/plan-session/SKILL.md.template` - Core workflow skill
-- `docs_specflow/ROADMAP.md` - Current tasks (gitignored, not templates)
-- `docs_specflow/ADR.md` - Architecture decisions for SpecFlow itself
-- `configuration/TECH_STACKS.md` - Tech detection patterns for AI
+- `cli/src/install.js` — the entire CLI: places skills, records a receipt
+- `templates/global-skills/specflow-init/SKILL.md` — owns all project facts
+- `templates/global-skills/plan-autonomous-batch/SKILL.md` — gated batch runner
+- `core/CONFIG_CONTRACT.md` — canonical block embedded in every global skill;
+  edit here, then propagate
+- `configuration/CONFIG_SCHEMA.md` — authoritative config schema
+- `configuration/migrations/manifest.json` — gates migration; update it whenever
+  the schema shape changes
+- `templates/payload/hooks/specflow-config.cjs` — the reader hooks parse with
+- `templates/payload/migrate-config.js` — deterministic 0 → 1 transform
 
 ---
 
 ## Questions?
 
-Check `docs_specflow/OVERVIEW.md` for system architecture or `README.md` for user-facing documentation.
+`README.md` for the user-facing story, `MIGRATION.md` for the 1.x upgrade path,
+`configuration/CONFIG_SCHEMA.md` for what a config may contain.
 
-For session planning, always start with `/plan-session` to get proper context and task selection.
+For session planning, start with `plan-session`.

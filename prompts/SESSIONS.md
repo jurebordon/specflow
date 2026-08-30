@@ -10,10 +10,10 @@
 Read CLAUDE.md to get project context.
 
 Then check the current state:
-- docs_specflow/ROADMAP.md - for current and upcoming tasks
-- docs_specflow/SESSION_LOG.md (last 3 entries) - for recent context
-- docs_specflow/OVERVIEW.md - for system understanding
-- docs_specflow/ADR.md - for relevant decisions
+- docs/ROADMAP.md - for current and upcoming tasks
+- docs/SESSION_LOG.md (last 3 entries) - for recent context
+- docs/OVERVIEW.md - for system understanding
+- docs/ADR.md - for relevant decisions
 
 Create a session plan including:
 - Session goal: ONE task from ROADMAP (Now or top of Next)
@@ -74,18 +74,18 @@ If tests fail, fix them before proceeding.
 ## 2. Update Documentation
 
 ### Always Update:
-- docs_specflow/ROADMAP.md
+- docs/ROADMAP.md
   - Mark completed task as done (move to Done section)
   - Adjust Now/Next if priorities changed
   - Add any new blockers discovered
 
-- docs_specflow/SESSION_LOG.md
+- docs/SESSION_LOG.md
   - Prepend new entry with today's date
   - Include: role, task, files changed, summary, decisions, next steps
 
 ### Update If Changed:
-- docs_specflow/OVERVIEW.md - if architecture or system description changed
-- docs_specflow/ADR.md - if significant technical decision was made (append only)
+- docs/OVERVIEW.md - if architecture or system description changed
+- docs/ADR.md - if significant technical decision was made (append only)
 
 ## 3. Final Commit
 Ensure all changes are committed:
@@ -197,10 +197,10 @@ This is a pivot session to reassess project direction.
 ## 1. Review Current State
 
 Check these documents:
-- docs_specflow/ROADMAP.md - Is this still accurate?
-- docs_specflow/VISION.md - Is the direction still valid?
-- docs_specflow/SESSION_LOG.md (last 5-10 entries) - What patterns emerge?
-- docs_specflow/ADR.md - Any decisions that need revisiting?
+- docs/ROADMAP.md - Is this still accurate?
+- docs/VISION.md - Is the direction still valid?
+- docs/SESSION_LOG.md (last 5-10 entries) - What patterns emerge?
+- docs/ADR.md - Any decisions that need revisiting?
 
 ## 2. Identify Drift
 

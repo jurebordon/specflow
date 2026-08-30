@@ -11,8 +11,8 @@ Common questions and troubleshooting for SpecFlow.
 | Aspect | SpecFlow | spec-kit |
 |--------|----------|----------|
 | Focus | Documentation + workflow | Specification → code |
-| Installation | CLI (`npx specflow-ai init`) or prompts | CLI tool required |
-| Structure | `docs_specflow/` + `.claude/` | `.specify/` folder |
+| Installation | `specflow install` once per machine, then the `specflow-init` skill | CLI tool required |
+| Structure | `.specflow/config.md` + your docs path + `.claude/` | `.specify/` folder |
 | Workflow | Session-based | Phase-based |
 | Flexibility | Adapts to existing projects | Greenfield focused |
 
@@ -27,7 +27,7 @@ No. SpecFlow works with any AI assistant:
 - GitHub Copilot
 - Any LLM that can follow prompts
 
-The `.claude/skills/` folder is named for convenience but the prompts work anywhere.
+Skills install to `~/.claude/skills/`, but they are plain markdown and work with any Agent Skills-compatible assistant.
 
 ### Can I use SpecFlow with an existing project?
 
@@ -44,6 +44,37 @@ Add more only when you need it. For solo projects, three files might be enough f
 
 ---
 
+### Why aren't skills in my project any more?
+
+Because a skill in your project is a frozen copy. Improving a skill meant
+reinstalling it into every repo before the improvement took effect, and
+`specflow update` overwrote whatever you had edited locally.
+
+Skills now install once to `~/.claude/skills/` and read project facts from
+`.specflow/config.md` at runtime. One upgrade reaches every project, and
+updates cannot touch your repo.
+
+The trade-off: a teammate cloning your repo gets no skills until they run
+`specflow install` themselves.
+
+### A skill says my project isn't initialised. Why won't it just guess?
+
+Because guessing is how you get silent corruption. A skill that assumed
+`docs/ROADMAP.md` in a project that keeps tasks somewhere else would write to a
+file nobody reads, and report success.
+
+Run `specflow-init`. It takes a minute and every skill works afterwards.
+
+### Can I still customise a skill?
+
+Yes, but understand the scope. Editing `~/.claude/skills/plan-session/SKILL.md`
+changes it for every project on your machine, and `specflow update` will replace
+it.
+
+For project-specific behaviour use `<docs>/CUSTOM.md`, which skills read, or
+`.claude/rules/`. For a genuinely different workflow, copy the skill under a new
+name — `specflow install` will not touch a skill it did not write.
+
 ## Setup Questions
 
 ### The AI generated too much documentation. What do I do?
@@ -52,7 +83,7 @@ Delete what you don't need. SpecFlow suggests a structure, but you own it. Keep 
 
 ```bash
 # Keep only essentials for a simple project
-rm docs_specflow/VISION.md docs_specflow/ADR.md
+rm docs/VISION.md docs/ADR.md
 ```
 
 You can always add them back later.
@@ -61,12 +92,12 @@ You can always add them back later.
 
 Yes. The suggested structure is:
 ```
-docs_specflow/        # Documentation
-.claude/skills/       # Session skills (Agent Skills standard)
+docs/                 # Documentation (path is your choice)
+.specflow/config.md   # Project facts, read by every skill
 ```
 
 But you can:
-- Put everything in `docs_specflow/`
+- Put everything under one docs path
 - Skip folders entirely
 
 Just update references in CLAUDE.md.
@@ -143,7 +174,7 @@ Customize the end-session command. The three workflows are:
 2. **PR Review** - Create PR, wait for approval
 3. **CI/CD Gated** - Create MR, no local merge
 
-If yours is different, edit `.claude/skills/end-session/SKILL.md` to match your actual process.
+If yours is different, record it in `.specflow/config.md` under `## Git Workflow`. The skill reads it from there — do not edit the skill, which is shared by every project on your machine.
 
 ### I accidentally merged locally when I shouldn't have
 
@@ -240,10 +271,11 @@ Or explicitly tell it what changed since the last session.
 ### Generated commands don't match my project
 
 Skills are templates. Edit them directly:
-- `.claude/skills/start-session/SKILL.md`
-- `.claude/skills/end-session/SKILL.md`
+- `.specflow/config.md` under `## Commands`
 
-After running `/init-specflow`, skills are populated with your detected commands. Edit them directly if needed.
+Commands live in the config, not in the skills. Fix them there and every skill picks the change up immediately.
+
+Remember each category is a **list**: a repo with a backend and a frontend needs both entries. A single command silently skips half your suite.
 
 ### I'm getting merge conflicts in documentation
 

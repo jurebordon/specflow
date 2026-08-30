@@ -57,7 +57,7 @@ The feature docs live in the worktree and travel with the branch.
 ~/projects/
 ├── my-app/                    # Main worktree (main branch)
 │   ├── CLAUDE.md
-│   ├── docs_specflow/
+│   ├── docs/
 │   │   ├── ROADMAP.md         # Central - tasks tagged [feature: name]
 │   │   ├── SESSION_LOG.md     # Central - sessions tagged [feature-name]
 │   │   └── feature_docs/
@@ -67,7 +67,7 @@ The feature docs live in the worktree and travel with the branch.
 │
 ├── my-app-user-auth/          # Worktree (feat/user-auth)
 │   ├── CLAUDE.md
-│   ├── docs_specflow/         # Same structure, diverged content
+│   ├── docs/         # Same structure, diverged content
 │   │   ├── ROADMAP.md
 │   │   ├── SESSION_LOG.md
 │   │   └── feature_docs/
@@ -75,7 +75,7 @@ The feature docs live in the worktree and travel with the branch.
 │
 └── my-app-api-v2/             # Worktree (feat/api-v2)
     ├── CLAUDE.md
-    ├── docs_specflow/
+    ├── docs/
     └── src/
 ```
 
@@ -155,7 +155,7 @@ Simply change directories:
 cd ../project-feature-b
 
 # Check context
-cat docs_specflow/ROADMAP.md
+cat docs/ROADMAP.md
 ```
 
 No stashing, no branch switching, no lost context.
@@ -178,8 +178,8 @@ No stashing, no branch switching, no lost context.
 ### Feature Documentation
 
 When feature merges to main:
-- `docs_specflow/ROADMAP.md` and `SESSION_LOG.md` merge with feature-tagged entries
-- `docs_specflow/feature_docs/[feature-name]/SPEC.md` merges in (if created)
+- `docs/ROADMAP.md` and `SESSION_LOG.md` merge with feature-tagged entries
+- `docs/feature_docs/[feature-name]/SPEC.md` merges in (if created)
 - Feature-prefixed session entries avoid merge conflicts
 
 ### Handling Conflicts
@@ -193,8 +193,8 @@ If conflicts occur in docs:
 
 The main branch now has:
 - Completed feature code
-- Feature SPEC in `docs_specflow/feature_docs/[feature-name]/SPEC.md`
-- Session history with feature prefix in `docs_specflow/SESSION_LOG.md`
+- Feature SPEC in `docs/feature_docs/[feature-name]/SPEC.md`
+- Session history with feature prefix in `docs/SESSION_LOG.md`
 
 ---
 
